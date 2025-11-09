@@ -1,0 +1,62 @@
+import ForYouFeed from '@/components/home/ForYouFeed';
+import HotFeed from '@/components/home/HotFeed';
+import RandomFeed from '@/components/home/RandomFeed';
+import React, { useState } from 'react';
+import { useWindowDimensions, View } from 'react-native';
+import { useTheme } from 'react-native-paper';
+import { SceneRendererProps, TabBar, TabView } from 'react-native-tab-view';
+
+export default function HomeScreen() {
+  const theme = useTheme();
+  const layout = useWindowDimensions();
+  
+  const [index, setIndex] = useState(0);
+  const [routes] = useState([
+    { key: 'for-you', title: 'For You' },
+    { key: 'hot', title: 'Hot' },
+    { key: 'random', title: 'Random' },
+  ]);
+
+  // Custom renderScene to preserve component instances and prevent scroll position loss
+  const renderScene = ({ route }: { route: { key: string } }) => {
+    switch (route.key) {
+      case 'for-you':
+        return <ForYouFeed />;
+      case 'hot':
+        return (
+          <HotFeed />
+        );
+      case 'random':
+        return (
+          <RandomFeed />
+        );
+      default:
+        return null;
+    }
+  };
+
+  const renderTabBar = (props: SceneRendererProps & { navigationState: any }) => (
+    <TabBar
+      {...props}
+      indicatorStyle={{ backgroundColor: theme.colors.primary }}
+      style={{ backgroundColor: theme.colors.surface, elevation: 0 }}
+      tabStyle={{ backgroundColor: theme.colors.surface }}
+      activeColor={theme.colors.primary}
+      inactiveColor={theme.colors.onSurfaceVariant}
+      scrollEnabled={true}
+    />
+  );
+
+  return (
+    <View style={{ flex: 1, backgroundColor: theme.colors.surface }}>
+      <TabView
+        navigationState={{ index, routes }}
+        renderScene={renderScene}
+        onIndexChange={setIndex}
+        initialLayout={{ width: layout.width }}
+        renderTabBar={renderTabBar}
+        style={{ backgroundColor: theme.colors.surface, paddingTop: 52 }}
+      />
+    </View>
+  );
+}

@@ -1,0 +1,31 @@
+/* Basic styles for React Native Web */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+#root {
+  height: 100vh;
+  width: 100vw;
+}
+
+/* React Native Web specific styles */
+.rn-view {
+  box-sizing: border-box;
+}
+
+/* Ensure proper flex behavior */
+.rn-flex {
+  display: flex;
+}
+
+/* Text rendering */
+.rn-text {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

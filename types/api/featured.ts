@@ -1,0 +1,174 @@
+/**
+ * Type definitions for Wikipedia featured content APIs
+ */
+
+import { Article } from './articles';
+import { ImageThumbnail } from './base';
+
+
+/**
+ * Featured picture for UI components
+ */
+export interface FeaturedPicture {
+  title: string;
+  image: {
+    source: string;
+    width: number;
+    height: number;
+  };
+  description: {
+    html: string;
+    text: string;
+    lang: string;
+  };
+}
+
+/**
+ * Most Read interfaces
+ */
+export interface MostReadArticle extends Article {
+  rank: number;
+  view_history: {
+    date: string;
+    views: number;
+  }[];
+}
+
+export interface MostRead {
+  date: string;
+  articles: MostReadArticle[];
+}
+
+/**
+ * Today's Featured Article interface
+ */
+export interface TodayFeaturedArticle {
+  type: string;
+  title: string;
+  displaytitle: string;
+  description: string;
+  thumbnail?: ImageThumbnail;
+}
+
+/**
+ * News interfaces
+ */
+export interface NewsLink {
+  type: string;
+  title: string;
+  displaytitle: string;
+  namespace: {
+    id: number;
+    text: string;
+  };
+  wikibase_item: string;
+  titles: {
+    canonical: string;
+    normalized: string;
+    display: string;
+  };
+  pageid: number;
+}
+
+export interface NewsItem {
+  links: NewsLink[];
+}
+
+/**
+ * Did You Know interface
+ */
+export interface DidYouKnowItem {
+  html: string;
+}
+
+/**
+ * Image of the Day interface
+ */
+export interface ImageOfTheDay {
+  title: string;
+  thumbnail: {
+    source: string;
+    width: number;
+    height: number;
+  };
+  image: ImageThumbnail[];
+  file_page: string;
+  artist: {
+    html: string;
+    text: string;
+  };
+  credit: {
+    html: string;
+    text: string;
+  };
+  license: {
+    type: string;
+    code: string;
+    url: string;
+  };
+  description: {
+    html: string;
+    text: string;
+    lang: string;
+  };
+  wb_entity_id: string;
+  structured?: {
+    captions: Record<string, string>;
+  };
+}
+
+/**
+ * On This Day interfaces
+ */
+export interface OnThisDayPage {
+  type: string;
+  title: string;
+  displaytitle: string;
+  namespace: {
+    id: number;
+    text: string;
+  };
+  wikibase_item: string;
+  titles: {
+    canonical: string;
+    normalized: string;
+    display: string;
+  };
+  pageid: number;
+}
+
+export interface OnThisDayItem {
+  text: string;
+  pages: OnThisDayPage[];
+}
+
+export interface FeaturedContentContextType {
+  featuredContent: FeaturedContent | null;
+  trendingCategories: string[];
+  isLoading: boolean;
+  error: string | null;
+  refreshFeaturedContent: () => Promise<void>;
+}
+
+/**
+ * Represents the Wikimedia Featured Feed API response
+ */
+export interface FeaturedContent {
+  tfa: Article;
+  news: NewsItem[];
+  dyk: DidYouKnowItem[];
+  onthisday: OnThisDayItem[];
+  image: FeaturedPicture;
+  mostread?: {
+    date: string;
+    articles: Article[];
+  };
+}
+
+/**
+ * Response from fetchFeaturedContent API
+ */
+export interface FeaturedContentResponse {
+  data: FeaturedContent;
+  error?: string;
+}
