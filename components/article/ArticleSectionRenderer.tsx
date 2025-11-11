@@ -4,11 +4,8 @@ import React, { useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import { List, Text, useTheme } from 'react-native-paper';
 import { WtfArticleListItem, WtfArticleSection } from '../../types/third-party/wtf-article';
-import CitationRenderer from './CitationRenderer';
-import InlineCitationRenderer from './InlineCitationRenderer';
 import MediaPlayer from './MediaPlayer';
 import TextWithLinksRenderer from './TextWithLinksRenderer';
-import WorksRenderer from './WorksRenderer';
 
 interface ArticleSectionRendererProps {
   section: WtfArticleSection;
@@ -50,7 +47,7 @@ const InfoboxRenderer = React.memo(function InfoboxRenderer({
       }}>
         {Object.entries(infoboxes[0]).map(([key, value]) => {
           // Skip the 'type' property, image-related properties, and any non-object values
-          const skipKeys = ['type', 'image', 'alt', 'caption'];
+          const skipKeys = ['type', 'image', 'alt', 'caption', 'image alt', 'image caption'];
           if (skipKeys.includes(key) || typeof value !== 'object' || value === null || !(value as any).text) {
             return null;
           }
@@ -118,13 +115,11 @@ const InfoboxRenderer = React.memo(function InfoboxRenderer({
   );
 });
 
-// Component to render paragraphs with optional citations
+// Component to render paragraphs
 const ParagraphsRenderer = React.memo(function ParagraphsRenderer({ 
-  paragraphs, 
-  templates 
+  paragraphs 
 }: { 
   paragraphs: any[];
-  templates: any[];
 }) {
   if (!paragraphs || paragraphs.length === 0) {
     return null;
@@ -151,10 +146,6 @@ const ParagraphsRenderer = React.memo(function ParagraphsRenderer({
               />
             ))}
           </Text>
-          {/* Show inline citations after the paragraph if this section has citation templates */}
-          {templates.length > 0 && paragraphs && i === paragraphs.length - 1 && (
-            <InlineCitationRenderer templates={templates} />
-          )}
         </View>
       ))}
     </>
@@ -203,7 +194,6 @@ const ArticleSectionRenderer = React.memo(function ArticleSectionRenderer({
   const hasContent = hasImages || hasParagraphs;
 
   const infoboxes = section.infoboxes || [];
-  const templates = section.templates || [];
   const paragraphs = section.paragraphs || [];
   const lists = section.lists || [];
 
@@ -222,8 +212,7 @@ const ArticleSectionRenderer = React.memo(function ArticleSectionRenderer({
           </TouchableOpacity>
         )}
         <InfoboxRenderer infoboxes={infoboxes} />
-        <ParagraphsRenderer paragraphs={paragraphs} templates={templates} />
-        <CitationRenderer templates={templates} />
+        <ParagraphsRenderer paragraphs={paragraphs} />
       </>
     );
   }
@@ -245,16 +234,11 @@ const ArticleSectionRenderer = React.memo(function ArticleSectionRenderer({
           onImagePress={onImagePress}
         />
       )}
-      <ParagraphsRenderer 
-        paragraphs={paragraphs} 
-        templates={templates} 
-      />
+      <ParagraphsRenderer paragraphs={paragraphs} />
       <ListsRenderer 
         lists={lists} 
         sectionTitle={section.title.trim()} 
       />
-      <CitationRenderer templates={templates} />
-      <WorksRenderer references={section.references || []} />
     </List.Accordion>
   );
 });

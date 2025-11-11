@@ -30,7 +30,7 @@ export default function FeaturedArticleCard() {
         />
       )}
       <Card.Content>
-        <HtmlRenderer html={article.extract_html || ''} maxLines={6} style={{paddingTop: 6}}/>
+        <HtmlRenderer html={article.extract_html || ''} maxLines={6} style={{paddingTop: 12}}/>
       </Card.Content>
     </Card>
   );

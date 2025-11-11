@@ -46,7 +46,7 @@ function CarouselItem({ item, itemWidth, theme }: any) {
         if (title) {
           const thumb = await fetchArticleThumbnail(title);
           if (thumb) {
-            setThumbnail(thumb);
+            setThumbnail(thumb.source);
             return; // Important: return after setting thumbnail
           }
         }
@@ -81,32 +81,25 @@ function CarouselItem({ item, itemWidth, theme }: any) {
             overflow: 'hidden',
           }}
         >
-          {thumbnail && typeof thumbnail === 'string' && (
-            <ImageBackground
-              source={{ uri: thumbnail }}
-              contentFit="cover"
-              style={{ width: '100%', height: 250 }}
-            >
-              {/* Semi-transparent overlay covering entire image for better text contrast */}
-              <View style={{ 
-                position: 'absolute', 
-                top: 0,
-                bottom: 0,
-                left: 0, 
-                right: 0, 
-                backgroundColor: 'rgba(0, 0, 0, 0.4)',
-                justifyContent: 'flex-end',
-                padding: 16,
-              }}>
-                <HtmlRenderer html={description} style={{color: 'white'}} />
-              </View>
-            </ImageBackground>
-          )}
-          {(!thumbnail || typeof thumbnail !== 'string') && (
-            <View style={{ flex: 1, justifyContent: 'flex-end', padding: 16 }}>
-              <HtmlRenderer html={description} />
+          <ImageBackground
+            source={{ uri: thumbnail || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48L3N2Zz4=' }}
+            contentFit="cover"
+            style={{ width: '100%', height: 250 }}
+          >
+            {/* Semi-transparent overlay covering entire image for better text contrast */}
+            <View style={{ 
+              position: 'absolute', 
+              top: 0,
+              bottom: 0,
+              left: 0, 
+              right: 0, 
+              backgroundColor: thumbnail ? 'rgba(0, 0, 0, 0.7)' : 'transparent',
+              justifyContent: 'flex-end',
+              padding: 16,
+            }}>
+              <HtmlRenderer html={description} style={{color: 'white'}} />
             </View>
-          )}
+          </ImageBackground>
         </Card>
       </View>
     </>

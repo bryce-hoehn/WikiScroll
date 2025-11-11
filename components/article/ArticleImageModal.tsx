@@ -1,8 +1,7 @@
 import { Image } from 'expo-image';
 import React from 'react';
-import { Modal, TouchableOpacity } from 'react-native';
+import { Modal, TouchableOpacity, View } from 'react-native';
 import { Appbar } from 'react-native-paper';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface ArticleImageModalProps {
   visible: boolean;
@@ -22,9 +21,17 @@ export default function ArticleImageModal({
       transparent={true}
       animationType="fade"
       onRequestClose={onClose}
+      statusBarTranslucent={true}
     >
-      <SafeAreaView style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.9)' }}>
-        <Appbar.Header style={{ backgroundColor: 'transparent' }}>
+      <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.9)' }}>
+        <Appbar.Header 
+          style={{ 
+            backgroundColor: 'transparent',
+            marginTop: 0,
+            paddingTop: 0,
+            elevation: 0,
+          }}
+        >
           <Appbar.Action 
             icon="close" 
             onPress={onClose}
@@ -37,7 +44,12 @@ export default function ArticleImageModal({
         </Appbar.Header>
         
         <TouchableOpacity 
-          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+          style={{ 
+            flex: 1, 
+            justifyContent: 'center', 
+            alignItems: 'center',
+            marginTop: -56, // Compensate for Appbar height
+          }}
           onPress={onClose}
           activeOpacity={1}
         >
@@ -52,7 +64,7 @@ export default function ArticleImageModal({
             />
           )}
         </TouchableOpacity>
-      </SafeAreaView>
+      </View>
     </Modal>
   );
 }

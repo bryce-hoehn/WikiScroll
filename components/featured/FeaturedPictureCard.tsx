@@ -28,7 +28,7 @@ export default function FeaturedImageCard() {
         />
       )}
       <Card.Content>
-        <HtmlRenderer html={img.description.html} maxLines={6} style={{paddingTop: 6}}/>
+        <HtmlRenderer html={img.description.html} maxLines={6} style={{paddingTop: 12}}/>
       </Card.Content>
     </Card>
   );

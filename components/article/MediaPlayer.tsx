@@ -19,7 +19,15 @@ export default function MediaPlayer({ media, onImagePress }: MediaPlayerProps) {
         <ResponsiveImage
           source={{ source: media.thumb || '', width: 400, height: 300 }} alt={media.caption || ''}
         />
-        <Text variant="labelSmall">{media.caption}</Text>
+        <Text 
+        variant="labelSmall"
+        style={{ 
+          textAlign: 'center',
+          paddingVertical: 8,
+        }}
+      >
+        {media.caption}
+      </Text>
       </TouchableOpacity> 
     ) 
 
@@ -29,7 +37,15 @@ export default function MediaPlayer({ media, onImagePress }: MediaPlayerProps) {
       <ResponsiveImage
         source={{ source: media.thumb || media.url || '', width: 400, height: 300 }} alt={media.caption || ''}
       />
-      <Text variant="labelSmall">{media.caption}</Text>
+      <Text 
+        variant="labelSmall"
+        style={{ 
+          textAlign: 'center',
+          paddingVertical: 8,
+        }}
+      >
+        {media.caption}
+      </Text>
     </TouchableOpacity> 
   ); 
 }

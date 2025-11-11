@@ -1,5 +1,5 @@
 import { SearchSuggestion } from '../../types/api';
-import { axiosInstance, WIKIPEDIA_API_CONFIG } from '../shared';
+import { restAxiosInstance, WIKIPEDIA_API_CONFIG } from '../shared';
 
 export const fetchSearchSuggestions = async (
   query: string
@@ -14,7 +14,7 @@ export const fetchSearchSuggestions = async (
     
     console.log('Search URL:', searchUrl);
 
-    const searchResponse = await axiosInstance.get(searchUrl);
+    const searchResponse = await restAxiosInstance.get(searchUrl);
     const searchData = searchResponse.data;
 
     console.log('Search data received:', searchData);
@@ -28,7 +28,7 @@ export const fetchSearchSuggestions = async (
     const pageIds = results.map((result: any) => result.pageid).join('|');
     const pageInfoUrl = `${WIKIPEDIA_API_CONFIG.BASE_URL}?action=query&pageids=${pageIds}&prop=pageimages|extracts|description&pithumbsize=200&exintro=1&explaintext=1&format=json&origin=*`;
     
-    const pageInfoResponse = await axiosInstance.get(pageInfoUrl);
+    const pageInfoResponse = await restAxiosInstance.get(pageInfoUrl);
     const pageInfoData = pageInfoResponse.data;
     const pages = pageInfoData.query?.pages || {};
 

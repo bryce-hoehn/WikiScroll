@@ -137,61 +137,54 @@ export default function SubCategories() {
           </Text>
         </View>
       ) : (
-        <FlatList
-          style={{ flex: 1 }}
-          data={[]}
-          ListHeaderComponent={
-            <>
-              {/* Subcategories Section */}
-              {subcategories.length > 0 && (
-                <View style={{ padding: 16 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-                    <Text 
-                      variant="titleMedium" 
-                      style={{ flex: 1 }}
-                    >
-                      Subcategories
-                    </Text>
-                    <TouchableOpacity onPress={() => setSubcategoriesHorizontal(!subcategoriesHorizontal)}>
-                      <Icon 
-                        source={subcategoriesHorizontal ? "chevron-down" : "chevron-up"} 
-                        size={24} 
-                        color={theme.colors.onSurface}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                  <FlatList
-                    data={subcategories}
-                    renderItem={({ item }) => renderSubcategoryItem(item)}
-                    keyExtractor={(item) => item.title}
-                    horizontal={subcategoriesHorizontal}
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{ paddingRight: 16 }}
+        <View style={{ flex: 1 }}>
+          {/* Subcategories Section */}
+          {subcategories.length > 0 && (
+            <View style={{ padding: 16 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+                <Text 
+                  variant="titleMedium" 
+                  style={{ flex: 1 }}
+                >
+                  Subcategories
+                </Text>
+                <TouchableOpacity onPress={() => setSubcategoriesHorizontal(!subcategoriesHorizontal)}>
+                  <Icon 
+                    source={subcategoriesHorizontal ? "chevron-down" : "chevron-up"} 
+                    size={24} 
+                    color={theme.colors.onSurface}
                   />
-                </View>
-              )}
+                </TouchableOpacity>
+              </View>
+              <FlatList
+                data={subcategories}
+                renderItem={({ item }) => renderSubcategoryItem(item)}
+                keyExtractor={(item) => item.title}
+                horizontal={subcategoriesHorizontal}
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingRight: 16 }}
+              />
+            </View>
+          )}
 
-              {/* Articles Section */}
-              {articles.length > 0 && (
-                <View style={{ padding: 16, paddingTop: subcategories.length > 0 ? 0 : 16 }}>
-                  <Text variant="titleMedium" style={{ marginBottom: 12 }}>
-                    Articles
-                  </Text>
-                  <FlatList
-                    data={articles}
-                    numColumns={2}
-                    renderItem={({ item }) => renderArticleItem(item)}
-                    keyExtractor={(item) => item.title}
-                    contentContainerStyle={{ paddingRight: 16 }}
-                    scrollEnabled={false}
-                  />
-                </View>
-              )}
-            </>
-          }
-          renderItem={null}
-          keyExtractor={() => 'header'}
-        />
+          {/* Articles Section */}
+          {articles.length > 0 && (
+            <View style={{ padding: 16, paddingTop: subcategories.length > 0 ? 0 : 16, flex: 1 }}>
+              <Text variant="titleMedium" style={{ marginBottom: 12 }}>
+                Articles
+              </Text>
+              <FlatList
+                data={articles}
+                numColumns={2}
+                renderItem={({ item }) => renderArticleItem(item)}
+                keyExtractor={(item) => item.title}
+                contentContainerStyle={{ paddingRight: 16 }}
+                scrollEnabled={true}
+                showsVerticalScrollIndicator={true}
+              />
+            </View>
+          )}
+        </View>
       )}
     </View>
   );

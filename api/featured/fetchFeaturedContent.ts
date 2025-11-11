@@ -1,5 +1,5 @@
 import { FeaturedContentResponse } from '../../types/api';
-import { axiosInstance, WIKIPEDIA_API_CONFIG } from '../shared';
+import { restAxiosInstance, WIKIPEDIA_API_CONFIG } from '../shared';
 
 /**
  * Fetches featured content from Wikipedia using the Featured Feed API
@@ -15,7 +15,7 @@ export const fetchFeaturedContent = async (): Promise<FeaturedContentResponse> =
 
     const url = `${WIKIPEDIA_API_CONFIG.WIKIMEDIA_BASE_URL}/feed/v1/wikipedia/en/featured/${formattedDate}`;
     
-    const response = await axiosInstance.get(url);
+    const response = await restAxiosInstance.get(url);
 
     return {
       data: response.data,

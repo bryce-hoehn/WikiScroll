@@ -5,8 +5,8 @@ import EmptyState from './EmptyState';
 import Feed from './Feed';
 
 export default function HotFeed() {
-  const { featuredContent, trendingCategories, refreshFeaturedContent } = useFeaturedContent();
-  const { getQuickRecommendations } = useRecommendations();
+  const { trendingCategories, refreshFeaturedContent } = useFeaturedContent();
+  const { getRecommendations } = useRecommendations();
   
   const [recommendations, setRecommendations] = useState<any>([]);
   const [loading, setLoading] = useState(false);
@@ -24,12 +24,13 @@ export default function HotFeed() {
         await refreshFeaturedContent();
       }
       
+      // For Hot page, use trending categories from featured content
       if (trendingCategories.length === 0) {
         setRecommendations([]);
         return;
       }
       
-      const recs = await getQuickRecommendations(15, trendingCategories);
+      const recs = await getRecommendations(15, trendingCategories);
       setRecommendations(recs);
     } catch (error) {
       console.error('Failed to load trending recommendations:', error);
@@ -37,7 +38,7 @@ export default function HotFeed() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [refreshFeaturedContent, trendingCategories, getQuickRecommendations]);
+  }, [trendingCategories, getRecommendations, refreshFeaturedContent]);
 
   const handleRefresh = useCallback(() => {
     loadRecommendations(true);
@@ -47,12 +48,13 @@ export default function HotFeed() {
     if (!loading) {
       setLoading(true);
       try {
+        // For Hot page, use trending categories from featured content
         if (trendingCategories.length === 0) {
           setLoading(false);
           return;
         }
         
-        const newRecs = await getQuickRecommendations(10, trendingCategories);
+        const newRecs = await getRecommendations(10, trendingCategories);
         setRecommendations((prev: any[]) => {
           const combined = [...prev, ...newRecs];
           const uniqueRecs = combined.filter((rec, index, self) => 
@@ -66,7 +68,7 @@ export default function HotFeed() {
         setLoading(false);
       }
     }
-  }, [loading, getQuickRecommendations, trendingCategories]);
+  }, [loading, trendingCategories, getRecommendations]);
 
   useEffect(() => {
     loadRecommendations();

@@ -1,29 +1,24 @@
 import React from 'react';
 import { View } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
-import { WtfArticleTemplate } from '../../types/third-party/wtf-article';
+import { WtfArticleReference } from '../../types/third-party/wtf-article';
 
 interface InlineCitationRendererProps {
-  templates: WtfArticleTemplate[];
+  references: WtfArticleReference[];
 }
 
 const InlineCitationRenderer = React.memo(function InlineCitationRenderer({ 
-  templates 
+  references 
 }: InlineCitationRendererProps) {
   const theme = useTheme();
 
-  // Filter citation templates
-  const citationTemplates = templates.filter(template => 
-    template.name === 'citation' || template.name === 'cite'
-  );
-
-  if (citationTemplates.length === 0) {
+  if (references.length === 0) {
     return null;
   }
 
   return (
     <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 8 }}>
-      {citationTemplates.map((template, index) => (
+      {references.map((reference, index) => (
         <Text 
           key={`inline-citation-${index}`}
           style={{ 

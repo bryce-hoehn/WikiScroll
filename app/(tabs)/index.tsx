@@ -40,10 +40,13 @@ export default function HomeScreen() {
       {...props}
       indicatorStyle={{ backgroundColor: theme.colors.primary }}
       style={{ backgroundColor: theme.colors.surface, elevation: 0 }}
-      tabStyle={{ backgroundColor: theme.colors.surface }}
+      tabStyle={{ 
+        backgroundColor: theme.colors.surface,
+        width: layout.width / 3, // Each tab takes 1/3 of screen width
+      }}
       activeColor={theme.colors.primary}
       inactiveColor={theme.colors.onSurfaceVariant}
-      scrollEnabled={true}
+      scrollEnabled={false} // Disable scrolling since tabs fit screen
     />
   );
 
@@ -55,7 +58,7 @@ export default function HomeScreen() {
         onIndexChange={setIndex}
         initialLayout={{ width: layout.width }}
         renderTabBar={renderTabBar}
-        style={{ backgroundColor: theme.colors.surface, paddingTop: 52 }}
+        style={{ backgroundColor: theme.colors.surface, paddingTop: 72 }}
       />
     </View>
   );

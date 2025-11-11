@@ -67,7 +67,7 @@ export default function Feed({
         />
       }
       onEndReached={loadMore}
-      onEndReachedThreshold={0.1}
+      onEndReachedThreshold={0.5}
       ListFooterComponent={renderFooter}
       ListEmptyComponent={renderEmptyState}
       initialNumToRender={5}
