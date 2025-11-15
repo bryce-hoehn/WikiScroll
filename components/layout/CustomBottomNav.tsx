@@ -80,7 +80,7 @@ export default function CustomBottomNav({ currentRoute }: CustomBottomNavProps) 
       backgroundColor: theme.colors.surface,
       borderTopColor: theme.colors.outline,
       paddingBottom: insets.bottom,
-      height: 60 + insets.bottom
+      minHeight: 60
     }]}>
       {navItems.map((item) => {
         const active = isActive(item.route);
@@ -95,13 +95,13 @@ export default function CustomBottomNav({ currentRoute }: CustomBottomNavProps) 
             {item.iconSet === 'material' ? (
               <MaterialIcons
                 name={item.icon as any}
-                size={24}
+                size={26}
                 color={color}
               />
             ) : (
               <MaterialCommunityIcons
                 name={item.icon as any}
-                size={24}
+                size={26}
                 color={color}
               />
             )}
@@ -122,16 +122,23 @@ export default function CustomBottomNav({ currentRoute }: CustomBottomNavProps) 
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    borderTopWidth: 1,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
   },
   navItem: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 8,
+    gap: 4,
   },
   label: {
-    marginTop: 4,
-    fontSize: 10,
+    fontSize: 12,
+    fontWeight: '400',
+    letterSpacing: 0.1,
   },
 });

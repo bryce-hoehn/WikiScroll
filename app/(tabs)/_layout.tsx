@@ -67,6 +67,11 @@ export default function TabLayout() {
           ),
         }}
       />
+
+      <Tabs.Screen
+        name="article/[title]"
+        options={{ href: null }} // Prevent it from appearing in tabs
+      />
     </Tabs>
   );
 }

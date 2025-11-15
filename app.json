@@ -20,7 +20,16 @@
     "web": {
       "output": "static",
       "favicon": "./assets/images/icon.png",
-      "bundler": "metro"
+      "bundler": "metro",
+      "name": "WikiFlow - Wikipedia Reader",
+      "shortName": "WikiFlow",
+      "lang": "en",
+      "scope": "/",
+      "themeColor": "#000000",
+      "backgroundColor": "#ffffff",
+      "display": "standalone",
+      "orientation": "portrait",
+      "startUrl": "/"
     },
     "plugins": [
       "expo-router",
@@ -51,6 +60,12 @@
         "projectId": "57646a65-2954-4207-a890-a5358e8043bc"
       }
     },
-    "owner": "17hoehbr"
+    "owner": "17hoehbr",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/57646a65-2954-4207-a890-a5358e8043bc"
+    }
   }
 }
