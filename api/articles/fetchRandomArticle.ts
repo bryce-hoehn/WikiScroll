@@ -1,11 +1,11 @@
-import { RandomArticleResponse } from '../../types/api';
+import { ArticleResponse } from '../../types/api/articles';
 import { restAxiosInstance } from '../shared';
 
-export const fetchRandomArticle = async (maxRetries = 3): Promise<RandomArticleResponse> => {
+export const fetchRandomArticle = async (maxRetries = 3): Promise<ArticleResponse> => {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       // Use Wikipedia REST API to get a random page summary
-      const url = 'https://en.wikipedia.org/api/rest_v1/page/random/summary';
+      const url = '/page/random/summary';
       const response = await restAxiosInstance.get(url, {
         timeout: 10000, // 10 second timeout
         validateStatus: (status) => status === 200 // Only accept 200 OK

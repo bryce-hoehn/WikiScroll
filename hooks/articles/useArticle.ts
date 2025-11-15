@@ -1,18 +1,19 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchArticleByTitle } from '../../api';
+import { fetchArticleSummary } from '../../api';
 import { useBookmarks } from '../../context/BookmarksContext';
-import { WtfArticle } from '../../types/third-party/wtf-article';
+import { Article } from '../../types/api';
 
 /**
- * Hook for fetching Wikipedia articles by title
+ * Hook for fetching Wikipedia article summaries by title
  * Checks offline cache first, then falls back to network
+ * Used for recommendation cards, search results, etc.
  */
 export default function useArticle(title: string) {
   const { getOfflineArticle } = useBookmarks();
 
   return useQuery({
     queryKey: ['article', title],
-    queryFn: async (): Promise<WtfArticle | null> => {
+    queryFn: async (): Promise<Article | null> => {
       // Check if article is available offline first
       const offlineArticle = getOfflineArticle(title);
       if (offlineArticle) {
@@ -20,7 +21,7 @@ export default function useArticle(title: string) {
       }
       
       // Fall back to network request
-      const articleResponse = await fetchArticleByTitle(title);
+      const articleResponse = await fetchArticleSummary(title);
       return articleResponse.article;
     },
     enabled: !!title,

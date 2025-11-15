@@ -1,8 +1,8 @@
 import { router } from 'expo-router';
+import { parseDocument } from 'htmlparser2';
 import React from 'react';
 import { Linking } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
-import { parseHtml } from '../../utils/htmlParser';
 
 interface HtmlRendererProps {
   html: string;
@@ -18,22 +18,29 @@ export default function HtmlRenderer({ html, maxLines, variant = 'bodyLarge', st
   const theme = useTheme();
   
   // Validate html input
-  if (!html || typeof html !== 'string') {
+  if (!html || typeof html !== 'string' || html.trim() === '') {
     return null;
   }
 
-  const { elements, error } = parseHtml(html);
+  let elements = [];
   
-  if (error) {
-    console.warn('HTML parsing error:', error);
+  try {
+    const doc = parseDocument(html);
+    elements = doc.children;
+  } catch (parseError) {
+    console.warn('HTML parsing error:', parseError);
     // Fallback: render raw text without HTML parsing
+    const plainText = html.replace(/<[^>]*>/g, '').trim();
+    if (!plainText) {
+      return null;
+    }
     return (
       <Text
         variant={variant}
         style={style}
         numberOfLines={maxLines}
       >
-        {html.replace(/<[^>]*>/g, '')} {/* Strip HTML tags */}
+        {plainText}
       </Text>
     );
   }
@@ -44,7 +51,7 @@ export default function HtmlRenderer({ html, maxLines, variant = 'bodyLarge', st
       const categoryUrl = href.startsWith('./Category:')
         ? href.slice('./Category:'.length)
         : href.slice('https://en.wikipedia.org/wiki/Wikipedia:Contents/Categories#'.length);
-      router.push(`/(zCategoryStack)/${encodeURIComponent(categoryUrl)}`);
+      router.push(`/(tabs)/(zCategoryStack)/${encodeURIComponent(categoryUrl)}`);
     } else if (href.startsWith('./') || href.includes('wikipedia.org/wiki/')) {
       const articleUrl = href.startsWith('./')
         ? href.slice('./'.length)

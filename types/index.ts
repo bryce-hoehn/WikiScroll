@@ -66,18 +66,12 @@ export * from './shared';
 
 /**
  * Common type utilities
- * 
+ *
  * Note: Many utility types are already provided by TypeScript:
  * - Partial<T> - makes all properties optional
- * - Required<T> - makes all properties required  
+ * - Required<T> - makes all properties required
  * - Pick<T, K> - picks specific properties
  * - Omit<T, K> - omits specific properties
  * - React.ReactNode - for children props
  * - React.RefObject<T> - for component refs
  */
-
-// Utility type for nullable values (T | null is built-in, but this provides a named alias)
-export type Nullable<T> = T | null;
-
-// Utility type for async functions (built-in as () => Promise<T>, but this provides a named alias)
-export type AsyncFunction<T = void> = () => Promise<T>;

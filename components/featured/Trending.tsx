@@ -9,7 +9,7 @@ import TrendingPagination from './TrendingPagination';
 
 export default function TrendingList() {
   const { featuredContent, isLoading } = useFeaturedContent();
-  const [currentPage, setCurrentPage] = useState(0);
+  const [, setCurrentPage] = useState(0);
   const progress = useSharedValue(0);
   const itemsPerPage = 5;
   const { width: windowWidth } = useWindowDimensions();

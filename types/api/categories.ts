@@ -2,31 +2,16 @@
  * Type definitions for Wikipedia category-related APIs
  */
 
-import { ArticleContent } from './base';
-
-/**
- * Represents a simplified category entry returned from the API
- */
-export interface CategoryPage {
-  title: string;
-  pageid?: number;
-  ns?: number;
-}
-
-/**
- * Represents a category member (article or subcategory)
- */
-export interface CategoryMember {
-  pageid: number;
-  title: string;
-  ns: number;
-}
+import { PageMetadata } from './base';
 
 /**
  * Represents an article within a category
  */
-export interface CategoryArticle extends ArticleContent {
-  pageid: number;
+export interface CategoryArticle extends PageMetadata {
+  description?: string;
+  extract?: string;
+  extract_html?: string;
+  thumbnail?: string;
 }
 
 /**

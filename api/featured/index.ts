@@ -3,3 +3,5 @@
  */
 
 export { fetchFeaturedContent } from './fetchFeaturedContent';
+export { fetchTrendingArticles } from './fetchTrendingArticles';
+

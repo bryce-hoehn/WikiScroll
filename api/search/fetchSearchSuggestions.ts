@@ -1,5 +1,12 @@
-import { SearchSuggestion } from '../../types/api';
-import { restAxiosInstance, WIKIPEDIA_API_CONFIG } from '../shared';
+import { PageInfo, RawSearchResult, SearchSuggestion } from '../../types/api';
+import { actionAxiosInstance } from '../shared';
+
+interface CombinedSearchResponse {
+  query?: {
+    search?: RawSearchResult[];
+    pages?: Record<string, PageInfo>;
+  };
+}
 
 export const fetchSearchSuggestions = async (
   query: string
@@ -7,41 +14,41 @@ export const fetchSearchSuggestions = async (
   if (!query.trim()) return [];
 
   try {
-    console.log('Starting search for:', query);
 
-    // Use Wikipedia Action API for search suggestions - increased to 10 results
-    const searchUrl = `${WIKIPEDIA_API_CONFIG.BASE_URL}?action=query&list=search&srsearch=${encodeURIComponent(query)}&srlimit=10&format=json&origin=*`;
-    
-    console.log('Search URL:', searchUrl);
+    // Use Wikipedia Action API for search with page info in single request
+    const params = {
+      action: 'query',
+      list: 'search',
+      srsearch: query,
+      srlimit: 10,
+      prop: 'pageimages|description',
+      piprop: 'thumbnail',
+      pithumbsize: 200,
+      format: 'json',
+      origin: '*'
+    };
 
-    const searchResponse = await restAxiosInstance.get(searchUrl);
+    const searchResponse = await actionAxiosInstance.get<CombinedSearchResponse>('', { params });
     const searchData = searchResponse.data;
 
     console.log('Search data received:', searchData);
 
     const results = searchData.query?.search || [];
+    const pages = searchData.query?.pages || {};
     console.log('Search results count:', results.length);
 
     if (results.length === 0) return [];
 
-    // Fetch page info for all results to get images and descriptions
-    const pageIds = results.map((result: any) => result.pageid).join('|');
-    const pageInfoUrl = `${WIKIPEDIA_API_CONFIG.BASE_URL}?action=query&pageids=${pageIds}&prop=pageimages|extracts|description&pithumbsize=200&exintro=1&explaintext=1&format=json&origin=*`;
-    
-    const pageInfoResponse = await restAxiosInstance.get(pageInfoUrl);
-    const pageInfoData = pageInfoResponse.data;
-    const pages = pageInfoData.query?.pages || {};
-
-    return results.map((result: any) => {
+    return results.map((result: RawSearchResult) => {
       const pageInfo = pages[result.pageid] || {};
       return {
         title: result.title,
-        description: pageInfo.description || pageInfo.extract?.substring(0, 150) || result.snippet?.replace(/<[^>]*>/g, '') || '',
+        description: pageInfo.description || result.snippet?.replace(/<[^>]*>/g, '') || '',
         image: pageInfo.thumbnail?.source,
       };
     });
-  } catch (error: any) {
-    console.error('Failed to fetch search suggestions:', error.response?.status, error.response?.data || error);
+  } catch (error: unknown) {
+    console.error('Failed to fetch search suggestions:', error);
     return [];
   }
 };

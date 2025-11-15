@@ -18,7 +18,7 @@ export function FeaturedContentProvider({ children }: FeaturedContentProviderPro
     if (!featuredContentQuery.data && !featuredContentQuery.isLoading) {
       featuredContentQuery.refetch();
     }
-  }, []);
+  }, [featuredContentQuery.data, featuredContentQuery.isLoading, featuredContentQuery.refetch]);
 
   const contextValue: FeaturedContentContextType = {
     featuredContent: featuredContentQuery.data?.data && 'tfa' in featuredContentQuery.data.data ? featuredContentQuery.data.data : null,

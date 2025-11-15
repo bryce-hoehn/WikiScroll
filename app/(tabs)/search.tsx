@@ -1,21 +1,13 @@
-import { fetchRandomArticle } from '@/api/articles';
-import {
-  FeaturedArticleCard,
-  FeaturedCarousel,
-  FeaturedPictureCard
-} from '@/components/featured';
-import TrendingList from '@/components/featured/Trending';
+import FeaturedArticleSection from '@/components/search/FeaturedArticleSection';
+import FeaturedCarouselSection from '@/components/search/FeaturedCarouselSection';
+import FeaturedPictureSection from '@/components/search/FeaturedPictureSection';
 import SearchOverlay from '@/components/search/SearchOverlay';
-import {
-  FeaturedArticleSkeleton,
-  FeaturedCarouselSkeleton,
-  FeaturedPictureSkeleton
-} from '@/components/search/SkeletonComponents';
+import TrendingSection from '@/components/search/TrendingSection';
 import { useFeaturedContent } from '@/context/FeaturedContentContext';
-import { router } from 'expo-router';
+import { FlashList } from '@shopify/flash-list';
 import React, { useState } from 'react';
-import { FlatList, View } from 'react-native';
-import { Appbar, Searchbar, Text, useTheme } from 'react-native-paper';
+import { View } from 'react-native';
+import { Appbar, Searchbar, useTheme } from 'react-native-paper';
 
 export default function SearchScreen() {
   const theme = useTheme();
@@ -30,126 +22,106 @@ export default function SearchScreen() {
     setShowSearchOverlay(false);
   };
 
-  const handleRandomArticle = async () => {
-    try {
-      const randomArticle = await fetchRandomArticle();
-      
-      if (randomArticle?.article?.title) {
-        router.push({
-          pathname: '/(zArticleStack)/[title]',
-          params: { title: randomArticle?.article?.title }
-        });
-      }
-    } catch (error) {
-      console.error('Failed to fetch random article:', error);
-    }
-  };
-
-  // Content items array - restored all featured content types
   const contentItems = [
     {
       key: 'featured-article',
-      content: isLoading ? (
-        <FeaturedArticleSkeleton />
-      ) : featuredContent?.tfa ? (
-        <>
-          <Text variant="headlineMedium" style={{ marginBottom: 8, fontWeight: 'bold' }}>
-            Featured Article
-          </Text>
-          <FeaturedArticleCard />
-        </>
-      ) : null
+      content: <FeaturedArticleSection />
     },
     {
       key: 'in-the-news',
-      content: isLoading ? (
-        <FeaturedCarouselSkeleton />
-      ) : featuredContent?.news ? (
-        <>
-          <Text variant="headlineMedium" style={{ marginBottom: 8, fontWeight: 'bold' }}>
-            In The News
-          </Text>
-          <FeaturedCarousel items={featuredContent.news}/>
-        </>
-      ) : null
+      content: (
+        <FeaturedCarouselSection
+          title="In The News"
+          items={featuredContent?.news?.map((newsItem, index) => {
+            // Use the first link for navigation and thumbnail
+            const firstLink = newsItem.links[0];
+            return {
+              title: firstLink?.title || 'News Story',
+              description: newsItem.story || firstLink?.description || firstLink?.title || 'Latest news',
+              thumbnail: firstLink?.thumbnail,
+              pageid: firstLink?.pageid,
+              // Add the full article title for navigation
+              articleTitle: firstLink?.title,
+              // Add links array for the carousel item to handle multiple articles
+              links: newsItem.links,
+            };
+          })}
+          cardType="news"
+        />
+      )
     },
     {
       key: 'did-you-know',
-      content: isLoading ? (
-        <FeaturedCarouselSkeleton />
-      ) : featuredContent?.dyk ? (
-        <>
-          <Text variant="headlineMedium" style={{ marginBottom: 8, fontWeight: 'bold' }}>
-            Did You Know?
-          </Text>
-          <FeaturedCarousel items={featuredContent.dyk} />
-        </>
-      ) : null
+      content: (
+        <FeaturedCarouselSection
+          title="Did You Know?"
+          items={featuredContent?.dyk?.map(item => {
+            const titleMatch = item.html.match(/title="([^"]*)"/);
+            const title = titleMatch?.[1] || 'Did You Know?';
+            
+            return {
+              title,
+              description: item.html, // Keep HTML for proper rendering
+              html: item.html, // Add explicit html field for Did You Know items
+            };
+          })}
+          cardType="did-you-know"
+        />
+      )
     },
     {
       key: 'featured-picture',
-      content: isLoading ? (
-        <FeaturedPictureSkeleton />
-      ) : featuredContent?.image ? (
-        <>
-          <Text variant="headlineMedium" style={{ marginBottom: 8, fontWeight: 'bold' }}>
-            Featured Picture
-          </Text>
-          <FeaturedPictureCard />
-        </>
-      ) : null
+      content: <FeaturedPictureSection />
     },
     {
       key: 'trending',
-      content: isLoading ? (
-        <FeaturedCarouselSkeleton />
-      ) : featuredContent?.mostread ? (
-        <>
-          <Text variant="headlineMedium" style={{ marginBottom: 8, fontWeight: 'bold' }}>
-            Trending Articles
-          </Text>
-          <TrendingList />
-        </>
-      ) : null
+      content: <TrendingSection />
     },
     {
       key: 'on-this-day',
-      content: isLoading ? (
-        <FeaturedCarouselSkeleton />
-      ) : featuredContent?.onthisday ? (
-        (() => {
-          // Transform the facts
-          const parsedMap = featuredContent.onthisday.map((fact: any) => {
-            // Make a shallow copy to avoid mutating original data
-            const newFact = { ...fact };
-            if (fact.pages) {
-              fact.pages.forEach((page: any) => {
-                newFact.text = newFact.text.replace(page.normalizedtitle, page.displaytitle);
-              });
-            }
-            return newFact;
-          });
-
-          return (
-            <>
-              <Text
-                variant="headlineMedium"
-                style={{ marginBottom: 8, fontWeight: 'bold' }}
-              >
-                On This Day
-              </Text>
-              <FeaturedCarousel items={parsedMap} />
-            </>
-          );
-        })()
-      ) : null
+      content: (
+        <FeaturedCarouselSection
+          title="On This Day"
+          items={featuredContent?.onthisday?.map(item => ({
+            title: item.text.substring(0, 100) + '...',
+            description: item.text,
+            html: item.text, // Add HTML field for proper rendering with links
+            thumbnail: item.pages?.[0]?.thumbnail,
+            year: item.year, // Add the year from the OnThisDayItem
+            page: item.pages?.[0],
+            articleTitle: item.pages?.[0]?.title,
+          }))}
+          cardType="on-this-day"
+        />
+      )
     }
-  ].filter(item => item.content);
+  ].filter(item => {
+    // Filter out sections that don't have content (except during loading)
+    if (isLoading) return true;
+    
+    // Check if the section has actual content
+    switch (item.key) {
+      case 'featured-article':
+        return !!featuredContent?.tfa;
+      case 'in-the-news':
+        return !!featuredContent?.news?.length;
+      case 'did-you-know':
+        return !!featuredContent?.dyk?.length;
+      case 'featured-picture':
+        return !!featuredContent?.image;
+      case 'trending':
+        return !!featuredContent?.mostread;
+      case 'on-this-day':
+        return !!featuredContent?.onthisday?.length;
+      default:
+        return false;
+    }
+  });
 
   return (
     <>
-      <SearchOverlay 
-        visible={showSearchOverlay} 
+      <SearchOverlay
+        visible={showSearchOverlay}
         onClose={handleSearchClose}
       />
       
@@ -160,7 +132,6 @@ export default function SearchScreen() {
               backgroundColor: theme.colors.surface,
             }}
           >
-            <Appbar.Action icon="shuffle" onPress={handleRandomArticle} />
             <Searchbar
               placeholder="Search Wikipedia"
               value=""
@@ -172,7 +143,7 @@ export default function SearchScreen() {
             />
           </Appbar.Header>
           
-          <FlatList
+          <FlashList
             data={contentItems}
             renderItem={({ item }) => item.content}
             keyExtractor={(item) => item.key}

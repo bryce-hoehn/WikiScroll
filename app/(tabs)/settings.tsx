@@ -2,13 +2,29 @@ import { PreferencesContext } from '@/context/PreferencesContext';
 import { useVisitedArticles } from '@/hooks';
 import React, { useState } from 'react';
 import { Alert, ScrollView, View } from 'react-native';
-import { Appbar, Button, Card, Divider, Switch, Text, useTheme } from 'react-native-paper';
+import { Appbar, Button, Card, Divider, Menu, Text, useTheme } from 'react-native-paper';
 
 export default function SettingsScreen() {
   const theme = useTheme();
-  const { toggleTheme, isThemeDark } = React.useContext(PreferencesContext);
+  const { currentTheme, setTheme } = React.useContext(PreferencesContext);
   const { clearVisitedArticles, visitedArticles } = useVisitedArticles();
   const [isResetting, setIsResetting] = useState(false);
+  const [themeMenuVisible, setThemeMenuVisible] = useState(false);
+
+  const themeOptions = [
+    { label: 'Automatic', value: 'automatic' },
+    { label: 'Light', value: 'light' },
+    { label: 'Light Medium Contrast', value: 'light-medium-contrast' },
+    { label: 'Light High Contrast', value: 'light-high-contrast' },
+    { label: 'Dark', value: 'dark' },
+    { label: 'Dark Medium Contrast', value: 'dark-medium-contrast' },
+    { label: 'Dark High Contrast', value: 'dark-high-contrast' },
+  ];
+
+  const getThemeDisplayName = (themeValue: string) => {
+    const option = themeOptions.find(opt => opt.value === themeValue);
+    return option ? option.label : 'Automatic';
+  };
 
   const handleResetReadingHistory = () => {
     Alert.alert(
@@ -96,26 +112,40 @@ export default function SettingsScreen() {
             <Divider style={{ marginHorizontal: 16 }} />
             
             <View style={{ padding: 16 }}>
-              <View style={{ 
-                flexDirection: 'row', 
-                alignItems: 'center', 
-                justifyContent: 'space-between',
-                paddingVertical: 8
-              }}>
-                <View style={{ flex: 1 }}>
-                  <Text variant="bodyMedium" style={{ fontWeight: '500' }}>
-                    Dark Mode
-                  </Text>
-                  <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, marginTop: 2 }}>
-                    Switch between light and dark themes
-                  </Text>
-                </View>
-                <Switch 
-                  value={isThemeDark} 
-                  onValueChange={toggleTheme}
-                  trackColor={{ false: theme.colors.surfaceVariant, true: theme.colors.primary }}
-                  thumbColor={isThemeDark ? theme.colors.onPrimary : theme.colors.onSurfaceVariant}
-                />
+              <View style={{ marginBottom: 16 }}>
+                <Text variant="bodyMedium" style={{ fontWeight: '500', marginBottom: 4 }}>
+                  Theme
+                </Text>
+                <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, marginBottom: 8 }}>
+                  Choose your preferred theme
+                </Text>
+                <Menu
+                  visible={themeMenuVisible}
+                  onDismiss={() => setThemeMenuVisible(false)}
+                  anchor={
+                    <Button
+                      mode="outlined"
+                      onPress={() => setThemeMenuVisible(true)}
+                      style={{ borderRadius: 8 }}
+                      contentStyle={{ justifyContent: 'space-between' }}
+                      icon="chevron-down"
+                    >
+                      {getThemeDisplayName(currentTheme)}
+                    </Button>
+                  }
+                >
+                  {themeOptions.map((option) => (
+                    <Menu.Item
+                      key={option.value}
+                      onPress={() => {
+                        setTheme(option.value as any);
+                        setThemeMenuVisible(false);
+                      }}
+                      title={option.label}
+                      leadingIcon={currentTheme === option.value ? 'check' : undefined}
+                    />
+                  ))}
+                </Menu>
               </View>
             </View>
           </Card.Content>

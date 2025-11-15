@@ -29,6 +29,9 @@ export default function BookmarksEmptyState() {
           iconColor={theme.colors.onSurfaceVariant}
           size={40}
           style={{ margin: 0 }}
+          accessibilityLabel="Bookmark icon"
+          accessibilityElementsHidden={true}
+          importantForAccessibility="no"
         />
       </View>
       <Text variant="headlineSmall" style={{ 
@@ -47,15 +50,17 @@ export default function BookmarksEmptyState() {
       }}>
         Articles you bookmark will appear here for easy access later.
       </Text>
-      <Button 
-        mode="contained" 
+      <Button
+        mode="contained"
         onPress={() => router.push('/')}
-        style={{ 
+        style={{
           borderRadius: 12,
           paddingHorizontal: 24
         }}
         contentStyle={{ paddingVertical: 8 }}
         icon="home"
+        accessibilityLabel="Browse articles"
+        accessibilityHint="Navigates to the home screen to browse articles"
       >
         Browse Articles
       </Button>

@@ -34,47 +34,55 @@ export default function TrendingListItem({
       <List.Item
         title={item.normalizedTitle}
         onPress={() => router.push(`/(zArticleStack)/${encodeURIComponent(item.title)}`)}
-        titleStyle={{ 
-          fontSize: 16, 
-          fontWeight: '500', 
+        titleStyle={{
+          fontSize: 16,
+          fontWeight: '500',
           color: theme.colors.onSurface
         }}
         description={item.description}
-        descriptionStyle={{ 
-          fontSize: 12, 
-          color: theme.colors.onSurfaceVariant, 
-          marginTop: 2 
+        descriptionStyle={{
+          fontSize: 12,
+          color: theme.colors.onSurfaceVariant,
+          marginTop: 2
         }}
+        accessibilityLabel={`Open trending article: ${item.normalizedTitle}`}
+        accessibilityHint={`Opens the trending article: ${item.normalizedTitle}`}
         left={props => (
           item.thumbnail ? (
-            <View style={{ 
-              width: 48, 
-              height: 48, 
-              borderRadius: 8, 
+            <View style={{
+              width: 48,
+              height: 48,
+              borderRadius: 8,
               overflow: 'hidden',
               marginRight: 12,
               marginLeft: 12,
               backgroundColor: theme.colors.surfaceVariant
             }}>
-              <Image 
-                source={{ uri: item.thumbnail }} 
+              <Image
+                source={{ uri: item.thumbnail }}
                 style={{ width: '100%', height: '100%' }}
+                placeholder={{ blurhash: 'L5H2EC=PM+yV0gMqNGa#00bH?G-9' }}
+                alt={`Thumbnail for ${item.normalizedTitle}`}
+                accessibilityLabel={`Thumbnail for ${item.normalizedTitle}`}
               />
             </View>
           ) : (
-            <View style={{ 
-              width: 48, 
-              height: 48, 
+            <View style={{
+              width: 48,
+              height: 48,
               borderRadius: 16,
               backgroundColor: theme.colors.primary,
-              justifyContent: 'center', 
-              alignItems: 'center', 
+              justifyContent: 'center',
+              alignItems: 'center',
               marginRight: 12,
               marginLeft: 12
-            }}>
-              <Text style={{ 
+            }}
+            accessibilityElementsHidden={true}
+            importantForAccessibility="no"
+            >
+              <Text style={{
                 fontSize: 14,
-                fontWeight: 'bold', 
+                fontWeight: 'bold',
                 color: theme.colors.onPrimary
               }}>
                 {pageIndex * itemsPerPage + itemIndex + 1}

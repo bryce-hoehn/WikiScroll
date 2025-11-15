@@ -1,50 +1,125 @@
-# Welcome to your Expo app 👋
+# WikiFlow
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A modern, cross-platform Wikipedia reader built with React Native and Expo. Explore Wikipedia with a beautiful, intuitive interface optimized for mobile devices. Experience the smooth flow of knowledge discovery.
 
-## Get started
+## Features
 
-1. Install dependencies
+### 🏠 Home Screen
+- **For You Feed**: Personalized article recommendations based on your reading history
+- **Hot Articles**: Trending content from Wikipedia's featured feed
+- **Random Articles**: Discover new topics with random article exploration
 
+### 🔍 Search & Discovery
+- **Smart Search**: Real-time search suggestions with Wikipedia's API
+- **Featured Content**: Today's featured article, picture of the day, and more
+- **Trending Articles**: Most-read articles with daily updates
+- **Categories**: Browse Wikipedia by topic categories
+
+### 📚 Reading Experience
+- **Bookmarks**: Save articles for offline reading
+- **Dark Mode**: Comfortable reading in any lighting
+- **Responsive Design**: Optimized for mobile and tablet screens
+- **Article Navigation**: Easy navigation between related articles
+
+### 🎨 Modern UI
+- **Material Design**: Clean, modern interface using React Native Paper
+- **Smooth Animations**: Fluid transitions and interactions
+- **Accessibility**: Full accessibility support
+- **Offline Support**: Read bookmarked articles without internet
+
+## Tech Stack
+
+- **Framework**: React Native with Expo
+- **Navigation**: Expo Router (file-based routing)
+- **UI Library**: React Native Paper
+- **State Management**: React Context + TanStack Query
+- **TypeScript**: Full type safety
+- **Storage**: AsyncStorage for offline data
+
+## Getting Started
+
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+- Expo CLI
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd WikipediaExpo
+   ```
+
+2. **Install dependencies**
    ```bash
    npm install
    ```
 
-2. Start the app
-
+3. **Start the development server**
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+4. **Run on your preferred platform**
+   - Press `a` for Android
+   - Press `i` for iOS  
+   - Press `w` for web
+   - Scan QR code with Expo Go app
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### Development Scripts
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- `npm start` - Start development server
+- `npm run android` - Run on Android
+- `npm run ios` - Run on iOS
+- `npm run web` - Run on web
+- `npm run lint` - Run ESLint
+- `npm run reset-project` - Reset to blank project
 
-## Get a fresh project
+## Project Structure
 
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+WikipediaExpo/
+├── app/                    # Expo Router app directory
+│   ├── (tabs)/            # Bottom tab navigation
+│   └── (zArticleStack)/   # Article detail screens
+├── components/            # Reusable UI components
+├── hooks/                # Custom React hooks
+├── api/                  # Wikipedia API integrations
+├── types/                # TypeScript type definitions
+├── context/              # React Context providers
+├── utils/                # Utility functions
+└── assets/               # Images and icons
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## API Integration
 
-## Learn more
+The app integrates with multiple Wikipedia APIs:
+- **Featured Content API**: Today's featured article, picture of the day
+- **Pageviews API**: Trending articles and most-read content
+- **Search API**: Real-time search suggestions
+- **Article API**: Article summaries and metadata
+- **Categories API**: Category browsing and navigation
 
-To learn more about developing your project with Expo, look at the following resources:
+## Contributing
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## Join the community
+## License
 
-Join our community of developers creating universal apps.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Acknowledgments
+
+- Wikipedia for providing the content and APIs
+- Expo team for the excellent development platform
+- React Native community for the ecosystem
+- React Native Paper for the UI components
+
+---
+
+**WikiFlow** - Where knowledge flows smoothly.

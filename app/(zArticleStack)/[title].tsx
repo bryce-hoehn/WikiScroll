@@ -1,14 +1,16 @@
 import { fetchArticleThumbnail } from '@/api/articles/fetchArticleThumbnail';
+import Article from '@/components/article/Article';
+import CustomBottomNav from '@/components/layout/CustomBottomNav';
 import { ImageThumbnail } from '@/types';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
-import { FlatList } from 'react-native';
+import { View } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { SearchOverlay } from '../../components';
 import ArticleHeader from '../../components/article/ArticleHeader';
 import ArticleImageModal from '../../components/article/ArticleImageModal';
-import ArticleSectionRenderer from '../../components/article/ArticleSectionRenderer';
 import { useArticle, useBookmarks, useVisitedArticles } from '../../hooks';
+import { shareArticle } from '../../utils/shareUtils';
 
 export default function ArticleScreen() {
   const theme = useTheme();
@@ -70,57 +72,47 @@ export default function ArticleScreen() {
     }
   };
 
-  const handleImagePress = (imageUri: string, alt?: string) => {
-    setSelectedImage({ uri: imageUri, alt });
-    setShowImageModal(true);
+  const handleShare = async () => {
+    if (!article) return;
+    
+    try {
+      await shareArticle(
+        article.title,
+        article.description,
+        article.content_urls?.mobile.page
+      );
+    } catch (error) {
+      console.error('Failed to share article:', error);
+    }
   };
+
 
   const handleCloseImageModal = () => {
     setShowImageModal(false);
     setSelectedImage(null);
   };
 
-  const renderArticleSection = ({ item: section, index }: { item: any; index: number }) => (
-    <ArticleSectionRenderer
-      section={section}
-      index={index}
-      thumbnail={thumbnail}
-      onImagePress={handleImagePress}
-    />
-  );
-
   return (
     <>
       {showSearch ? (
         <SearchOverlay visible={showSearch} onClose={handleSearchClose} />
       ) : (
-        <>
-          <ArticleHeader
-            title={article?.title}
-            isBookmarked={isBookmarked}
-            onBookmarkToggle={handleBookmarkToggle}
-            onSearchPress={handleSearchPress}
-            onBackPress={handleBackPress}
-          />
-
-          <FlatList
-            data={article?.sections || []}
-            renderItem={renderArticleSection}
-            keyExtractor={(item, index) => `${item.title || 'section'}-${index}`}
-            style={{ backgroundColor: theme.colors.background }}
-            contentContainerStyle={{
-              flexGrow: 1,
-              paddingVertical: 8,
-            }}
-            showsVerticalScrollIndicator={false}
-            initialNumToRender={10}
-            maxToRenderPerBatch={10}
-            windowSize={10}
-            removeClippedSubviews={false}
-          />
-        </>
+        <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+          <View style={{ flex: 1 }}>
+            <ArticleHeader
+              title={article?.title}
+              isBookmarked={isBookmarked}
+              onBookmarkToggle={handleBookmarkToggle}
+              onSearchPress={handleSearchPress}
+              onBackPress={handleBackPress}
+              onShare={handleShare}
+            />
+            <Article title={title as string} />
+          </View>
+          <CustomBottomNav />
+        </View>
       )}
-
+      
       <ArticleImageModal
         visible={showImageModal}
         selectedImage={selectedImage}

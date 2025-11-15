@@ -17,19 +17,18 @@ export default function HomeScreen() {
     { key: 'random', title: 'Random' },
   ]);
 
-  // Custom renderScene to preserve component instances and prevent scroll position loss
+  const handleTabPress = (tabIndex: number) => {
+    setIndex(tabIndex);
+  };
+
   const renderScene = ({ route }: { route: { key: string } }) => {
     switch (route.key) {
       case 'for-you':
         return <ForYouFeed />;
       case 'hot':
-        return (
-          <HotFeed />
-        );
+        return <HotFeed />;
       case 'random':
-        return (
-          <RandomFeed />
-        );
+        return <RandomFeed />;
       default:
         return null;
     }
@@ -55,7 +54,7 @@ export default function HomeScreen() {
       <TabView
         navigationState={{ index, routes }}
         renderScene={renderScene}
-        onIndexChange={setIndex}
+        onIndexChange={handleTabPress}
         initialLayout={{ width: layout.width }}
         renderTabBar={renderTabBar}
         style={{ backgroundColor: theme.colors.surface, paddingTop: 72 }}

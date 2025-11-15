@@ -5,7 +5,7 @@ import { fetchCategoryPages } from '../../api';
  * Hook for fetching Wikipedia category pages
  * Categories rarely change, so we use aggressive caching
  */
-export default function useCategoryPages(category: string) {
+export default function useCategoryMembers(category: string) {
   return useQuery({
     queryKey: ['category-pages', category],
     queryFn: () => fetchCategoryPages(category),

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchArticleByTitle, fetchFeaturedContent } from '../../api';
+import { fetchFeaturedContent } from '../../api';
 
 /**
  * Hook for fetching Wikipedia featured content (Today's Featured Article, Picture of the Day, etc.)
@@ -16,33 +16,13 @@ export default function useFeaturedContent() {
         if (content.data?.mostread?.articles) {
           const trendingArticles = content.data.mostread.articles;
           
-          // Fetch categories for all trending articles
-          const categoryPromises = trendingArticles.map(async (article: any) => {
-            try {
-              const articleData = await fetchArticleByTitle(article.title);
-              return {
-                ...article,
-                categories: articleData.article?.categories || []
-              };
-            } catch (error) {
-              console.warn(`Failed to fetch categories for article: ${article.title}`, error);
-              return {
-                ...article,
-                categories: []
-              };
-            }
-          });
-          
-          // Wait for all category fetches to complete
-          const articlesWithCategories = await Promise.all(categoryPromises);
-          
           return {
             ...content,
             data: {
               ...content.data,
               mostread: {
                 ...content.data.mostread,
-                articles: articlesWithCategories
+                articles: trendingArticles
               }
             }
           };
@@ -51,9 +31,14 @@ export default function useFeaturedContent() {
         return content;
       } catch (error) {
         console.error('Featured content fetch failed, returning empty data:', error);
-        // Return empty featured content to prevent app from breaking
+        // Return properly structured empty featured content to prevent app from breaking
         return {
           data: {
+            tfa: null,
+            mostread: null,
+            image: null,
+            news: null,
+            dyk: null,
             onthisday: null,
           },
           onThisDay: {
@@ -67,17 +52,12 @@ export default function useFeaturedContent() {
   });
 
   // Extract trending categories from the featured content
-  const data = queryResult.data?.data as any;
-  const trendingCategories = data?.mostread?.articles
-    ? data.mostread.articles.flatMap((article: any) => 
-        article.categories || []
-      )
-    : [];
-
-  const uniqueTrendingCategories = [...new Set(trendingCategories)];
+  // Note: The new Article structure doesn't include categories
+  // We'll need to implement category fetching separately if needed
+  const trendingCategories: string[] = [];
 
   return {
     ...queryResult,
-    trendingCategories: uniqueTrendingCategories,
+    trendingCategories: trendingCategories,
   };
 }

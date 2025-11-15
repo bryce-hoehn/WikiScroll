@@ -1,52 +1,51 @@
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { Image } from "expo-image";
+import { FlashList } from '@shopify/flash-list';
 import { router } from 'expo-router';
 import React from 'react';
-import { FlatList, View } from 'react-native';
+import { View } from 'react-native';
 import { Appbar, Card, Text, useTheme } from 'react-native-paper';
 
 const rootCategories = {
-  'Academic disciplines': 'school',
-  'Behavior': 'psychology',
-  'Business': 'business-center',
-  'Communication': 'chat',
-  'Concepts': 'lightbulb',
-  'Culture': 'palette',
-  'Economy': 'trending-up',
-  'Education': 'school',
-  'Energy': 'bolt',
-  'Engineering': 'build',
-  'Entities': 'category',
-  'Food and drink': 'restaurant',
-  'Geography': 'public',
-  'Government': 'account-balance',
-  'Health': 'local-hospital',
-  'History': 'history',
-  'Humanities': 'book',
-  'Information': 'info',
-  'Knowledge': 'lightbulb',
-  'Language': 'translate',
-  'Law': 'gavel',
-  'Life': 'spa',
-  'Lists': 'list',
-  'Mass media': 'tv',
-  'Mathematics': 'calculate',
-  'Nature': 'nature',
-  'People': 'people',
-  'Philosophy': 'lightbulb',
-  'Politics': 'campaign',
-  'Religion': 'church',
-  'Science': 'science',
-  'Society': 'groups',
-  'Technology': 'computer',
-  'Time': 'schedule',
-  'Universe': 'public'
+  'Academic disciplines': require('../../assets/images/categories/Academic disciplines.jpg'),
+  'Behavior': require('../../assets/images/categories/Behavior.jpg'),
+  'Business': require('../../assets/images/categories/Business.jpg'),
+  'Communication': require('../../assets/images/categories/Communication.jpg'),
+  'Concepts': require('../../assets/images/categories/Concepts.png'),
+  'Culture': require('../../assets/images/categories/Culture.jpg'),
+  'Economy': require('../../assets/images/categories/Economy.jpg'),
+  'Education': require('../../assets/images/categories/Education.jpg'),
+  'Energy': require('../../assets/images/categories/Energy.jpg'),
+  'Engineering': require('../../assets/images/categories/Engineering.jpg'),
+  'Entities': require('../../assets/images/categories/Entities.png'),
+  'Food and drink': require('../../assets/images/categories/Food and Drink.jpg'),
+  'Geography': require('../../assets/images/categories/Geography.jpeg'),
+  'Government': require('../../assets/images/categories/Government.jpg'),
+  'Humanities': require('../../assets/images/categories/Humanities.jpg'),
+  'Information': require('../../assets/images/categories/Information.jpg'),
+  'Knowledge': require('../../assets/images/categories/Knowledge.jpg'),
+  'Language': require('../../assets/images/categories/Language.jpg'),
+  'Law': require('../../assets/images/categories/Law.jpg'),
+  'Life': require('../../assets/images/categories/Life.jpg'),
+  'Lists': require('../../assets/images/categories/Lists.png'),
+  'Mass media': require('../../assets/images/categories/Mass media.jpg'),
+  'Mathematics': require('../../assets/images/categories/Mathematics.png'),
+  'Nature': require('../../assets/images/categories/Nature.jpg'),
+  'People': require('../../assets/images/categories/People.jpg'),
+  'Philosophy': require('../../assets/images/categories/Philosophy.jpg'),
+  'Politics': require('../../assets/images/categories/Politics.jpg'),
+  'Religion': require('../../assets/images/categories/Religion.png'),
+  'Science': require('../../assets/images/categories/Science.png'),
+  'Society': require('../../assets/images/categories/Society.jpg'),
+  'Technology': require('../../assets/images/categories/Technology.jpg'),
+  'Time': require('../../assets/images/categories/Time.jpg'),
+  'Universe': require('../../assets/images/categories/Universe.jpg')
 } as const;
 
 export default function CategoriesScreen() {
   const theme = useTheme();
 
-  const renderCategoryItem = ({ item }: { item: [string, string] }) => (
-    <Card 
+  const renderCategoryItem = ({ item }: { item: [string, any] }) => (
+    <Card
       style={{
         flex: 1,
         margin: 8,
@@ -55,36 +54,53 @@ export default function CategoriesScreen() {
         overflow: 'hidden',
       }}
       onPress={() => router.push(`/(zCategoryStack)/${encodeURIComponent(item[0])}`)}
+      accessibilityRole="button"
+      accessibilityLabel={`Browse ${item[0]} category`}
+      accessibilityHint={`Opens articles in the ${item[0]} category`}
     >
-      <View style={{
-        height: 96,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: theme.colors.surfaceVariant,
-      }}>
-        <MaterialIcons 
-          name={item[1] as any} 
-          size={32} 
-          color={theme.colors.primary} 
-        />
-      </View>
-      <Card.Content style={{ 
-        padding: 12,
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}>
-        <Text 
-          variant="titleMedium" 
-          style={{ 
-            fontWeight: '600',
-            color: theme.colors.onSurface,
+      <Image
+        source={item[1]}
+        style={{
+          height: 96,
+          width: '100%',
+          borderRadius: 12,
+        }}
+        alt={`${item[0]} category image`}
+        accessibilityLabel={`${item[0]} category`}
+        accessibilityHint={`Image representing the ${item[0]} category`}
+      />
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: 'rgba(0, 0, 0, 0.3)',
+          borderRadius: 12,
+        }}
+        accessibilityElementsHidden={true}
+        importantForAccessibility="no"
+      >
+        <Text
+          variant="titleLarge"
+          style={{
+            fontWeight: '700',
+            color: 'white',
             textAlign: 'center',
+            textShadowColor: 'rgba(0, 0, 0, 0.75)',
+            textShadowOffset: { width: 1, height: 1 },
+            textShadowRadius: 3,
+            paddingHorizontal: 8,
           }}
           numberOfLines={2}
+          accessibilityRole="text"
         >
           {item[0]}
         </Text>
-      </Card.Content>
+      </View>
     </Card>
   );
 
@@ -107,7 +123,7 @@ export default function CategoriesScreen() {
         />
       </Appbar.Header>
 
-      <FlatList
+      <FlashList
         data={Object.entries(rootCategories)}
         renderItem={renderCategoryItem}
         keyExtractor={(item) => item[0]}
@@ -119,7 +135,6 @@ export default function CategoriesScreen() {
           flexGrow: 1,
         }}
         showsVerticalScrollIndicator={false}
-        windowSize={10}
       />
     </>
   );

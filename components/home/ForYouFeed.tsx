@@ -1,24 +1,20 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useRecommendations, useVisitedArticles } from '../../hooks';
+import { useBacklinkRecommendations, useVisitedArticles } from '../../hooks';
 import EmptyState from './EmptyState';
 import Feed from './Feed';
 
 export default function ForYouFeed() {
-  const { getQuickRecommendations } = useRecommendations();
-  const { visitedArticles, categories: visitedCategories, loading: visitedArticlesLoading } = useVisitedArticles();
+  const { getRecommendations } = useBacklinkRecommendations();
+  const { visitedArticles, loading: visitedArticlesLoading } = useVisitedArticles();
   
   const [recommendations, setRecommendations] = useState<any>([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+
   const loadRecommendations = useCallback(async (isRefresh = false) => {
-    // Don't load recommendations if visited articles are still loading
-    if (visitedArticlesLoading) {
-      return;
-    }
-    
-    if (visitedArticles.length === 0) {
-      setRecommendations([]);
+    // Don't load if no visited articles or still loading
+    if (visitedArticlesLoading || visitedArticles.length === 0) {
       return;
     }
     
@@ -29,8 +25,7 @@ export default function ForYouFeed() {
     }
     
     try {
-      // Use the pre-computed categories from visited articles
-      const recs = await getQuickRecommendations(15, visitedCategories);
+      const recs = await getRecommendations(20);
       setRecommendations(recs);
     } catch (error) {
       console.error('Failed to load recommendations:', error);
@@ -38,24 +33,23 @@ export default function ForYouFeed() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [getQuickRecommendations, visitedArticles.length, visitedArticlesLoading, visitedCategories]);
+  }, [getRecommendations, visitedArticles.length, visitedArticlesLoading]);
 
   const handleRefresh = useCallback(() => {
     loadRecommendations(true);
   }, [loadRecommendations]);
 
   const loadMore = useCallback(async () => {
-    if (!loading) {
+    if (!loading && visitedArticles.length > 0) {
       setLoading(true);
       try {
-        const newRecs = await getQuickRecommendations(10, visitedCategories);
+        const newRecs = await getRecommendations(20);
         setRecommendations((prev: any[]) => {
           const combined = [...prev, ...newRecs];
           // Remove duplicates
-          const uniqueRecs = combined.filter((rec, index, self) => 
+          return combined.filter((rec, index, self) =>
             index === self.findIndex(r => r.title === rec.title)
           );
-          return uniqueRecs;
         });
       } catch (error) {
         console.error('Failed to load more recommendations:', error);
@@ -63,39 +57,28 @@ export default function ForYouFeed() {
         setLoading(false);
       }
     }
-  }, [loading, getQuickRecommendations, visitedCategories]);
+  }, [loading, getRecommendations, visitedArticles.length]);
 
   useEffect(() => {
     loadRecommendations();
   }, [loadRecommendations]);
 
-  const renderEmptyState = useCallback(() => {
-    // Show welcome state when there are no visited articles
-    if (visitedArticles.length === 0 && !visitedArticlesLoading) {
-      return <EmptyState type="welcome" />;
-    }
-    
-    // Show loading state when there are no recommendations (including during initial load)
-    if (recommendations.length === 0) {
-      return (
-        <EmptyState 
-          icon="account-heart"
-          title="Finding Articles For You"
-          description="We're analyzing your reading history to find the perfect articles for you."
-          buttonText="Refresh Recommendations"
-          buttonAction={handleRefresh}
-          buttonIcon="refresh"
-          buttonMode="outlined"
-          showSpinner={loading || visitedArticlesLoading}
-        />
-      );
-    }
-    
-    return null;
-  }, [loading, visitedArticles.length, recommendations.length, handleRefresh, visitedArticlesLoading]);
+  // Show loading state while fetching recommendations
+  if (loading && recommendations.length === 0) {
+    return (
+      <EmptyState
+        icon="account-heart"
+        title="Finding Recommendations"
+        description="We're analyzing your reading history to find the perfect articles for you."
+        showSpinner={true}
+      />
+    );
+  }
 
-  const keyExtractor = useCallback((item: any) => 
-    `${item.title}-${item.thumbnail || 'no-thumb'}`, []);
+  // Show welcome screen if no recommendations found (same as welcome for now)
+  if (recommendations.length === 0 && !loading && visitedArticles.length > 0) {
+    return <EmptyState />;
+  }
 
   return (
     <Feed
@@ -104,8 +87,8 @@ export default function ForYouFeed() {
       refreshing={refreshing}
       onRefresh={handleRefresh}
       loadMore={loadMore}
-      renderEmptyState={renderEmptyState}
-      keyExtractor={keyExtractor}
+      renderEmptyState={() => null} // We handle empty states above
+      keyExtractor={(item: any) => `${item.title}-${item.thumbnail || 'no-thumb'}`}
     />
   );
 }

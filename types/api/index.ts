@@ -27,6 +27,6 @@ export interface BookmarkItem {
  */
 export interface VisitedArticleItem {
   title: string;
-  visitedAt: Date;
+  visitedAt: string;
   article?: Article;
 }

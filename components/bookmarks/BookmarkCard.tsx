@@ -11,7 +11,7 @@ export default function BookmarkCard({ item, onRemoveBookmark }: BookmarkCardPro
   const router = useRouter();
 
   return (
-    <Card 
+    <Card
       style={{
         width: '100%',
         marginBottom: 16,
@@ -19,18 +19,23 @@ export default function BookmarkCard({ item, onRemoveBookmark }: BookmarkCardPro
         elevation: 4,
       }}
       onPress={() => router.push(`/(zArticleStack)/${encodeURIComponent(item.title)}`)}
+      accessibilityRole="button"
+      accessibilityLabel={`Open article: ${item.title}`}
+      accessibilityHint={`Opens the ${item.title} article`}
     >
       {/* Article Image */}
       {item.thumbnail && (
-        <Image 
-          source={item.thumbnail.source}
-          style={{ 
-            height: 200, 
+        <Image
+          source={{ uri: item.thumbnail.source }}
+          style={{
+            height: 200,
             width: '100%',
             backgroundColor: theme.colors.surfaceVariant
           }}
           contentFit="cover"
-          contentPosition="center"
+          placeholder={{ blurhash: 'L5H2EC=PM+yV0gMqNGa#00bH?G-9' }}
+          alt={`Thumbnail for ${item.title}`}
+          accessibilityLabel={`Thumbnail image for ${item.title}`}
         />
       )}
 
@@ -81,6 +86,8 @@ export default function BookmarkCard({ item, onRemoveBookmark }: BookmarkCardPro
               onRemoveBookmark(item.title);
             }}
             style={{ margin: 0 }}
+            accessibilityLabel={`Remove ${item.title} from bookmarks`}
+            accessibilityHint={`Removes this article from your bookmarks`}
           />
         </View>
       </Card.Content>

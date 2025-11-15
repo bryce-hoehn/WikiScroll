@@ -1,8 +1,8 @@
-import { Image } from 'expo-image';
+import { FlashList } from '@shopify/flash-list';
 import React, { useCallback } from 'react';
-import { FlatList } from 'react-native';
 import { List, Text, useTheme } from 'react-native-paper';
 import { SearchSuggestion } from '../../types';
+import { Image } from "expo-image";
 
 interface SearchResultsListProps {
   suggestions: SearchSuggestion[];
@@ -21,17 +21,20 @@ export default function SearchResultsList({
       description={item.description}
       left={props => (
         item.image ? (
-          <Image 
-            source={{ uri: item.image }} 
+          <Image
+            source={{ uri: item.image }}
             style={{ width: 40, height: 40, borderRadius: 4 }}
             contentFit="cover"
-            onError={() => console.log('Failed to load image for:', item.title)}
+            alt={`Thumbnail for ${item.title}`}
+            accessibilityLabel={`Thumbnail for ${item.title}`}
           />
         ) : (
           <List.Icon {...props} icon="file-document-outline" />
         )
       )}
       onPress={() => onSuggestionClick(item.title)}
+      accessibilityLabel={`Open article: ${item.title}`}
+      accessibilityHint={`Opens the ${item.title} article`}
     />
   ), [onSuggestionClick]);
 
@@ -54,10 +57,10 @@ export default function SearchResultsList({
   return (
     <>
       {renderHeader()}
-      <FlatList
+      <FlashList
         data={suggestions}
         renderItem={renderSuggestionItem}
-        keyExtractor={(item, index) => `suggestion-${index}`}
+        keyExtractor={(item) => `suggestion-${item.title}`}
         contentContainerStyle={{ padding: 8 }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"

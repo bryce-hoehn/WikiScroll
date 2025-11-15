@@ -1,16 +1,21 @@
 import React from 'react';
-import { useThemeContext } from './ThemeProvider';
+import { ThemeType, useThemeContext } from './ThemeProvider';
 
-export const PreferencesContext = React.createContext({
-  toggleTheme: () => {},
-  isThemeDark: false,
+interface PreferencesContextType {
+  currentTheme: ThemeType;
+  setTheme: (theme: ThemeType) => void;
+}
+
+export const PreferencesContext = React.createContext<PreferencesContextType>({
+  currentTheme: 'automatic',
+  setTheme: () => {},
 });
 
 export function PreferencesProvider({ children }: { children: React.ReactNode }) {
-  const { toggleTheme, isThemeDark } = useThemeContext();
+  const { currentTheme, setTheme } = useThemeContext();
   
   return (
-    <PreferencesContext.Provider value={{ toggleTheme, isThemeDark }}>
+    <PreferencesContext.Provider value={{ currentTheme, setTheme }}>
       {children}
     </PreferencesContext.Provider>
   );

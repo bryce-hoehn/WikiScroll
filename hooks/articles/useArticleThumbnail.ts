@@ -10,17 +10,17 @@ export default function useArticleThumbnail(title: string) {
   const { getOfflineArticle } = useBookmarks();
 
   return useQuery({
-    queryKey: ['article', title],
+    queryKey: ['article-thumbnail', title],
     queryFn: async () => {
       // Check if article is available offline first
       const offlineArticle = getOfflineArticle(title);
-      if (offlineArticle) {
-        return offlineArticle;
+      if (offlineArticle && offlineArticle.thumbnail) {
+        return offlineArticle.thumbnail;
       }
       
       // Fall back to network request
-      const articleData = await fetchArticleThumbnail(title);
-      return articleData;
+      const thumbnail = await fetchArticleThumbnail(title);
+      return thumbnail;
     },
     enabled: !!title,
     staleTime: 5 * 60 * 1000, // 5 minutes

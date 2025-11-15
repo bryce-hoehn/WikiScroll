@@ -14,19 +14,23 @@ export default function FeaturedArticleCard() {
   }
 
   return (
-    <Card 
+    <Card
       style={{ width: '100%' }}
-      onPress={() => router.push(`/(zArticleStack)/${encodeURIComponent(article.normalizedtitle || article.title)}`)}
+      onPress={() => router.push(`/(zArticleStack)/${encodeURIComponent(article.titles?.normalized || article.title || '')}`)}
+      accessibilityRole="button"
+      accessibilityLabel={`Open featured article: ${article.titles?.normalized || article.title || ''}`}
+      accessibilityHint={`Opens the featured article: ${article.titles?.normalized || article.title || ''}`}
     >
       {article.thumbnail && (
-        <ResponsiveImage 
-          source={{ 
-            source: article.thumbnail.source, 
-            width: article.thumbnail.width || 400, 
-            height: article.thumbnail.height || 300 
+        <ResponsiveImage
+          source={{
+            source: article.thumbnail.source,
+            width: article.thumbnail.width || 400,
+            height: article.thumbnail.height || 300
           }}
           contentFit="cover"
           style={{ borderRadius: 12 }}
+          alt={`Thumbnail for ${article.titles?.normalized || article.title || ''}`}
         />
       )}
       <Card.Content>

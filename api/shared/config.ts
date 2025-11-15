@@ -1,8 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, isAxiosError } from 'axios';
 import { Platform } from 'react-native';
-import classifyPlugin from 'wtf-plugin-classify';
-import summaryPlugin from 'wtf-plugin-summary';
-import wtf from 'wtf_wikipedia';
 
 /**
  * Wikipedia API Configuration and Rate Limiting
@@ -29,9 +26,6 @@ import wtf from 'wtf_wikipedia';
  * - Include proper User-Agent headers as required
  */
 
-// Apply wtf plugins globally
-wtf.extend(summaryPlugin);
-wtf.extend(classifyPlugin);
 
 // Wikipedia API configuration
 export const WIKIPEDIA_API_CONFIG = {
@@ -39,12 +33,13 @@ export const WIKIPEDIA_API_CONFIG = {
   BASE_URL: 'https://en.wikipedia.org/w/api.php',
   WIKIMEDIA_BASE_URL: 'https://api.wikimedia.org',
   REST_API_BASE_URL: 'https://en.wikipedia.org/api/rest_v1',
+  CORE_API_BASE_URL: 'https://api.wikimedia.org/core/v1/wikipedia/en',
 };
 
 // Set headers for Wikipedia API
 const headers: Record<string, string> = {
   'Accept': 'application/json',
-  'Api-User-Agent': WIKIPEDIA_API_CONFIG.API_USER_AGENT
+  'Api-User-Agent': WIKIPEDIA_API_CONFIG.API_USER_AGENT,
 };
 
 if (Platform.OS !== 'web') {
@@ -55,6 +50,7 @@ if (Platform.OS !== 'web') {
 export const restAxiosInstance: AxiosInstance = axios.create({
   baseURL: WIKIPEDIA_API_CONFIG.REST_API_BASE_URL,
   headers,
+  withCredentials: false
 });
 
 // Delay helper
@@ -174,5 +170,3 @@ export const fetchConcurrently = async <T, R>(
   return fulfilledResults;
 };
 
-// Export wtf with plugins
-export const wtfWithPlugins: typeof wtf = wtf;

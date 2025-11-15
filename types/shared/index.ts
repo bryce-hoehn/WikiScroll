@@ -65,15 +65,6 @@ export interface AppError {
 }
 
 /**
- * Generic response wrapper for API calls (React hook style)
- */
-export interface HookApiResponse<T> {
-  data: T | null;
-  error: AppError | null;
-  loading: boolean;
-}
-
-/**
  * Pagination parameters
  */
 export interface PaginationParams {

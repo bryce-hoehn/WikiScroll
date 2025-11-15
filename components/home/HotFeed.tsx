@@ -1,83 +1,22 @@
-import { useFeaturedContent } from '@/context/FeaturedContentContext';
-import React, { useCallback, useEffect, useState } from 'react';
-import { useRecommendations } from '../../hooks';
+import React, { useCallback } from 'react';
+import useHotArticles from '../../hooks/content/useHotArticles';
+import useTrendingArticles from '../../hooks/content/useTrendingArticles';
+import { RecommendationItem } from '../../types/components';
 import EmptyState from './EmptyState';
 import Feed from './Feed';
 
 export default function HotFeed() {
-  const { trendingCategories, refreshFeaturedContent } = useFeaturedContent();
-  const { getRecommendations } = useRecommendations();
-  
-  const [recommendations, setRecommendations] = useState<any>([]);
-  const [loading, setLoading] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-
-  const loadRecommendations = useCallback(async (isRefresh = false) => {
-    if (isRefresh) {
-      setRefreshing(true);
-    } else {
-      setLoading(true);
-    }
-    
-    try {
-      if (isRefresh) {
-        await refreshFeaturedContent();
-      }
-      
-      // For Hot page, use trending categories from featured content
-      if (trendingCategories.length === 0) {
-        setRecommendations([]);
-        return;
-      }
-      
-      const recs = await getRecommendations(15, trendingCategories);
-      setRecommendations(recs);
-    } catch (error) {
-      console.error('Failed to load trending recommendations:', error);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, [trendingCategories, getRecommendations, refreshFeaturedContent]);
+  const { data: trendingArticles = [], isLoading, refetch } = useTrendingArticles();
+  const { displayedArticles, loadingMore, loadMore } = useHotArticles(trendingArticles);
 
   const handleRefresh = useCallback(() => {
-    loadRecommendations(true);
-  }, [loadRecommendations]);
-
-  const loadMore = useCallback(async () => {
-    if (!loading) {
-      setLoading(true);
-      try {
-        // For Hot page, use trending categories from featured content
-        if (trendingCategories.length === 0) {
-          setLoading(false);
-          return;
-        }
-        
-        const newRecs = await getRecommendations(10, trendingCategories);
-        setRecommendations((prev: any[]) => {
-          const combined = [...prev, ...newRecs];
-          const uniqueRecs = combined.filter((rec, index, self) => 
-            index === self.findIndex(r => r.title === rec.title)
-          );
-          return uniqueRecs;
-        });
-      } catch (error) {
-        console.error('Failed to load more recommendations:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-  }, [loading, trendingCategories, getRecommendations]);
-
-  useEffect(() => {
-    loadRecommendations();
-  }, [loadRecommendations]);
+    refetch();
+  }, [refetch]);
 
   const renderEmptyState = useCallback(() => {
-    if (recommendations.length === 0) {
+    if (!displayedArticles || displayedArticles.length === 0) {
       return (
-        <EmptyState 
+        <EmptyState
           icon="trending-up"
           title="Loading Hot Articles"
           description="Discovering what's popular on Wikipedia right now..."
@@ -87,16 +26,16 @@ export default function HotFeed() {
     }
     
     return null;
-  }, [recommendations.length]);
+  }, [displayedArticles]);
 
-  const keyExtractor = useCallback((item: any) => 
-    `${item.title}-${item.thumbnail || 'no-thumb'}`, []);
+  const keyExtractor = useCallback((item: RecommendationItem) =>
+    `${item?.title || 'unknown'}-${item?.thumbnail?.source || 'no-thumb'}`, []);
 
   return (
     <Feed
-      data={recommendations}
-      loading={loading}
-      refreshing={refreshing}
+      data={displayedArticles}
+      loading={isLoading || loadingMore}
+      refreshing={isLoading}
       onRefresh={handleRefresh}
       loadMore={loadMore}
       renderEmptyState={renderEmptyState}

@@ -1,7 +1,7 @@
-import { CategoryPagesResponse } from '../../types/api';
-import { fetchArticleByTitle } from '../articles';
+import { CategoryArticle, CategoryPagesResponse, CategorySubcategory } from '../../types/api';
+import { fetchArticleSummary } from '../articles';
 import { fetchDescription } from '../articles/fetchDescription';
-import { actionAxiosInstance, restAxiosInstance, WIKIPEDIA_API_CONFIG } from '../shared';
+import { actionAxiosInstance, restAxiosInstance } from '../shared';
 
 /**
  * Fetch category pages with Wikipedia API compliance
@@ -20,57 +20,86 @@ export const fetchCategoryPages = async (
 ): Promise<CategoryPagesResponse> => {
   try {
     // Category members still requires Action API as REST API doesn't have equivalent
-    const url = `${WIKIPEDIA_API_CONFIG.BASE_URL}`;
-    const params = {
+    
+    // Fetch both articles and subcategories
+    const params: any = {
       action: 'query',
       list: 'categorymembers',
       cmtitle: `Category:${categoryTitle}`,
-      cmtype: 'page',
-      cmlimit: 1,
+      cmtype: 'page|subcat',
+      cmlimit: 50, // Fetch more items to provide better recommendations
       format: 'json',
       origin: '*'
     };
 
-    const response = await actionAxiosInstance.get(url, { params });
+
+    const response = await actionAxiosInstance.get('', { params });
     const data = response.data;
 
     if (!data.query || !data.query.categorymembers || data.query.categorymembers.length === 0) {
       return { articles: [], subcategories: [] };
     }
 
-    const categoryMember = data.query.categorymembers[0];
+    const articles: CategoryArticle[] = [];
+    const subcategories: CategorySubcategory[] = [];
+    const articlePromises: Promise<void>[] = [];
 
-    // Fetch article summary using REST API for better performance
-    try {
-      // Use REST API summary endpoint for thumbnails and descriptions
-      const summaryUrl = `/page/summary/${encodeURIComponent(categoryMember.title)}`;
-      const summaryResponse = await restAxiosInstance.get(summaryUrl);
-      const summaryData = summaryResponse.data;
-      
-      const article = {
-        title: summaryData.title,
-        description: summaryData.description || summaryData.extract?.substring(0, 150) || '',
-        thumbnail: summaryData.thumbnail?.source || '',
-        pageid: summaryData.pageid || categoryMember.pageid,
-      };
-
-      return { articles: [article], subcategories: [] };
-    } catch (error) {
-      console.warn(`Failed to fetch summary for ${categoryMember.title}:`, error);
-      // Fallback to original methods
-      const articleResponse = await fetchArticleByTitle(categoryMember.title);
-      const article = articleResponse.article;
-      const description = await fetchDescription(categoryMember.title);
-      
-      const fallbackArticle = {
-        title: categoryMember.title,
-        description: description || article?.description || '',
-        thumbnail: '',
-        pageid: categoryMember.pageid,
-      };
-
-      return { articles: [fallbackArticle], subcategories: [] };
+    // Separate articles and subcategories
+    for (const member of data.query.categorymembers) {
+      if (member.ns === 14) { // Subcategory namespace
+        subcategories.push({
+          title: member.title.replace('Category:', ''),
+          description: ''
+        });
+      } else if (member.ns === 0) { // Main namespace (articles)
+        // Process articles in parallel for better performance
+        const articlePromise = (async () => {
+          try {
+            // Use REST API summary endpoint for thumbnails and descriptions
+            const summaryUrl = `/page/summary/${encodeURIComponent(member.title)}`;
+            const summaryResponse = await restAxiosInstance.get(summaryUrl);
+            const summaryData = summaryResponse.data;
+            
+            articles.push({
+              title: summaryData.title,
+              description: summaryData.description || summaryData.extract?.substring(0, 150) || '',
+              thumbnail: summaryData.thumbnail?.source || '',
+              pageid: summaryData.pageid || member.pageid,
+            });
+          } catch (error) {
+            console.warn(`Failed to fetch summary for ${member.title}:`, error);
+            // Fallback to original methods
+            try {
+              const articleResponse = await fetchArticleSummary(member.title);
+              const description = await fetchDescription(member.title);
+              
+              articles.push({
+                title: member.title,
+                description: description || articleResponse?.article?.description || '',
+                thumbnail: articleResponse?.article?.thumbnail?.source || '',
+                pageid: member.pageid,
+              });
+            } catch (fallbackError) {
+              console.warn(`Fallback also failed for ${member.title}:`, fallbackError);
+              // Add basic article info without description/thumbnail
+              articles.push({
+                title: member.title,
+                description: '',
+                thumbnail: '',
+                pageid: member.pageid,
+              });
+            }
+          }
+        })();
+        
+        articlePromises.push(articlePromise);
+      }
     }
+
+    // Wait for all article details to be fetched
+    await Promise.allSettled(articlePromises);
+
+    return { articles, subcategories };
   } catch (error: any) {
     console.error(`Failed to fetch category pages for ${categoryTitle}:`, error.response?.status, error.response?.data || error);
     return { articles: [], subcategories: [] };

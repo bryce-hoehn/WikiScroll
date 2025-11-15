@@ -19,27 +19,27 @@ export interface HookResponse<T> {
 /**
  * Hook response for article data
  */
-export interface UseArticleResponse extends HookResponse<Article> {}
+export type UseArticleResponse = HookResponse<Article>;
 
 /**
  * Hook response for featured content
  */
-export interface UseFeaturedContentResponse extends HookResponse<FeaturedContentResponse['data']> {}
+export type UseFeaturedContentResponse = HookResponse<FeaturedContentResponse['data']>;
 
 /**
  * Hook response for search suggestions
  */
-export interface UseSearchSuggestionsResponse extends HookResponse<SearchSuggestion[]> {}
+export type UseSearchSuggestionsResponse = HookResponse<SearchSuggestion[]>;
 
 /**
  * Hook response for category pages
  */
-export interface UseCategoryPagesResponse extends HookResponse<CategoryPagesResponse> {}
+export type UseCategoryPagesResponse = HookResponse<CategoryPagesResponse>;
 
 /**
  * Hook response for recommendations
  */
-export interface UseRecommendationsResponse extends HookResponse<Article[]> {}
+export type UseRecommendationsResponse = HookResponse<Article[]>;
 
 /**
  * Hook response for visited articles
@@ -47,19 +47,4 @@ export interface UseRecommendationsResponse extends HookResponse<Article[]> {}
 export interface UseVisitedArticlesResponse extends HookResponse<Article[]> {
   addVisitedArticle: (title: string, article?: Article) => Promise<void>;
   clearVisitedArticles: () => Promise<void>;
-}
-
-/**
- * Action types for visited articles reducer
- */
-export type VisitedArticlesAction =
-  | { type: 'SET_ARTICLES'; payload: Article[] }
-  | { type: 'ADD_ARTICLE'; payload: { title: string; article?: Article } }
-  | { type: 'CLEAR_ARTICLES' };
-
-/**
- * State for visited articles reducer
- */
-export interface VisitedArticlesState {
-  articles: Article[];
 }

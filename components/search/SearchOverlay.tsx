@@ -15,7 +15,7 @@ export default function SearchOverlay({ visible, onClose, initialQuery = '' }: S
   const { visitedArticles } = useVisitedArticles();
   
   const debouncedQuery = useDebounce(query, 300);
-  const { data: suggestions, isLoading, error } = useSearchSuggestions(debouncedQuery);
+  const { data: suggestions } = useSearchSuggestions(debouncedQuery);
 
   const handleSearchSubmit = useCallback(() => {
     if (query.trim()) {

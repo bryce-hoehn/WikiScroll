@@ -1,8 +1,9 @@
 import BookmarkCard from '@/components/bookmarks/BookmarkCard';
 import BookmarksEmptyState from '@/components/bookmarks/BookmarksEmptyState';
 import { useBookmarks } from '@/hooks';
+import { FlashList } from '@shopify/flash-list';
 import React, { useCallback } from 'react';
-import { Alert, FlatList } from 'react-native';
+import { Alert } from 'react-native';
 import { Appbar, useTheme } from 'react-native-paper';
 
 const CARD_MARGIN = 16;
@@ -80,7 +81,7 @@ export default function BookmarksScreen() {
         )}
       </Appbar.Header>
 
-      <FlatList
+      <FlashList
         data={bookmarks}
         renderItem={renderBookmarkCard}
         keyExtractor={(item) => item.title + item.bookmarkedAt}
@@ -93,10 +94,6 @@ export default function BookmarksScreen() {
         }}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={renderEmptyState}
-        initialNumToRender={5}
-        maxToRenderPerBatch={5}
-        windowSize={10}
-        removeClippedSubviews={true}
       />
     </>
   );

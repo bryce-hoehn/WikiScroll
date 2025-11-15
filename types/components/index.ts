@@ -4,7 +4,6 @@
 
 import { ImageThumbnail } from '../api/base';
 import { Bookmark } from '../bookmarks';
-import { WtfArticleLink as ArticleLink, WtfArticleSection as ArticleSection } from '../third-party/wtf-article';
 
 /**
  * Standardized data structure for recommendation cards
@@ -80,8 +79,9 @@ export interface TrendingProps {
  * Props for article section rendering
  */
 export interface ArticleSectionRendererProps {
-  section: ArticleSection;
-  index: number;
+  articleHtml: string;
+  thumbnail?: ImageThumbnail;
+  onImagePress?: (imageUri: string, alt?: string) => void;
 }
 
 /**
@@ -89,7 +89,6 @@ export interface ArticleSectionRendererProps {
  */
 export interface TextWithLinksRendererProps {
   text: string;
-  links: ArticleLink[];
   variant?: 'bodyLarge' | 'bodyMedium' | 'bodySmall' | 'titleLarge' | 'titleMedium' | 'titleSmall';
 }
 

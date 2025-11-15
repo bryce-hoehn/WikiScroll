@@ -3,8 +3,7 @@
  */
 
 import { Article } from './articles';
-import { ImageThumbnail } from './base';
-
+import { ImageThumbnail, WikipediaPageBase } from './base';
 
 /**
  * Featured picture for UI components
@@ -40,38 +39,11 @@ export interface MostRead {
 }
 
 /**
- * Today's Featured Article interface
- */
-export interface TodayFeaturedArticle {
-  type: string;
-  title: string;
-  displaytitle: string;
-  description: string;
-  thumbnail?: ImageThumbnail;
-}
-
-/**
  * News interfaces
  */
-export interface NewsLink {
-  type: string;
-  title: string;
-  displaytitle: string;
-  namespace: {
-    id: number;
-    text: string;
-  };
-  wikibase_item: string;
-  titles: {
-    canonical: string;
-    normalized: string;
-    display: string;
-  };
-  pageid: number;
-}
-
 export interface NewsItem {
-  links: NewsLink[];
+  links: WikipediaPageBase[];
+  story?: string;
 }
 
 /**
@@ -120,26 +92,10 @@ export interface ImageOfTheDay {
 /**
  * On This Day interfaces
  */
-export interface OnThisDayPage {
-  type: string;
-  title: string;
-  displaytitle: string;
-  namespace: {
-    id: number;
-    text: string;
-  };
-  wikibase_item: string;
-  titles: {
-    canonical: string;
-    normalized: string;
-    display: string;
-  };
-  pageid: number;
-}
-
 export interface OnThisDayItem {
   text: string;
-  pages: OnThisDayPage[];
+  year: number;
+  pages: WikipediaPageBase[];
 }
 
 export interface FeaturedContentContextType {

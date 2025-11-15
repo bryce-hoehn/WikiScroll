@@ -4,7 +4,7 @@ import { restAxiosInstance } from '../shared';
 export const fetchArticleThumbnail = async (title: string): Promise<ImageThumbnail | null> => {
   try {
     // Use Wikipedia REST API to fetch page summary including thumbnail
-    const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`;
+    const url = `/page/summary/${encodeURIComponent(title)}`;
     const response = await restAxiosInstance.get(url);
 
     const data = response.data;

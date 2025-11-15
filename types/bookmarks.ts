@@ -1,5 +1,5 @@
+import { Article } from './api';
 import { ImageThumbnail } from './api/base';
-import { WtfArticleSection } from './third-party/wtf-article';
 
 export interface Bookmark {
   title: string;
@@ -8,14 +8,8 @@ export interface Bookmark {
   bookmarkedAt: string;
 }
 
-export interface OfflineArticle {
-  title: string;
-  thumbnail?: ImageThumbnail;
-  description?: string;
-  sections?: WtfArticleSection[];
+export interface OfflineArticle extends Article {
   downloadedAt: string;
-  // Make compatible with WtfArticle
-  [key: string]: unknown;
 }
 
 export interface BookmarksContextType {

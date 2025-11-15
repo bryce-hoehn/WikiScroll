@@ -2,7 +2,7 @@
  * Type definitions for Wikipedia search-related APIs
  */
 
-import { ImageThumbnail } from './base';
+import { ImageThumbnail, PageMetadata } from './base';
 
 /**
  * Search suggestion from Wikipedia API
@@ -16,11 +16,8 @@ export interface SearchSuggestion {
 /**
  * Raw search result from Wikipedia API
  */
-export interface RawSearchResult {
-  pageid: number;
-  title: string;
+export interface RawSearchResult extends PageMetadata {
   snippet?: string;
-  ns?: number;
   size?: number;
   wordcount?: number;
   timestamp?: string;
@@ -29,11 +26,11 @@ export interface RawSearchResult {
 /**
  * Page info with images from Wikipedia API
  */
-export interface PageInfo {
-  pageid: number;
-  title: string;
+export interface PageInfo extends PageMetadata {
   thumbnail?: ImageThumbnail;
   pageimage?: string;
+  description?: string;
+  descriptionsource?: string;
 }
 
 /**

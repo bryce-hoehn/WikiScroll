@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "WikipediaExpo",
-    "slug": "wikipedia",
+    "name": "WikiFlow",
+    "slug": "wikiflow",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.WikipediaExpo"
+      "bundleIdentifier": "com.anonymous.WikiFlow"
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +21,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.WikipediaExpo"
+      "package": "com.anonymous.WikiFlow"
     },
     "web": {
       "output": "static",
@@ -42,8 +42,9 @@
           }
         }
       ],
-      "expo-video",
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-localization",
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true,
@@ -53,10 +54,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "f8f5ea32-195d-40b5-8140-08215a3fbe38"
+        "projectId": "57646a65-2954-4207-a890-a5358e8043bc"
       }
     },
     "owner": "17hoehbr"
-  },
-  "name": "wikipediaexpo"
+  }
 }

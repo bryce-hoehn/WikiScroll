@@ -5,18 +5,27 @@ import { View } from 'react-native';
 import { Card, IconButton, Text, useTheme } from 'react-native-paper';
 
 import { RecommendationCardProps } from '../../types/components';
+import { shareArticle } from '../../utils/shareUtils';
 
-export default function RecommendationCard({ 
-  item, 
-  index, 
-  isBookmarked, 
-  onBookmarkToggle 
+export default function RecommendationCard({
+  item,
+  index,
+  isBookmarked,
+  onBookmarkToggle
 }: RecommendationCardProps) {
+  const handleShare = async (e: any) => {
+    e.stopPropagation(); // Prevent card navigation
+    try {
+      await shareArticle(item.title, item.description);
+    } catch (error) {
+      console.error('Failed to share article:', error);
+    }
+  };
   const theme = useTheme();
-
-  return (
+    
+    return (
     <View style={{ alignItems: 'center' }}>
-      <Card 
+      <Card
         style={{
           width: '100%',
           marginBottom: 16,
@@ -25,31 +34,37 @@ export default function RecommendationCard({
           overflow: 'hidden',
         }}
         onPress={() => router.push(`/(zArticleStack)/${encodeURIComponent(item.title)}`)}
+        accessibilityRole="button"
+        accessibilityLabel={`Open recommended article: ${item.title}`}
+        accessibilityHint={`Opens the recommended article: ${item.title}`}
       >
         {/* Article Image */}
         {item.thumbnail && (
-          <Image 
-            source={{ uri: item.thumbnail.source }} 
-            style={{ 
+          <Image
+            source={{ uri: item.thumbnail.source }}
+            style={{
               height: 300,
               width: '100%',
               backgroundColor: theme.colors.surfaceVariant
             }}
             contentFit="cover"
+            placeholder={{ blurhash: 'L5H2EC=PM+yV0gMqNGa#00bH?G-9' }}
+            alt={`Thumbnail for ${item.title}`}
+            accessibilityLabel={`Thumbnail for ${item.title}`}
           />
         )}
 
         {/* Article Content */}
         <Card.Content style={{ padding: 20 }}>
-          <View style={{ 
-            flexDirection: 'row', 
+          <View style={{
+            flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'flex-start',
           }}>
-            <Text 
-              variant="titleLarge" 
-              style={{ 
-                fontWeight: '700', 
+            <Text
+              variant="titleLarge"
+              style={{
+                fontWeight: '700',
                 lineHeight: 24,
                 color: theme.colors.onSurface,
                 flex: 1,
@@ -59,15 +74,29 @@ export default function RecommendationCard({
             >
               {item.title}
             </Text>
-            <IconButton
-              icon={isBookmarked(item.title) ? "bookmark" : "bookmark-outline"}
-              iconColor={isBookmarked(item.title) ? theme.colors.primary : theme.colors.onSurfaceVariant}
-              onPress={(e) => {
-                e.stopPropagation(); // Prevent card navigation
-                onBookmarkToggle(item);
-              }}
-              style={{ margin: 0 }}
-            />
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <IconButton
+                icon="share-variant"
+                iconColor={theme.colors.onSurfaceVariant}
+                onPress={handleShare}
+                style={{ margin: 0 }}
+                size={20}
+                accessibilityLabel={`Share ${item.title}`}
+                accessibilityHint="Shares this article with others"
+              />
+              <IconButton
+                icon={isBookmarked(item.title) ? "bookmark" : "bookmark-outline"}
+                iconColor={isBookmarked(item.title) ? theme.colors.primary : theme.colors.onSurfaceVariant}
+                onPress={(e) => {
+                  e.stopPropagation(); // Prevent card navigation
+                  onBookmarkToggle(item);
+                }}
+                style={{ margin: 0 }}
+                size={20}
+                accessibilityLabel={isBookmarked(item.title) ? `Remove ${item.title} from bookmarks` : `Add ${item.title} to bookmarks`}
+                accessibilityHint={isBookmarked(item.title) ? "Removes article from bookmarks" : "Adds article to bookmarks"}
+              />
+            </View>
           </View>
           <Text 
             variant="bodyMedium" 
