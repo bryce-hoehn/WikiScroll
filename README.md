@@ -1,30 +1,31 @@
 # WikiFlow
 
-![WikiFlow Logo](./assets/images/icon.png)
+<p align="center">
+  <img src="./assets/images/icon.png" alt="wikiflow logo" />
+</p>
 
-Demo: https://wikiflow--nd9xzc9921.expo.app/
+[Demo:](https://wikiflow.expo.app/)
 
-A modern, cross-platform Wikipedia reader built with React Native and Expo. Explore Wikipedia with a beautiful, intuitive interface optimized for mobile devices. Experience the smooth flow of knowledge discovery.
+A modern, cross-platform Wikipedia reader built with React Native and Expo.
 
 ## Features
 
 ### 🏠 Home Screen
-- **For You Feed**: Personalized article recommendations based on your reading history
+- **For You Feed**: Personalized article recommendations based on your reading history. Browsing history is stored locally on device. Recommendations are pulled from random backlinks to items in your history
 - **Hot Articles**: Trending content from Wikipedia's most read API
 - **Random Articles**: Discover new topics with random article exploration
-- **Featured Content Carousel**: Interactive carousel with "On This Day", "Did You Know", and news cards
 
 ### 🔍 Search & Discovery
 - **Smart Search**: Real-time search suggestions with Wikipedia's API
 - **Featured Content**: Today's featured article, picture of the day, and more
 - **Trending Articles**: Most-read articles with daily updates
+- **Featured Content Carousel**: Interactive carousel with "On This Day", "Did You Know", and news cards
 - **Categories**: Browse Wikipedia by topic categories with visual icons
 
 ### 📚 Reading Experience
 - **Bookmarks**: Save articles for offline reading with persistent storage
-- **Dark Mode**: Comfortable reading in any lighting with automatic theme switching
+- **Dark Mode**: Material Design is used throughout the app, with multiple preset themes available
 - **Responsive Design**: Optimized for mobile and tablet screens
-- **Article Navigation**: Easy navigation between related articles with backlink recommendations
 - **Image Modal**: Full-screen image viewing with pinch-to-zoom
 - **Scroll-to-Top FAB**: Floating action button that appears when scrolling down, providing quick navigation back to the top
 
@@ -118,27 +119,6 @@ The app integrates with multiple Wikipedia APIs:
 - **Categories API**: Category browsing and navigation
 - **Backlinks API**: Related article recommendations
 
-## Key Features Implementation
-
-### Article Reading
-- HTML content parsing and rendering with custom styles
-- Image modal with zoom and pan gestures
-- Backlink recommendations for content discovery
-- Article thumbnails and metadata display
-
-### Content Discovery
-- Multiple feed types (For You, Hot, Random)
-- Category-based browsing with visual icons
-- Trending articles with pagination
-- Featured content carousel with different card types
-
-### User Experience
-- Persistent bookmarks with AsyncStorage
-- Visited article tracking
-- Debounced search for performance
-- Error boundaries and loading states
-- Responsive design for all screen sizes
-
 ## Contributing
 
 1. Fork the repository
@@ -158,7 +138,3 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - React Native community for the ecosystem
 - React Native Paper for the UI components
 - TanStack Query for efficient data fetching
-
----
-
-**WikiFlow** - Where knowledge flows smoothly.
