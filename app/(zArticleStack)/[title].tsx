@@ -24,23 +24,29 @@ export default function ArticleScreen() {
   const { addVisitedArticle } = useVisitedArticles();
   const { addBookmark, removeBookmark, isBookmarked } = useBookmarks();
 
-  // Fetch thumbnail when title changes
+  // Fetch thumbnail when title changes - defer to avoid blocking navigation
   useEffect(() => {
     const fetchThumbnail = async () => {
       if (title) {
-        const thumbnail = await fetchArticleThumbnail(title as string);
-        setThumbnail(thumbnail as unknown as ImageThumbnail);
+        // Use setTimeout to yield to the UI thread for navigation
+        setTimeout(async () => {
+          const thumbnail = await fetchArticleThumbnail(title as string);
+          setThumbnail(thumbnail as unknown as ImageThumbnail);
+        }, 100);
       }
     };
 
     fetchThumbnail();
   }, [title]);
 
-  // Track article visit when article data is loaded (only once per article)
+  // Track article visit when article data is loaded (only once per article) - defer to avoid blocking
   useEffect(() => {
     if (article && title && !hasTrackedVisit.current) {
-      addVisitedArticle(title as string, article);
-      hasTrackedVisit.current = true;
+      // Use setTimeout to yield to the UI thread for navigation
+      setTimeout(() => {
+        addVisitedArticle(title as string, article);
+        hasTrackedVisit.current = true;
+      }, 200);
     }
   }, [article, title, addVisitedArticle]);
 

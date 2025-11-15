@@ -16,7 +16,7 @@ export default function TabNavigation() {
           tabBarActiveTintColor: theme.colors.primary,
           tabBarStyle: {
             backgroundColor: theme.colors.surface,
-            borderTopColor: theme.colors.surface
+            borderTopColor: theme.colors.outline
           }
         }}
       >

@@ -66,7 +66,7 @@ const createMD3Theme = (scheme: any, isDark: boolean) => {
   };
 };
 
-// Create themes from JSON data
+// Create themes from JSON data (static - created once)
 const themes = {
   'light': createMD3Theme(themesData.schemes.light, false),
   'light-medium-contrast': createMD3Theme(themesData.schemes['light-medium-contrast'], false),

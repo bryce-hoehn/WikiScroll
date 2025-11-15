@@ -7,9 +7,9 @@ import RenderHtml, { HTMLContentModel, HTMLElementModel } from 'react-native-ren
 import { getArticleClassStyles, getArticleTagStyles } from '../../utils/articleStyles';
 import ScrollToTopFAB from '../common/ScrollToTopFAB';
 import ArticleImageModal from './ArticleImageModal';
-import { CaptionRenderer, createDomVisitors, ImageRenderer } from './ArticleRenderers';
+import { CaptionRenderer, ImageRenderer, useDomVisitors } from './ArticleRenderers';
 
-// Optimized article content component
+// Optimized article content component with performance improvements
 const ArticleContent = React.memo(({
   articleHtml,
   renderConfig,
@@ -29,9 +29,14 @@ const ArticleContent = React.memo(({
     domVisitors={renderConfig.domVisitors}
     customHTMLElementModels={renderConfig.customHTMLElementModels}
     enableExperimentalMarginCollapsing={true}
-    ignoredDomTags={['link', 'meta', 'map', 'video', 'audio']}
+    ignoredDomTags={['link', 'meta', 'map', 'video', 'audio', 'script', 'style', 'noscript']}
     enableExperimentalBRCollapsing={true}
     defaultTextProps={{selectable: true}}
+    // Performance optimizations
+    computeEmbeddedMaxWidth={() => renderConfig.width - 32} // Account for padding
+    systemFonts={['Arial', 'Courier New', 'Georgia']} // Limit font loading
+    // Reduce re-renders
+    key={articleHtml?.substring(0, 100)} // Use content-based key for better caching
     baseStyle={{
       userSelect: 'text',
       fontSize: fontSize,
@@ -60,7 +65,7 @@ export default function Article({ title }: ArticleProps) {
   });
   const scrollViewRef = useRef<ScrollView>(null);
   const [fabVisible, setFabVisible] = useState(false);
-  const [fontSize, setFontSize] = useState(16); // Base font size
+  const [fontSize] = useState(16); // Base font size
 
   const handleLinkPress = useCallback((href: string) => {
     // Handle internal Wikipedia links (both relative and absolute)
@@ -92,15 +97,15 @@ export default function Article({ title }: ArticleProps) {
     Linking.openURL(href).catch(console.error);
   }, []);
 
-  // Optimized: Only recalculate base styles when theme changes
-  const baseTagsStyles = useMemo(() => getArticleTagStyles(theme), [theme]);
-  
-  // Optimized: Apply font scaling directly in the baseStyle instead of recalculating all tags
-  const tagsStyles = useMemo(() => {
-    return baseTagsStyles as any;
-  }, [baseTagsStyles]);
-
-  const classesStyles = useMemo(() => getArticleClassStyles(theme) as any, [theme]);
+  // Optimized: Calculate styles once and reuse them
+  const { tagsStyles, classesStyles } = useMemo(() => {
+    const baseTagsStyles = getArticleTagStyles(theme);
+    const classesStyles = getArticleClassStyles(theme);
+    return {
+      tagsStyles: baseTagsStyles as any,
+      classesStyles: classesStyles as any
+    };
+  }, [theme]);
 
   // // Zoom controls
   // const increaseFontSize = useCallback(() => {
@@ -114,14 +119,6 @@ export default function Article({ title }: ArticleProps) {
   // const resetFontSize = useCallback(() => {
   //   setFontSize(16); // Reset to default
   // }, []);
-
-  const renderersProps = useMemo(() => ({
-    a: {
-      onPress: (event: any, href: string) => {
-        handleLinkPress(href);
-      },
-    }
-  }), [handleLinkPress]);
 
   const handleImagePress = useCallback((image: { uri: string; alt?: string }) => {
     setImageModalState({
@@ -137,31 +134,48 @@ export default function Article({ title }: ArticleProps) {
     });
   }, []);
 
-  const renderers = useMemo(() => ({
-    img: (props: any) => <ImageRenderer {...props} onImagePress={handleImagePress} />,
-    caption: CaptionRenderer
-  }), [handleImagePress]);
+  // Get DOM visitors from worklet hook
+  const domVisitors = useDomVisitors();
 
-  const customHTMLElementModels = useMemo(() => ({
-    caption: HTMLElementModel.fromCustomModel({
-      tagName: 'caption',
-      contentModel: HTMLContentModel.block
-    })
-  }), []);
+  // Optimized: Combine all render-related configurations into a single memo
+  const { renderConfig } = useMemo(() => {
+    const renderersProps = {
+      a: {
+        onPress: (event: any, href: string) => {
+          handleLinkPress(href);
+        },
+      }
+    };
 
-  const domVisitors = useMemo(() => createDomVisitors(), []);
+    const renderers = {
+      img: (props: any) => <ImageRenderer {...props} onImagePress={handleImagePress} />,
+      caption: CaptionRenderer
+    };
 
+    const customHTMLElementModels = {
+      caption: HTMLElementModel.fromCustomModel({
+        tagName: 'caption',
+        contentModel: HTMLContentModel.block
+      })
+    };
 
-  // Optimized: Memoize render configuration with stable dependencies
-  const renderConfig = useMemo(() => ({
-    width,
-    tagsStyles,
-    classesStyles,
-    renderersProps,
-    renderers,
-    domVisitors,
-    customHTMLElementModels
-  }), [width, tagsStyles, classesStyles, renderersProps, renderers, domVisitors, customHTMLElementModels]);
+    const renderConfig = {
+      width,
+      tagsStyles,
+      classesStyles,
+      renderersProps,
+      renderers,
+      domVisitors,
+      customHTMLElementModels
+    };
+
+    return {
+      renderersProps,
+      renderers,
+      customHTMLElementModels,
+      renderConfig
+    };
+  }, [width, tagsStyles, classesStyles, handleLinkPress, handleImagePress, domVisitors]);
 
 
   // Render states

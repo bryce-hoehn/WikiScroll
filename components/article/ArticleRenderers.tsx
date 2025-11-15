@@ -1,9 +1,10 @@
 import { selectAll } from "css-select";
 import { removeElement } from "domutils";
 import { Image } from "expo-image";
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
-import { Text, useTheme } from 'react-native-paper';
+import { Text, useTheme } from "react-native-paper";
+import { runOnUI } from 'react-native-worklets';
 
 // Custom caption renderer for table captions
 export const CaptionRenderer = ({ tnode }: { tnode: any }) => {
@@ -127,51 +128,76 @@ export const ImageRenderer = ({
 };
 
 /**
- * DOM visitor function to clean up Wikipedia-specific elements
- * Removes edit icons, hatnotes, and navigation boxes while keeping content
+ * Worklet function for DOM processing - runs on UI thread without blocking
  */
-export const createDomVisitors = () => {
-  const cleanCss = (element: any) => {
-    try {
-      // Define selectors for elements to remove (keeping infoboxes, external links, and references)
-      const selectorsToRemove = [
-        '.mw-editsection',     // Edit section links
-        '.hatnote',            // Hatnotes (disambiguation links)
-        '.navbox',             // Navigation boxes
-        '.catlinks',           // Category links at bottom
-        '.printfooter',        // Print footer
-        '.portal',             // Portal boxes
-        '.portal-bar',
-        '.sister-bar',
-        '.sistersitebox',       // Sister site boxes
-        '.sidebar',
-        '.shortdescription',
-        '.nomobile',
-        '.mw-empty-elt',
-        '.mw-valign-text-top',
-        '.plainlinks',
-      ];
+const processDomWorklet = (element: any) => {
+  'worklet';
+  
+  if (!element.children || element.children.length === 0) {
+    return;
+  }
 
-      // Process each selector
-      selectorsToRemove.forEach((selector) => {
-        const elements = selectAll(selector, element);
-        elements.forEach((el: any) => {
-          try {
-            if (el.parentNode) {
-              removeElement(el);
-            }
-          } catch (error) {
-            console.warn(`Failed to remove element with selector "${selector}":`, error);
+  try {
+    // Define selectors for elements to remove
+    const selectorsToRemove = [
+      '.mw-editsection',     // Edit section links
+      '.hatnote',            // Hatnotes (disambiguation links)
+      '.navbox',             // Navigation boxes
+      '.catlinks',           // Category links at bottom
+      '.printfooter',        // Print footer
+      '.portal',             // Portal boxes
+      '.portal-bar',
+      '.sister-bar',
+      '.sistersitebox',       // Sister site boxes
+      '.sidebar',
+      '.shortdescription',
+      '.nomobile',
+      '.mw-empty-elt',
+      '.mw-valign-text-top',
+      '.plainlinks',
+    ];
+
+    // Process all selectors in the worklet thread
+    for (const selector of selectorsToRemove) {
+      const elements = selectAll(selector, element);
+      
+      for (const el of elements) {
+        try {
+          if (el.parentNode) {
+            removeElement(el);
           }
-        });
-      });
-
-    } catch (error) {
-      console.warn('Error in onElement DOM visitor:', error);
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (error) {
+          // Continue with next element
+        }
+      }
     }
-  };
 
-  return {
-    onElement: cleanCss,
-  };
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    // Silently fail to avoid blocking the UI
+  }
+};
+
+/**
+ * Hook for creating DOM visitors using worklets to avoid blocking UI thread
+ */
+export const useDomVisitors = () => {
+  const [visitors, setVisitors] = useState<any>(null);
+
+  useEffect(() => {
+    // Initialize the visitors object once
+    const cleanCss = (element: any) => {
+      // Run the DOM processing on the UI thread via worklet
+      runOnUI(() => {
+        processDomWorklet(element);
+      })();
+    };
+
+    setVisitors({
+      onElement: cleanCss,
+    });
+  }, []);
+
+  return visitors;
 };

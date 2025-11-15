@@ -99,8 +99,18 @@ export default function useHotArticles(trendingArticles: TrendingArticle[]) {
       }
     });
     
-    // Only update if there are actual changes
-    if (JSON.stringify(updatedArticles) !== JSON.stringify(currentDisplayed)) {
+    // Only update if there are actual changes - use efficient comparison
+    const hasChanges = updatedArticles.length !== currentDisplayed.length ||
+      updatedArticles.some((article, index) => {
+        const currentArticle = currentDisplayed[index];
+        return !currentArticle ||
+          article.title !== currentArticle.title ||
+          article.description !== currentArticle.description ||
+          article.pageid !== currentArticle.pageid ||
+          article.thumbnail?.source !== currentArticle.thumbnail?.source;
+      });
+    
+    if (hasChanges) {
       setDisplayedArticles(updatedArticles);
       displayedArticlesRef.current = updatedArticles;
     }

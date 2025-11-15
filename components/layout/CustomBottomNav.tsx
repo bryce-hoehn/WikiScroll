@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface NavItem {
   name: string;
@@ -57,6 +58,7 @@ interface CustomBottomNavProps {
 
 export default function CustomBottomNav({ currentRoute }: CustomBottomNavProps) {
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
 
   const handleNavPress = (route: any) => {
     if (route === '/(tabs)') {
@@ -74,7 +76,12 @@ export default function CustomBottomNav({ currentRoute }: CustomBottomNavProps) 
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.surface }]}>
+    <View style={[styles.container, {
+      backgroundColor: theme.colors.surface,
+      borderTopColor: theme.colors.outline,
+      paddingBottom: insets.bottom,
+      height: 60 + insets.bottom
+    }]}>
       {navItems.map((item) => {
         const active = isActive(item.route);
         const color = active ? theme.colors.primary : theme.colors.onSurfaceVariant;
@@ -86,20 +93,20 @@ export default function CustomBottomNav({ currentRoute }: CustomBottomNavProps) 
             onPress={() => handleNavPress(item.route)}
           >
             {item.iconSet === 'material' ? (
-              <MaterialIcons 
-                name={item.icon as any} 
-                size={24} 
-                color={color} 
+              <MaterialIcons
+                name={item.icon as any}
+                size={24}
+                color={color}
               />
             ) : (
-              <MaterialCommunityIcons 
-                name={item.icon as any} 
-                size={24} 
-                color={color} 
+              <MaterialCommunityIcons
+                name={item.icon as any}
+                size={24}
+                color={color}
               />
             )}
-            <Text 
-              variant="labelSmall" 
+            <Text
+              variant="labelSmall"
               style={[styles.label, { color }]}
               numberOfLines={1}
             >
@@ -115,9 +122,7 @@ export default function CustomBottomNav({ currentRoute }: CustomBottomNavProps) 
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    height: 60,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(0, 0, 0, 0.1)',
   },
   navItem: {
     flex: 1,
