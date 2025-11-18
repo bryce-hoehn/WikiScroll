@@ -27,9 +27,6 @@ The app is functional but has not been thoroughly tested. Consider it a work in 
 - **Popular Articles**: Top read articles on Wikipedia
 - **Random Articles**: Discover new topics
 - **Featured Content**: Daily featured articles, "On This Day" entries, and more
-
-### Reading Experience
-
 - **Bookmarks**: Save articles for later
 - **Dark Mode**: Automatic theme switching
 - **Article Navigation**: Easy browsing between related articles
@@ -109,26 +106,14 @@ WikipediaExpo/
 └── types/                  # TypeScript definitions
 ```
 
-## API Integration
-
-This app uses Wikipedia's public APIs:
-
-- Featured Content API
-- Pageviews API
-- Search API
-- Article API
-- Categories API
-
-All content is provided by Wikipedia under their standard licensing terms.
-
 ## Known Limitations
 
 - Recommendation algorithm is extremely basic
-- Probably still needs some performance optimization
+- Performance optimizations needed, especially for initial load
 - Error handling could be more robust
 - Limited testing
 - Media player does not work
-- API calls are directly to Wikimedia's public API and thus abide by their rate limits
+- API calls are directly to Wikimedia's public API, so network speed is limited to their rate limits
 - The codebase is still being refined as I learn
 
 ## Third-Party Libraries
@@ -147,8 +132,6 @@ All dependencies are listed in `package.json` with their respective licenses. Mo
 ## Acknowledgments
 
 - **Wikipedia** for providing the content and APIs that make this project possible
-- **Expo** team for the excellent development platform
-- **React Native** community for the ecosystem and support
 - **komsiatun** from Noun Project for the book icon used in the logo
 - All the open-source maintainers whose libraries I've used
 
