@@ -32,6 +32,10 @@ interface ExpansionPanelProps {
    * Test ID for testing
    */
   testID?: string;
+  /**
+   * Native ID for finding the element (e.g., for scrolling)
+   */
+  nativeID?: string;
 }
 
 /**
@@ -56,6 +60,7 @@ export default function ExpansionPanel({
   style,
   accessibilityLabel,
   testID,
+  nativeID,
 }: ExpansionPanelProps) {
   const theme = useTheme();
   const { reducedMotion } = useReducedMotion();
@@ -206,7 +211,7 @@ export default function ExpansionPanel({
   });
 
   return (
-    <View style={[styles.container, style]} testID={testID}>
+    <View style={[styles.container, style]} testID={testID} nativeID={nativeID}>
       {/* Header - always visible */}
       <Pressable
         onPress={onPress}

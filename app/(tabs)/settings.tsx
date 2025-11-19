@@ -6,24 +6,24 @@ import { useBookmarks } from '@/context/BookmarksContext';
 import { useThemeContext } from '@/context/ThemeProvider';
 import { useReducedMotion, useVisitedArticles } from '@/hooks';
 import {
-  exportUserProfile,
-  importUserProfile,
-  readFileContent,
+    exportUserProfile,
+    importUserProfile,
+    readFileContent,
 } from '@/utils/bookmarkImportExport';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, Linking, Platform, ScrollView, useWindowDimensions, View } from 'react-native';
 import {
-  Appbar,
-  Button,
-  Divider,
-  List,
-  Menu,
-  Modal,
-  Portal,
-  Switch,
-  Text,
-  useTheme,
+    Appbar,
+    Button,
+    Divider,
+    List,
+    Menu,
+    Modal,
+    Portal,
+    Switch,
+    Text,
+    useTheme,
 } from 'react-native-paper';
 import { useSnackbar } from '../../context/SnackbarContext';
 
@@ -480,7 +480,7 @@ export default function SettingsScreen() {
             left={(props) => <List.Icon {...props} icon="bug-outline" />}
             right={(props) => <List.Icon {...props} icon="open-in-new" />}
             onPress={() => {
-              const url = 'https://github.com/bryce-hoehn/WikiFlow/issues';
+              const url = 'https://github.com/bryce-hoehn/Wikiscroll/issues';
               if (Platform.OS === 'web') {
                 window.open(url, '_blank', 'noopener,noreferrer');
               } else {
@@ -489,7 +489,7 @@ export default function SettingsScreen() {
                     console.error('Failed to open GitHub issues:', err);
                   }
                   showError(
-                    'Unable to open GitHub. Please visit: https://github.com/bryce-hoehn/WikiFlow/issues'
+                    'Unable to open GitHub. Please visit: https://github.com/bryce-hoehn/Wikiscroll/issues'
                   );
                 });
               }

@@ -11,6 +11,33 @@ interface RandomFeedProps {
   scrollY?: Animated.Value;
 }
 
+const BATCH_SIZE = 6;
+const INITIAL_LOAD_COUNT = 18;
+const LOAD_MORE_COUNT = 12;
+
+async function fetchArticlesInBatches(count: number): Promise<ArticleResponse[]> {
+  const allResponses: ArticleResponse[] = [];
+  
+  for (let i = 0; i < count; i += BATCH_SIZE) {
+    const currentBatchSize = Math.min(BATCH_SIZE, count - i);
+    const batchPromises = Array.from({ length: currentBatchSize }, () => fetchRandomArticle());
+    
+    const batchResults = await Promise.allSettled(batchPromises);
+    
+    batchResults.forEach((result) => {
+      if (result.status === 'fulfilled') {
+        allResponses.push(result.value);
+      }
+    });
+    
+    if (i + BATCH_SIZE < count) {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
+  }
+  
+  return allResponses;
+}
+
 export default function RandomFeed({ scrollY }: RandomFeedProps) {
   const [randomArticles, setRandomArticles] = useState<RecommendationItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -22,14 +49,10 @@ export default function RandomFeed({ scrollY }: RandomFeedProps) {
 
     setLoading(true);
     try {
-      // Load more articles at once for seamless scrolling
-      const articlePromises = [];
-      const loadCount = randomArticles.length === 0 ? 25 : 15; // More on initial load
-      for (let i = 0; i < loadCount; i++) {
-        articlePromises.push(fetchRandomArticle());
-      }
-
-      const responses = await Promise.all(articlePromises);
+      const loadCount = randomArticles.length === 0 ? INITIAL_LOAD_COUNT : LOAD_MORE_COUNT;
+      
+      const responses = await fetchArticlesInBatches(loadCount);
+      
       const validArticles = responses
         .filter((response: ArticleResponse) => response.article !== null)
         .map((response: ArticleResponse) => {
@@ -48,10 +71,8 @@ export default function RandomFeed({ scrollY }: RandomFeedProps) {
           } as RecommendationItem;
         });
 
-      // Use functional update to avoid stale closure
       setRandomArticles((prev) => {
         const updated = [...prev, ...validArticles];
-        // Stop loading after reaching a reasonable number for performance
         if (updated.length >= 50) {
           setHasMore(false);
         }
@@ -66,7 +87,6 @@ export default function RandomFeed({ scrollY }: RandomFeedProps) {
     }
   }, [loading, hasMore, randomArticles.length]);
 
-  // Load initial articles - use ref to prevent infinite loop
   const hasLoadedInitialRef = useRef(false);
   useEffect(() => {
     if (!hasLoadedInitialRef.current && randomArticles.length === 0 && !loading) {
@@ -81,13 +101,8 @@ export default function RandomFeed({ scrollY }: RandomFeedProps) {
     setHasMore(true);
 
     try {
-      // Load more articles on refresh for seamless experience
-      const articlePromises = [];
-      for (let i = 0; i < 25; i++) {
-        articlePromises.push(fetchRandomArticle());
-      }
-
-      const responses = await Promise.all(articlePromises);
+      const responses = await fetchArticlesInBatches(INITIAL_LOAD_COUNT);
+      
       const validArticles = responses
         .filter((response: ArticleResponse) => response.article !== null)
         .map((response: ArticleResponse) => {

@@ -14,7 +14,7 @@ export default function Root({ children }: PropsWithChildren) {
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
         {/* Page title */}
-        <title>WikiFlow</title>
+        <title>Wikiscroll</title>
 
         {/* Link the PWA manifest file. */}
         <link rel="manifest" href="/manifest.json" />
@@ -32,7 +32,7 @@ export default function Root({ children }: PropsWithChildren) {
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="WikiFlow" />
+        <meta name="apple-mobile-web-app-title" content="Wikiscroll" />
         <link rel="apple-touch-icon" href="/icon.png" />
 
         {/*

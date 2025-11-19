@@ -1,7 +1,7 @@
 {
   "id": "/",
-  "short_name": "WikiFlow",
-  "name": "WikiFlow - Wikipedia Reader",
+  "short_name": "Wikiscroll",
+  "name": "Wikiscroll",
   "description": "A modern Wikipedia reader",
   "icons": [
     {

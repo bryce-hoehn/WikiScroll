@@ -40,7 +40,7 @@ export const isDev = (): boolean => {
  * @returns The app name string
  */
 export const getAppName = (): string => {
-  return Constants.expoConfig?.name || 'WikiFlow';
+  return Constants.expoConfig?.name || 'Wikiscroll';
 };
 
 /**
@@ -48,7 +48,7 @@ export const getAppName = (): string => {
  * @returns The app slug string
  */
 export const getAppSlug = (): string => {
-  return Constants.expoConfig?.slug || 'wikiflow';
+  return Constants.expoConfig?.slug || 'wikiscroll';
 };
 
 /**

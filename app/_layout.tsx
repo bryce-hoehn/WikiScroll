@@ -3,7 +3,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { setBackgroundColorAsync } from 'expo-system-ui';
 import React, { useEffect } from 'react';
-import { Platform, View } from 'react-native';
+import { LogBox, Platform, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useTheme } from 'react-native-paper';
 import ErrorBoundary from '../components/common/ErrorBoundary';
@@ -15,11 +15,94 @@ import { SnackbarProvider } from '../context/SnackbarContext';
 import { ThemeProvider } from '../context/ThemeProvider';
 
 // Silence development-only logs in production builds (aggressive sweep).
-// Keeps console.error for runtime errors, removes console.log/warn/debug noise.
+// Filters console.error for known harmless third-party library errors.
 if (typeof __DEV__ !== 'undefined' && !__DEV__) {
   console.log = () => {};
-  console.warn = () => {};
   console.debug = () => {};
+  
+  // Silence warnings in production
+  console.warn = () => {};
+  
+  // Disable React Native LogBox warnings in production
+  try {
+    LogBox.ignoreAllLogs(true);
+  } catch (e) {
+    // LogBox might not be available in all environments
+  }
+  
+  // Filter console.error to silence known harmless errors from third-party libraries
+  const originalError = console.error;
+  console.error = (...args: any[]) => {
+    const errorMessage = args.join(' ');
+    
+    // List of known harmless error patterns to silence in production
+    const harmlessErrors = [
+      "can't access property",
+      "document.body is null",
+      "useNativeDriver",
+      "RCTAnimation",
+      "shadow*",
+      "props.pointerEvents is deprecated",
+      "Source map error",
+      "request failed with status 404",
+      "installHook.js.map",
+    ];
+    
+    // Only silence if it matches a known harmless error pattern
+    const isHarmless = harmlessErrors.some(pattern => 
+      errorMessage.toLowerCase().includes(pattern.toLowerCase())
+    );
+    
+    if (!isHarmless) {
+      originalError.apply(console, args);
+    }
+  };
+  
+  // Also catch uncaught errors and filter them
+  if (typeof window !== 'undefined') {
+    const originalOnError = window.onerror;
+    window.onerror = (message, source, lineno, colno, error) => {
+      const errorMessage = String(message);
+      const harmlessErrors = [
+        "can't access property",
+        "document.body is null",
+        "useNativeDriver",
+        "Source map error",
+      ];
+      
+      const isHarmless = harmlessErrors.some(pattern => 
+        errorMessage.toLowerCase().includes(pattern.toLowerCase())
+      );
+      
+      if (!isHarmless && originalOnError) {
+        return originalOnError(message, source, lineno, colno, error);
+      }
+      return false; // Suppress the error
+    };
+    
+    // Catch unhandled promise rejections that might be harmless
+    const originalUnhandledRejection = window.onunhandledrejection;
+    window.addEventListener('unhandledrejection', (event: PromiseRejectionEvent) => {
+      const errorMessage = event.reason?.message || String(event.reason || '');
+      const harmlessErrors = [
+        "can't access property",
+        "document.body is null",
+      ];
+      
+      const isHarmless = harmlessErrors.some(pattern => 
+        errorMessage.toLowerCase().includes(pattern.toLowerCase())
+      );
+      
+      if (isHarmless) {
+        event.preventDefault(); // Suppress the error
+      } else if (originalUnhandledRejection) {
+        // Call original handler if it exists
+        if (typeof originalUnhandledRejection === 'function') {
+          originalUnhandledRejection.call(window, event);
+        }
+      }
+    });
+  }
 }
 
 const queryClient = new QueryClient({

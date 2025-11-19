@@ -2,7 +2,7 @@ import { useArticleHtml, useReadingProgress } from '@/hooks';
 // import { activateKeepAwake, deactivateKeepAwake } from 'expo-keep-awake';
 import { router } from 'expo-router';
 import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, ScrollView, useWindowDimensions, View } from 'react-native';
+import { Animated, Platform, ScrollView, UIManager, useWindowDimensions, View } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import {
   useFontFamily,
@@ -151,9 +151,81 @@ export default function Article({
 
   const handleSectionPress = useCallback((sectionId: string) => {
     setScrollToSection(sectionId);
-    // Reset after a brief delay to allow navigation to occur
-    setTimeout(() => setScrollToSection(null), 100);
   }, []);
+
+  // Minimal smooth scroll to section
+  useEffect(() => {
+    if (!scrollToSection || !scrollViewRef.current) return;
+
+    const scrollToElement = (retryCount = 0) => {
+      const maxRetries = 10;
+      if (retryCount >= maxRetries) {
+        setScrollToSection(null);
+        return;
+      }
+
+      if (Platform.OS === 'web') {
+        // Web: Use native scrollIntoView API
+        const element = document.getElementById(`section-${scrollToSection}`);
+        if (!element) {
+          setTimeout(() => scrollToElement(retryCount + 1), 100);
+          return;
+        }
+
+        // Use browser's native scrollIntoView for smooth scrolling
+        element.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start',
+          inline: 'nearest'
+        });
+        setScrollToSection(null);
+      } else {
+        // Native: Use measure API (modern approach)
+        const reactTag = (UIManager as any).findViewByNativeID?.(`section-${scrollToSection}`);
+        
+        if (reactTag && scrollViewRef.current) {
+          try {
+            // Measure target element position using UIManager
+            (UIManager as any).measure(reactTag, (x: number, y: number, width: number, height: number, pageX: number, pageY: number) => {
+              // Measure scroll view position to calculate relative offset
+              if (scrollViewRef.current) {
+                (scrollViewRef.current as any).measure?.(
+                  (sx: number, sy: number, sw: number, sh: number, spx: number, spy: number) => {
+                    const relativeY = pageY - spy;
+                    scrollViewRef.current?.scrollTo({ y: Math.max(0, relativeY - 20), animated: true });
+                    setScrollToSection(null);
+                  }
+                );
+              } else {
+                setTimeout(() => scrollToElement(retryCount + 1), 100);
+              }
+            });
+          } catch (error) {
+            // Retry if measurement fails
+            setTimeout(() => scrollToElement(retryCount + 1), 100);
+          }
+        } else {
+          setTimeout(() => scrollToElement(retryCount + 1), 100);
+        }
+      }
+    };
+
+    // Wait for section expansion animation to complete, then scroll
+    // Use requestAnimationFrame to ensure DOM is updated
+    const attemptScroll = () => {
+      if (typeof requestAnimationFrame !== 'undefined') {
+        requestAnimationFrame(() => {
+          setTimeout(() => scrollToElement(), 100);
+        });
+      } else {
+        setTimeout(() => scrollToElement(), 100);
+      }
+    };
+    
+    const timeoutId = setTimeout(attemptScroll, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [scrollToSection]);
 
   // Get initial expanded sections from saved progress
   const progressData = getProgressData(articleTitleForProgress);

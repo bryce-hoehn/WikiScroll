@@ -93,6 +93,7 @@ export default function ArticleSectionRenderer({
       onPress={onPress}
       accessibilityLabel={`Section: ${section.heading}`}
       testID={`section-${section.id}`}
+      nativeID={`section-${section.id}`}
     >
       {section.html && !section.error && renderSectionBody(section)}
       {isStillLoading && (

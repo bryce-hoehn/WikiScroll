@@ -1,10 +1,10 @@
-# WikiFlow
+# Wikiscroll
 
 <p align="center">
-  <img src="./assets/images/icon.png" alt="wikiflow logo" height=128 width=128 />
+  <img src="./assets/images/icon.png" alt="wikiscroll logo" height=128 width=128 />
 </p>
 
-[Demo](https://wikiflow.expo.app/)
+[Demo](https://wikiscroll.expo.app/)
 
 A cross-platform Wikipedia reader built with React Native and Expo. This project is my final passion project required for my UX Master's Degree at Kent State. The goal of the project is to provide a more educational alternative to social media platforms like X utilizing the same attention design principles that makes these platforms addictive.
 
@@ -17,7 +17,7 @@ This is an educational project demonstrating UX principles, modern mobile app de
 - Modern React Native development practices
 - Combining theory of information organization with practical interaction design
 
-The app is functional but has not been thoroughly tested. Consider it a work in progress and a learning exercise.
+The app is functional but not been thoroughly tested. Consider it a work in progress and a learning exercise.
 
 ## Features
 
@@ -78,7 +78,7 @@ The app is functional but has not been thoroughly tested. Consider it a work in 
 1. Clone the repository:
 
    ```
-   git clone https://github.com/bryce-hoehn/WikiFlow
+   git clone https://github.com/bryce-hoehn/Wikiscroll
    cd WikipediaExpo
    ```
 
@@ -132,7 +132,8 @@ WikipediaExpo/
 - Recommendation algorithm is extremely basic
 - Error handling could be more robust
 - Limited testing
-- API calls are directly to Wikimedia's public API, so network speed is limited to their rate limits
+- Large bundle size - initial load will always be slow
+- Network speed limited by WikiMedia API rate limits
 - The codebase is still being refined as I learn
 
 ## Third-Party Libraries
@@ -153,7 +154,7 @@ All dependencies are listed in `package.json` with their respective licenses. Mo
 ## Acknowledgments
 
 - **Wikipedia** for providing the content and APIs that make this project possible
-- **komsiatun** from Noun Project for the book icon used in the logo
+- **Maria Karina Putri** from Noun Project for the scroll icon used in the logo
 - All the open-source maintainers whose libraries I've used
 
 ## License

@@ -1,6 +1,6 @@
 import useAsyncStorage from './useAsyncStorage';
 
-const REDUCED_MOTION_KEY = '@wikiflow:reducedMotion';
+const REDUCED_MOTION_KEY = '@wikiscroll:reducedMotion';
 const DEFAULT_REDUCED_MOTION = false;
 
 /**

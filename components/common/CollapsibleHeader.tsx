@@ -81,7 +81,7 @@ export default function CollapsibleHeader({
       {children || (
         <View style={styles.content}>
           <Image
-            source={require('../../assets/images/books.png')}
+            source={require('../../assets/images/scroll.png')}
             style={[
               styles.icon,
               {

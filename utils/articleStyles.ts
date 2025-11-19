@@ -235,6 +235,47 @@ export function getArticleClassStyles(
       justifyContent: 'center',
       marginVertical: 8,
     },
+    // Combined class for thumbnail groups (table-like structure)
+    'thumbinner multiimageinner': {
+      width: '100%',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginVertical: 12,
+      flexDirection: 'column' as any,
+    },
+    // Table row equivalent in thumbnail groups
+    trow: {
+      width: '100%',
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexDirection: 'row' as any,
+      flexWrap: 'wrap' as any,
+      marginVertical: 4,
+    },
+    // Single thumbnail item in a group
+    tsingle: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginHorizontal: 8,
+      marginVertical: 8,
+      maxWidth: '100%',
+    },
+    // Image container within thumbnail
+    thumbimage: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '100%',
+    },
+    // Caption for thumbnails
+    thumbcaption: {
+      fontSize: baseFontSize * 0.85,
+      color: theme.colors.onSurfaceVariant,
+      fontStyle: 'italic',
+      textAlign: 'center' as TextStyle['textAlign'],
+      marginTop: 8,
+      paddingHorizontal: 8,
+      width: '100%',
+    },
     // Wikipedia-specific classes for better theme adaptation
     reference: {
       color: theme.colors.onSurfaceVariant,
