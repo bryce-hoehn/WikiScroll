@@ -1,4 +1,4 @@
-# Wikiscroll
+# WikiScroll
 
 <p align="center">
   <img src="./assets/images/icon.png" alt="wikiscroll logo" height=128 width=128 />
