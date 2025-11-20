@@ -151,8 +151,12 @@ function InnerLayout() {
       if (root) {
         root.style.backgroundColor = bgColor;
       }
-      document.body.style.backgroundColor = bgColor;
-      document.documentElement.style.backgroundColor = bgColor;
+      if (document.body) {
+        document.body.style.backgroundColor = bgColor;
+      }
+      if (document.documentElement) {
+        document.documentElement.style.backgroundColor = bgColor;
+      }
     }
   }, [theme.colors.background]);
 

@@ -18,6 +18,9 @@ export const copyToClipboard = async (text: string): Promise<void> => {
       await navigator.clipboard.writeText(text);
     } else {
       // Fallback for older browsers
+      if (typeof document === 'undefined' || !document.body) {
+        throw new Error('Document body is not available');
+      }
       const textArea = document.createElement('textarea');
       textArea.value = text;
       textArea.style.position = 'fixed';

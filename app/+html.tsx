@@ -137,8 +137,12 @@ export default function Root({ children }: PropsWithChildren) {
               const bgColor = getInitialBackgroundColor();
               
               // Set background color immediately
-              document.documentElement.style.backgroundColor = bgColor;
-              document.body.style.backgroundColor = bgColor;
+              if (document.documentElement) {
+                document.documentElement.style.backgroundColor = bgColor;
+              }
+              if (document.body) {
+                document.body.style.backgroundColor = bgColor;
+              }
               const root = document.getElementById('root');
               if (root) {
                 root.style.backgroundColor = bgColor;

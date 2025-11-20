@@ -138,6 +138,9 @@ export async function exportUserProfile(): Promise<boolean> {
 
     if (Platform.OS === 'web') {
       // Web: Create download link
+      if (typeof document === 'undefined' || !document.body) {
+        throw new Error('Document body is not available');
+      }
       const blob = new Blob([jsonString], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
