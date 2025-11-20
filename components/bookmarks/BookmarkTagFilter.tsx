@@ -50,10 +50,18 @@ export default function BookmarkTagFilter({
 
   // Calculate pagination for all platforms
   // Estimate available width: screen width minus padding
-  const containerPadding = 24; // 12px on each side
-  const estimatedChipWidth = 100; // Reduced from 120 to fit more pills per page
+  const containerPadding = SPACING.md * 2; // 12px on each side = 24px total
+  const chipGap = SPACING.xs; // 4px gap between chips
+  // Use a conservative estimate to account for variable chip widths (tag names + counts)
+  // Chips can be 80-140px wide depending on content, so we use 110px as a safe average
+  const estimatedChipWidth = 110;
   const availableWidth = width - containerPadding;
-  const tagsPerPage = Math.max(1, Math.floor(availableWidth / estimatedChipWidth));
+  
+  // Calculate tags per page accounting for gaps between chips
+  // Formula: availableWidth = (n * chipWidth) + ((n - 1) * gap)
+  // Solving for n: n = (availableWidth + gap) / (chipWidth + gap)
+  const tagsPerPage = Math.max(1, Math.floor((availableWidth + chipGap) / (estimatedChipWidth + chipGap)));
+  
   const totalPages = Math.ceil(tagData.length / tagsPerPage);
   const startIndex = currentPage * tagsPerPage;
   const endIndex = startIndex + tagsPerPage;
