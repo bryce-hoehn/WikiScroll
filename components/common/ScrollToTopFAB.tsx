@@ -98,9 +98,11 @@ export default function ScrollToTopFAB({ scrollRef, visible = true, hasBottomTab
     default: 16,
   });
 
-  const spacingFromTabBar = hasBottomTabBar && !isLargeScreen ? 16 : 0;
+  // MD3: Bottom tab bar is 56dp tall, FAB should be positioned above it with 16dp spacing
+  const tabBarHeight = 56;
+  const spacingFromTabBar = 16; // MD3: 16dp spacing between FAB and tab bar
   const bottomPosition = hasBottomTabBar && !isLargeScreen
-    ? spacingFromTabBar
+    ? tabBarHeight + spacingFromTabBar + (Platform.OS === 'web' ? Math.max(insets.bottom, SPACING.sm) : insets.bottom)
     : insets.bottom + bottomSpacing;
 
   return (

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import React, { useMemo } from 'react';
-import { fetchArticleSummariesBatch } from '../../api';
+import { fetchArticleSummaries } from '../../api';
 import { VisitedArticle } from '../../hooks/storage/useVisitedArticles';
 import { Article } from '../../types/api';
 import BaseListWithHeader from './BaseListWithHeader';
@@ -27,9 +27,15 @@ export default function RecentArticlesList({
     [recentVisitedArticles]
   );
 
+  // Sort for stable query key but don't mutate original array
+  const sortedTitlesForKey = useMemo(
+    () => [...visibleTitles].sort().join('|'),
+    [visibleTitles]
+  );
+
   const { data: summariesMap } = useQuery({
-    queryKey: ['article-summaries-batch', visibleTitles.sort().join('|')],
-    queryFn: () => fetchArticleSummariesBatch(visibleTitles),
+    queryKey: ['article-summaries-batch', sortedTitlesForKey],
+    queryFn: () => fetchArticleSummaries(visibleTitles),
     enabled: visibleTitles.length > 0,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 30 * 60 * 1000, // 30 minutes

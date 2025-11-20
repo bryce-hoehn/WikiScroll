@@ -6,7 +6,8 @@ export { fetchArticleBacklinks, fetchArticleBacklinksBatch } from './fetchArticl
 export { fetchArticleCategories } from './fetchArticleCategories';
 export { fetchArticleHtml } from './fetchArticleHtml';
 export { fetchArticleLinks, fetchArticleLinksBatch } from './fetchArticleLinks';
-export { fetchArticleSummariesBatch, fetchArticleSummary } from './fetchArticleSummary';
+export { fetchArticleSummaries, fetchArticleSummary } from './fetchArticleSummary';
 export { fetchArticleThumbnail } from './fetchArticleThumbnail';
 export { fetchDescription } from './fetchDescription';
-export { fetchRandomArticle } from './fetchRandomArticle';
+export { fetchRandomArticle, fetchRandomArticles } from './fetchRandomArticle';
+

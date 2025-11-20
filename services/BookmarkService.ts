@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
-import { fetchArticleSummary } from '../api';
+import { fetchArticleSummaries, fetchArticleSummary } from '../api';
 import { ImageThumbnail } from '../types/api/base';
 import { Bookmark, OfflineArticle } from '../types/bookmarks';
 import { saveBookmarks, saveOfflineArticles } from '../utils/bookmarkStorage';
@@ -140,28 +140,32 @@ export async function downloadAllBookmarks(
     const bookmarkTitles = currentBookmarks.map((bookmark) => bookmark.title);
     const total = bookmarkTitles.length;
 
-    // Fetch articles one by one to report progress
-    const updatedOfflineArticles = { ...currentOfflineArticles };
+    if (total === 0) {
+      return currentOfflineArticles;
+    }
 
-    for (let i = 0; i < bookmarkTitles.length; i++) {
-      const title = bookmarkTitles[i];
-      try {
-        const articleResponse = await fetchArticleSummary(title);
-        if (articleResponse.article) {
-          const offlineArticle: OfflineArticle = {
-            ...articleResponse.article,
-            downloadedAt: new Date().toISOString(),
-          };
-          updatedOfflineArticles[articleResponse.article.title] = offlineArticle;
-        }
-      } catch (error) {
-        // Silently handle fetch errors for individual articles
+    // Batch fetch all articles at once (much faster)
+    const summariesMap = await fetchArticleSummaries(bookmarkTitles);
+    const updatedOfflineArticles = { ...currentOfflineArticles };
+    const downloadedAt = new Date().toISOString();
+
+    // Process results and report progress
+    let downloaded = 0;
+    for (const title of bookmarkTitles) {
+      const article = summariesMap[title];
+      if (article) {
+        const offlineArticle: OfflineArticle = {
+          ...article,
+          downloadedAt,
+        };
+        updatedOfflineArticles[article.title] = offlineArticle;
+        downloaded++;
       }
 
-      // Report progress
+      // Report progress after each article is processed
       if (onProgress) {
-        const progress = (i + 1) / total;
-        onProgress(progress, i + 1, total);
+        const progress = downloaded / total;
+        onProgress(progress, downloaded, total);
       }
     }
 

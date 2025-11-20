@@ -1,4 +1,4 @@
-import { fetchArticleSummariesBatch } from '@/api';
+import { fetchArticleSummaries } from '@/api';
 import RecommendationCard from '@/components/article/RecommendationCard';
 import { LAYOUT } from '@/constants/layout';
 import { SPACING } from '@/constants/spacing';
@@ -62,9 +62,15 @@ export default function ReadingHistoryScreen() {
     [visitedArticles]
   );
 
+  // Sort for stable query key but don't mutate original array
+  const sortedTitlesForKey = useMemo(
+    () => [...articleTitles].sort().join('|'),
+    [articleTitles]
+  );
+
   const { data: summariesMap, isLoading: isLoadingSummaries } = useQuery({
-    queryKey: ['article-summaries-batch', articleTitles.sort().join('|')],
-    queryFn: () => fetchArticleSummariesBatch(articleTitles),
+    queryKey: ['article-summaries-batch', sortedTitlesForKey],
+    queryFn: () => fetchArticleSummaries(articleTitles),
     enabled: articleTitles.length > 0,
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,

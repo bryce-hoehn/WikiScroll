@@ -1,7 +1,7 @@
-import { FlashList } from '@shopify/flash-list';
 import React, { useState } from 'react';
-import { Platform, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { Chip, IconButton, useTheme } from 'react-native-paper';
+import { SPACING } from '../../constants/spacing';
 import { TYPOGRAPHY } from '../../constants/typography';
 import { Bookmark } from '../../types/bookmarks';
 
@@ -48,18 +48,16 @@ export default function BookmarkTagFilter({
     ];
   }, [tags, tagCounts, bookmarks.length]);
 
-  // Calculate pagination for web
-  const isWeb = Platform.OS === 'web';
-  // Estimate available width: screen width minus sidebars and padding
-  // For header, we have less space - estimate container width
+  // Calculate pagination for all platforms
+  // Estimate available width: screen width minus padding
   const containerPadding = 24; // 12px on each side
-  const estimatedChipWidth = 120; // Average width including count text and margin
+  const estimatedChipWidth = 100; // Reduced from 120 to fit more pills per page
   const availableWidth = width - containerPadding;
-  const tagsPerPage = isWeb ? Math.max(1, Math.floor(availableWidth / estimatedChipWidth)) : tagData.length;
-  const totalPages = isWeb ? Math.ceil(tagData.length / tagsPerPage) : 1;
+  const tagsPerPage = Math.max(1, Math.floor(availableWidth / estimatedChipWidth));
+  const totalPages = Math.ceil(tagData.length / tagsPerPage);
   const startIndex = currentPage * tagsPerPage;
   const endIndex = startIndex + tagsPerPage;
-  const displayedTags = isWeb ? tagData.slice(startIndex, endIndex) : tagData;
+  const displayedTags = tagData.slice(startIndex, endIndex);
 
   // Reset to first page when tagData changes
   React.useEffect(() => {
@@ -70,106 +68,64 @@ export default function BookmarkTagFilter({
     return null; // Don't show tag filter if no tags exist
   }
 
-  const renderTagItem = ({
-    item,
-  }: {
-    item: { tag: string | null; label: string; count: number };
-  }) => (
-    <Chip
-      selected={selectedTag === item.tag}
-      onPress={() => onTagChange(item.tag)}
-      style={styles.chip}
-      textStyle={{ fontSize: TYPOGRAPHY.bodyMedium }}
-      mode="flat"
-      compact
-    >
-      {item.label} ({item.count})
-    </Chip>
-  );
-
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.surface }]}>
-      {isWeb ? (
-        <>
-          <View style={styles.tagsRow}>
-            {displayedTags.map((item) => (
-              <Chip
-                key={item.tag || 'all'}
-                selected={selectedTag === item.tag}
-                onPress={() => onTagChange(item.tag)}
-                style={styles.chip}
-                textStyle={{ fontSize: TYPOGRAPHY.bodyMedium }}
-                mode="flat"
-                compact
-              >
-                {item.label} ({item.count})
-              </Chip>
+      <View style={styles.tagsRow}>
+        {displayedTags.map((item) => (
+          <Chip
+            key={item.tag || 'all'}
+            selected={selectedTag === item.tag}
+            onPress={() => onTagChange(item.tag)}
+            style={styles.chip}
+            textStyle={styles.chipText}
+            mode="flat"
+            compact
+          >
+            {item.label} ({item.count})
+          </Chip>
+        ))}
+      </View>
+      {totalPages > 1 && (
+        <View style={styles.paginationContainer}>
+          <IconButton
+            icon="chevron-left"
+            iconColor={theme.colors.onSurfaceVariant}
+            size={24}
+            onPress={() => {
+              // Loop pagination: go to last page if on first page
+              setCurrentPage(currentPage === 0 ? totalPages - 1 : currentPage - 1);
+            }}
+            accessibilityLabel="Previous page"
+            accessibilityHint="Navigate to the previous page of tags"
+          />
+          <View style={styles.pageIndicators}>
+            {Array.from({ length: totalPages }, (_, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.pageIndicator,
+                  {
+                    backgroundColor:
+                      currentPage === index
+                        ? theme.colors.primary
+                        : theme.colors.surfaceVariant,
+                  },
+                ]}
+              />
             ))}
           </View>
-          {totalPages > 1 && (
-            <View style={styles.paginationContainer}>
-              <IconButton
-                icon="chevron-left"
-                iconColor={
-                  currentPage === 0
-                    ? theme.colors.onSurfaceDisabled
-                    : theme.colors.onSurfaceVariant
-                }
-                size={20}
-                onPress={() => {
-                  if (currentPage > 0) {
-                    setCurrentPage(currentPage - 1);
-                  }
-                }}
-                disabled={currentPage === 0}
-                accessibilityLabel="Previous page"
-                accessibilityHint="Navigate to the previous page of tags"
-              />
-              <View style={styles.pageIndicators}>
-                {Array.from({ length: totalPages }, (_, index) => (
-                  <View
-                    key={index}
-                    style={[
-                      styles.pageIndicator,
-                      {
-                        backgroundColor:
-                          currentPage === index
-                            ? theme.colors.primary
-                            : theme.colors.surfaceVariant,
-                      },
-                    ]}
-                  />
-                ))}
-              </View>
-              <IconButton
-                icon="chevron-right"
-                iconColor={
-                  currentPage === totalPages - 1
-                    ? theme.colors.onSurfaceDisabled
-                    : theme.colors.onSurfaceVariant
-                }
-                size={20}
-                onPress={() => {
-                  if (currentPage < totalPages - 1) {
-                    setCurrentPage(currentPage + 1);
-                  }
-                }}
-                disabled={currentPage === totalPages - 1}
-                accessibilityLabel="Next page"
-                accessibilityHint="Navigate to the next page of tags"
-              />
-            </View>
-          )}
-        </>
-      ) : (
-        <FlashList
-          data={tagData}
-          renderItem={renderTagItem}
-          keyExtractor={(item) => item.tag || 'all'}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.chipContainer}
-        />
+          <IconButton
+            icon="chevron-right"
+            iconColor={theme.colors.onSurfaceVariant}
+            size={24}
+            onPress={() => {
+              // Loop pagination: go to first page if on last page
+              setCurrentPage(currentPage === totalPages - 1 ? 0 : currentPage + 1);
+            }}
+            accessibilityLabel="Next page"
+            accessibilityHint="Navigate to the next page of tags"
+          />
+        </View>
       )}
     </View>
   );
@@ -177,37 +133,39 @@ export default function BookmarkTagFilter({
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  chipContainer: {
-    paddingRight: 12,
-    gap: 4,
+    paddingVertical: SPACING.sm,
+    paddingHorizontal: SPACING.md,
   },
   tagsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 4,
+    gap: SPACING.xs,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   chip: {
-    marginRight: 4,
-    height: 32,
+    height: 32, // MD3: Filter chips are 32dp height
+    marginBottom: SPACING.xs,
+  },
+  chipText: {
+    fontSize: TYPOGRAPHY.bodyMedium,
+    lineHeight: TYPOGRAPHY.bodyMedium * 1.2,
   },
   paginationContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 8,
-    gap: 8,
+    marginTop: SPACING.sm,
+    gap: SPACING.sm,
   },
   pageIndicators: {
     flexDirection: 'row',
-    gap: 6,
+    gap: SPACING.xs + 2, // 6dp gap between indicators
     alignItems: 'center',
   },
   pageIndicator: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+    width: 8, // MD3: 8dp width for better touch target
+    height: 8, // MD3: 8dp height
+    borderRadius: 4, // Circular indicator
   },
 });

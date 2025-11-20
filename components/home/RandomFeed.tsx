@@ -1,8 +1,7 @@
 import { router } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, Platform } from 'react-native';
-import { fetchRandomArticle } from '../../api';
-import { fetchConcurrently } from '../../api/shared/restAxiosInstance';
+import { Animated } from 'react-native';
+import { fetchRandomArticles } from '../../api';
 import { ArticleResponse } from '../../types/api/articles';
 import { RecommendationItem } from '../../types/components';
 import StandardEmptyState from '../common/StandardEmptyState';
@@ -14,50 +13,6 @@ interface RandomFeedProps {
 
 const INITIAL_LOAD_COUNT = 18;
 const LOAD_MORE_COUNT = 12;
-
-async function fetchArticlesInBatches(count: number): Promise<ArticleResponse[]> {
-  // Use fetchConcurrently to respect rate limits (max 5 concurrent)
-  // This is much faster than sequential batching and works better in Safari
-  const items = Array.from({ length: count }, (_, i) => i);
-  
-  try {
-    const responses = await fetchConcurrently(
-      items,
-      () => fetchRandomArticle(),
-      5 // Max concurrent requests (matches rate limiter)
-    );
-    
-    // Return responses (failed ones are filtered out by fetchConcurrently)
-    return responses;
-  } catch (error) {
-    // Fallback: if concurrent fetching fails (e.g., Safari issues), try sequential
-    // This is slower but more reliable for Safari
-    if (Platform.OS === 'web') {
-      const allResponses: ArticleResponse[] = [];
-      
-      // Make requests truly sequentially with small delays
-      for (let i = 0; i < count; i++) {
-        try {
-          const response = await fetchRandomArticle();
-          allResponses.push(response);
-        } catch (err) {
-          // Continue with next request if one fails
-          allResponses.push({ article: null, error: 'Failed to fetch' } as ArticleResponse);
-        }
-        
-        // Add small delay between requests to avoid overwhelming Safari
-        if (i < count - 1) {
-          await new Promise((resolve) => setTimeout(resolve, 150));
-        }
-      }
-      
-      return allResponses;
-    }
-    
-    // For non-web platforms, return empty array on error
-    return [];
-  }
-}
 
 function RandomFeed({ scrollY }: RandomFeedProps) {
   const [randomArticles, setRandomArticles] = useState<RecommendationItem[]>([]);
@@ -74,7 +29,7 @@ function RandomFeed({ scrollY }: RandomFeedProps) {
     try {
       const loadCount = randomArticles.length === 0 ? INITIAL_LOAD_COUNT : LOAD_MORE_COUNT;
       
-      const responses = await fetchArticlesInBatches(loadCount);
+      const responses = await fetchRandomArticles(loadCount);
       
       const validArticles = responses
         .filter((response: ArticleResponse) => response.article !== null)
@@ -131,7 +86,7 @@ function RandomFeed({ scrollY }: RandomFeedProps) {
     setHasError(false);
 
     try {
-      const responses = await fetchArticlesInBatches(INITIAL_LOAD_COUNT);
+      const responses = await fetchRandomArticles(INITIAL_LOAD_COUNT);
       
       const validArticles = responses
         .filter((response: ArticleResponse) => response.article !== null)

@@ -22,7 +22,6 @@ import { FeaturedContent, FeaturedContentResponse } from '@/types/api/featured';
  */
 export const fetchFeaturedContent = async (): Promise<FeaturedContentResponse> => {
   const tryFetchForDate = async (date: Date): Promise<FeaturedContent | null> => {
-    // Use UTC date components to match Wikipedia API (which uses UTC dates)
     const formattedDate = [
       date.getUTCFullYear(),
       String(date.getUTCMonth() + 1).padStart(2, '0'),
@@ -36,12 +35,8 @@ export const fetchFeaturedContent = async (): Promise<FeaturedContentResponse> =
         baseURL: WIKIPEDIA_API_CONFIG.WIKIMEDIA_BASE_URL,
       });
 
-      // Normalize the response: convert null arrays to empty arrays
-      // The API sometimes returns null for news/dyk when they're not available
       const data = response.data;
       if (data) {
-        // Handle both null and undefined (missing fields)
-        // The API sometimes omits news/dyk entirely, or returns null
         const normalized = {
           ...data,
           news: data.news != null && Array.isArray(data.news) ? data.news : [],
@@ -64,19 +59,16 @@ export const fetchFeaturedContent = async (): Promise<FeaturedContentResponse> =
   };
 
   try {
-    // Use UTC date to avoid timezone issues - Wikipedia API uses UTC dates
     const now = new Date();
     const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
     let data = await tryFetchForDate(today);
 
-    // If current day fails, try previous day
     if (!data) {
       const yesterday = new Date(today);
       yesterday.setUTCDate(yesterday.getUTCDate() - 1);
       data = await tryFetchForDate(yesterday);
     }
 
-    // If both fail, throw the original error
     if (!data) {
       throw new Error('Featured content not available for current or previous day');
     }
@@ -85,7 +77,6 @@ export const fetchFeaturedContent = async (): Promise<FeaturedContentResponse> =
       data,
     };
   } catch (error: unknown) {
-    // Re-throw error to be handled by caller
     throw error;
   }
 };

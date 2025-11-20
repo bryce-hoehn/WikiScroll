@@ -1,4 +1,4 @@
-import { fetchArticleSummariesBatch } from '@/api';
+import { fetchArticleSummaries } from '@/api';
 import { RecommendationItem } from '@/types/components';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -37,27 +37,25 @@ export default function useHotArticles(trendingArticles: TrendingArticle[]) {
   }, [allTrendingArticles, currentPage]);
 
   // Batch fetch all displayed article summaries at once (much faster)
+  // Sort titles for query key (stable cache key) but don't mutate original array
+  const sortedTitlesForKey = useMemo(() => [...displayedTitles].sort().join('|'), [displayedTitles]);
+  
   const { data: summariesMap, isLoading: isLoadingSummaries } = useQuery({
-    queryKey: ['article-summaries-batch', displayedTitles.sort().join('|')],
-    queryFn: () => fetchArticleSummariesBatch(displayedTitles),
+    queryKey: ['article-summaries-batch', sortedTitlesForKey],
+    queryFn: () => fetchArticleSummaries(displayedTitles),
     enabled: displayedTitles.length > 0,
     staleTime: 10 * 60 * 1000, // 10 minutes
     gcTime: 30 * 60 * 1000, // 30 minutes
     refetchOnWindowFocus: false, // Don't refetch on focus
   });
 
-  const isArticleComplete = useCallback((article: RecommendationItem | null): boolean => {
-    return !!(
-      article &&
-      article.title &&
-      article.title !== '' &&
-      (article.description !== undefined || article.extract !== undefined)
-    );
-  }, []);
-
   const displayedArticles = useMemo(() => {
-    if (!summariesMap) return [];
-    
+    // Don't return articles until summaries have loaded (or query has completed)
+    // This allows the Feed component to show skeletons while loading
+    if (isLoadingSummaries || !summariesMap) {
+      return [];
+    }
+
     return displayedTitles
       .map((title) => {
         const article = summariesMap[title];
@@ -71,10 +69,14 @@ export default function useHotArticles(trendingArticles: TrendingArticle[]) {
             pageid: article.pageid,
           } as RecommendationItem;
         }
-        return null;
+        // If article not found in summaries, return basic item with just title
+        return {
+          title,
+          displaytitle: title,
+        } as RecommendationItem;
       })
-      .filter((article): article is RecommendationItem => isArticleComplete(article));
-  }, [summariesMap, displayedTitles, isArticleComplete]);
+      .filter((article): article is RecommendationItem => article !== null && article.title !== '');
+  }, [summariesMap, displayedTitles, isLoadingSummaries]);
 
   useEffect(() => {
     if (trendingArticles.length > 0 && allTrendingArticles.length === 0) {
@@ -119,12 +121,12 @@ export default function useHotArticles(trendingArticles: TrendingArticle[]) {
     };
   }, []);
 
-  const isLoadingInitial = allTrendingArticles.length > 0 && displayedArticles.length === 0;
-  const isLoading = isLoadingSummaries;
+  // Show loading state while summaries are being fetched
+  const isLoading = isLoadingSummaries && displayedTitles.length > 0;
 
   return {
     displayedArticles,
-    loadingMore: loadingMore || isLoadingInitial || isLoading,
+    loadingMore: loadingMore || isLoading,
     loadMore,
     hasMore: currentPage * ITEMS_PER_PAGE < allTrendingArticles.length,
   };

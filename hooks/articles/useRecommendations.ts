@@ -3,7 +3,7 @@ import {
   fetchArticleBacklinksBatch,
   fetchArticleLinks,
   fetchArticleLinksBatch,
-  fetchArticleSummariesBatch,
+  fetchArticleSummaries,
   fetchArticleSummary,
 } from '@/api';
 import useArticleLinks from '@/hooks/storage/useArticleLinks';
@@ -63,15 +63,17 @@ export default function useBacklinkRecommendations() {
         if (articlesNeedingFetch.length > 0) {
           try {
             // Batch fetch both backlinks and forward links in parallel
+            // Sort for stable query key but don't mutate original array
+            const sortedTitlesForKey = [...articlesNeedingFetch].sort().join('|');
             const [backlinksBatch, forwardLinksBatch] = await Promise.all([
               queryClient.fetchQuery({
-                queryKey: ['article-backlinks-batch', articlesNeedingFetch.sort().join('|')],
+                queryKey: ['article-backlinks-batch', sortedTitlesForKey],
                 queryFn: () => fetchArticleBacklinksBatch(articlesNeedingFetch),
                 staleTime: 10 * 60 * 1000,
                 gcTime: 30 * 60 * 1000,
               }),
               queryClient.fetchQuery({
-                queryKey: ['article-links-batch', articlesNeedingFetch.sort().join('|')],
+                queryKey: ['article-links-batch', sortedTitlesForKey],
                 queryFn: () => fetchArticleLinksBatch(articlesNeedingFetch),
                 staleTime: 10 * 60 * 1000,
                 gcTime: 30 * 60 * 1000,
@@ -79,19 +81,22 @@ export default function useBacklinkRecommendations() {
             ]);
 
             // Combine backlinks and forward links for each article
+            // Collect all updates first, then save in parallel
+            const linkUpdates: Array<{ title: string; links: string[] }> = [];
             for (const title of articlesNeedingFetch) {
               const backlinks = backlinksBatch[title] || [];
               const forwardLinks = forwardLinksBatch[title] || [];
-            const allLinks = Array.from(new Set([...backlinks, ...forwardLinks]));
+              const allLinks = Array.from(new Set([...backlinks, ...forwardLinks]));
               fetchedLinksMap[title] = allLinks;
-
-              // Save to AsyncStorage for future use (even if empty, to avoid refetching)
-              await saveArticleLinks(title, allLinks);
+              linkUpdates.push({ title, links: allLinks });
 
               // Update React Query cache for individual article queries
               queryClient.setQueryData(['article-backlinks', title], backlinks);
               queryClient.setQueryData(['article-links', title], forwardLinks);
             }
+
+            // Save all links in parallel (AsyncStorage handles concurrency)
+            await Promise.all(linkUpdates.map(({ title, links }) => saveArticleLinks(title, links)));
           } catch (error) {
             // If batch fetch fails, fall back to individual fetches
             if (typeof __DEV__ !== 'undefined' && __DEV__) {
@@ -145,9 +150,11 @@ export default function useBacklinkRecommendations() {
         
         let summariesMap: Record<string, Article | null> = {};
         try {
+          // Sort for stable query key but don't mutate original array
+          const sortedTitlesForKey = [...titlesToFetch].sort().join('|');
           summariesMap = await queryClient.fetchQuery({
-            queryKey: ['article-summaries-batch', titlesToFetch.sort().join('|')],
-            queryFn: () => fetchArticleSummariesBatch(titlesToFetch),
+            queryKey: ['article-summaries-batch', sortedTitlesForKey],
+            queryFn: () => fetchArticleSummaries(titlesToFetch),
             staleTime: 5 * 60 * 1000,
             gcTime: 30 * 60 * 1000,
           });

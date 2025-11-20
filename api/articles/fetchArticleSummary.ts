@@ -1,6 +1,6 @@
 import { actionAxiosInstance, restAxiosInstance, WIKIPEDIA_API_CONFIG } from '@/api/shared';
 import { Article, ArticleResponse } from '@/types/api';
-import { ImageThumbnail, WikipediaActionApiParams, WikipediaPage, WikipediaQueryResponse } from '@/types/api/base';
+import { ImageThumbnail, isAxiosError, WikipediaActionApiParams, WikipediaPage, WikipediaQueryResponse } from '@/types/api/base';
 import { normalizeWikipediaTitle } from '@/utils/titleNormalization';
 
 /**
@@ -30,7 +30,6 @@ export const fetchArticleSummary = async (title: string): Promise<ArticleRespons
       `/page/summary/${encodeURIComponent(cleanTitle)}`,
       {
         baseURL: WIKIPEDIA_API_CONFIG.REST_API_BASE_URL,
-        // Uses centralized 8s timeout from axiosInstance
       }
     );
 
@@ -51,13 +50,10 @@ export const fetchArticleSummary = async (title: string): Promise<ArticleRespons
 };
 
 /**
- * Batch fetch article summaries using Wikipedia Action API
- * Much faster than individual REST API calls
- * 
  * @param titles - Array of article titles to fetch summaries for
  * @returns Map of article title to Article object
  */
-export const fetchArticleSummariesBatch = async (
+export const fetchArticleSummaries = async (
   titles: string[]
 ): Promise<Record<string, Article | null>> => {
   if (titles.length === 0) {
@@ -65,8 +61,6 @@ export const fetchArticleSummariesBatch = async (
   }
 
   const results: Record<string, Article | null> = {};
-  
-  // Wikipedia API allows up to 50 titles per request
   const BATCH_SIZE = 50;
   const batches: string[][] = [];
   
@@ -86,7 +80,7 @@ export const fetchArticleSummariesBatch = async (
         pilimit: 50,
         exintro: true,
         explaintext: true,
-        exlimit: 50,
+        exlimit: 20,
         inprop: 'url',
         format: 'json',
         origin: '*',
@@ -98,6 +92,14 @@ export const fetchArticleSummariesBatch = async (
       });
 
       const pages = batchResponse.data.query?.pages;
+      const normalized = (batchResponse.data.query as any)?.normalized || [];
+      const normalizedToOriginal: Record<string, string> = {};
+      for (const norm of normalized as Array<{ from: string; to: string }>) {
+        if (norm.from && norm.to) {
+          normalizedToOriginal[norm.to] = batch.find(t => normalizeWikipediaTitle(t) === norm.from) || norm.from;
+        }
+      }
+      
       if (pages) {
         for (const page of Object.values(pages)) {
           const pageData = page as WikipediaPage & { 
@@ -107,19 +109,35 @@ export const fetchArticleSummariesBatch = async (
             fullurl?: string;
           };
           
-          // Match by title (case-insensitive)
-          const originalTitle = batch.find(
-            t => normalizeWikipediaTitle(t) === pageData.title || t === pageData.title
-          );
+          const pageTitle = pageData.title;
+          let originalTitle = batch.find(t => {
+            const normalizedInput = normalizeWikipediaTitle(t);
+            return normalizedInput === normalizeWikipediaTitle(pageTitle) || 
+                   t === pageTitle ||
+                   normalizeWikipediaTitle(t) === pageTitle;
+          });
+          
+          if (!originalTitle && normalizedToOriginal[pageTitle]) {
+            originalTitle = normalizedToOriginal[pageTitle];
+          }
           
           if (originalTitle) {
+            let thumbnail: ImageThumbnail | undefined;
+            if (pageData.thumbnail && pageData.thumbnail.source) {
+              thumbnail = {
+                source: pageData.thumbnail.source,
+                width: pageData.thumbnail.width,
+                height: pageData.thumbnail.height,
+              };
+            }
+            
             results[originalTitle] = {
-              title: pageData.title,
-              displaytitle: pageData.title,
+              title: pageTitle,
+              displaytitle: pageTitle,
               pageid: pageData.pageid,
-              extract: pageData.extract,
-              thumbnail: pageData.thumbnail,
-              description: pageData.extract?.substring(0, 200),
+              extract: pageData.extract || undefined,
+              thumbnail: thumbnail,
+              description: pageData.extract ? pageData.extract.substring(0, 200) : undefined,
               content_urls: pageData.canonicalurl || pageData.fullurl ? {
                 desktop: { page: pageData.canonicalurl || pageData.fullurl || '' },
                 mobile: { page: pageData.canonicalurl || pageData.fullurl || '' },
@@ -129,7 +147,6 @@ export const fetchArticleSummariesBatch = async (
         }
       }
     } catch (error) {
-      // If batch fails, mark all titles in this batch as failed
       for (const title of batch) {
         if (!(title in results)) {
           results[title] = null;

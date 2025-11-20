@@ -1,53 +1,86 @@
-import { restAxiosInstance, WIKIPEDIA_API_CONFIG } from '@/api/shared';
+import { actionAxiosInstance, WIKIPEDIA_API_CONFIG } from '@/api/shared';
 import { ArticleResponse } from '@/types/api/articles';
+import { WikipediaActionApiParams, WikipediaQueryResponse } from '@/types/api/base';
+import { fetchArticleSummaries } from './fetchArticleSummary';
 
+/**
+ * Fetch a single random article
+ */
 export const fetchRandomArticle = async (maxRetries = 3): Promise<ArticleResponse> => {
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+  const batch = await fetchRandomArticles(1);
+  if (batch.length > 0 && batch[0].article) {
+    return batch[0];
+  }
+  return {
+    article: null,
+    error: 'Failed to load random article',
+  };
+};
+
+/**
+ * @param count - Number of random articles to fetch (max 20 per request, will batch if needed)
+ * @returns Array of ArticleResponse objects
+ */
+export const fetchRandomArticles = async (count: number): Promise<ArticleResponse[]> => {
+  if (count <= 0) {
+    return [];
+  }
+
+  const results: ArticleResponse[] = [];
+  const BATCH_SIZE = 20;
+  const batches: number[] = [];
+  
+  for (let i = 0; i < count; i += BATCH_SIZE) {
+    batches.push(Math.min(BATCH_SIZE, count - i));
+  }
+
+  for (const batchSize of batches) {
     try {
-      // Use Wikipedia REST API to get a random page summary
-      const url = '/page/random/summary';
-      const response = await restAxiosInstance.get(url, {
-        baseURL: WIKIPEDIA_API_CONFIG.REST_API_BASE_URL,
-        validateStatus: (status) => status === 200, // Only accept 200 OK
-        // Uses centralized 8s timeout from axiosInstance
+      const randomParams: WikipediaActionApiParams = {
+        action: 'query',
+        list: 'random',
+        rnnamespace: 0,
+        rnlimit: batchSize,
+        format: 'json',
+        origin: '*',
+      };
+
+      const randomResponse = await actionAxiosInstance.get<WikipediaQueryResponse>('', {
+        baseURL: WIKIPEDIA_API_CONFIG.BASE_URL,
+        params: randomParams,
       });
 
-      const data = response.data;
-
-      // Validate that we got a proper article with required fields
-      if (!data.title || !data.extract) {
-        continue; // Try again
+      const randomPages = randomResponse.data.query?.random || [];
+      if (randomPages.length === 0) {
+        continue;
       }
 
-      return {
-        article: data,
-      };
-    } catch (error: unknown) {
-      const axiosError = error as {
-        response?: { status?: number };
-        code?: string;
-        message?: string;
-      };
+      const titles = randomPages.map((page: { title: string }) => page.title);
+      const summariesMap = await fetchArticleSummaries(titles);
 
-      // If it's a 404 or network error, retry
-      if (axiosError.response?.status === 404 || axiosError.code === 'NETWORK_ERROR') {
-        if (attempt < maxRetries) {
-          // Wait before retrying (exponential backoff)
-          await new Promise((resolve) => setTimeout(resolve, 500 * attempt));
-          continue;
+      for (const title of titles) {
+        const article = summariesMap[title];
+        if (article) {
+          results.push({ article });
+        } else {
+          results.push({
+            article: null,
+            error: 'Failed to load article summary',
+          });
         }
       }
-
-      // For other errors or final attempt, return error
-      return {
-        article: null,
-        error: 'Failed to load random article',
-      };
+    } catch (error: unknown) {
+      if (typeof __DEV__ !== 'undefined' && __DEV__) {
+        console.error('Failed to fetch random articles batch:', error);
+      }
+      for (let i = 0; i < batchSize; i++) {
+        results.push({
+          article: null,
+          error: 'Failed to load random article',
+        });
+      }
     }
   }
 
-  return {
-    article: null,
-    error: 'All retry attempts failed',
-  };
+  return results;
 };

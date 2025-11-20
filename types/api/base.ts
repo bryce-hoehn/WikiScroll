@@ -145,6 +145,15 @@ export interface CategoryMember {
 }
 
 /**
+ * Random page from Wikipedia Action API
+ */
+export interface RandomPage {
+  id: number;
+  ns: number;
+  title: string;
+}
+
+/**
  * Wikipedia Action API query response structure
  */
 export interface WikipediaQueryResponse {
@@ -152,6 +161,7 @@ export interface WikipediaQueryResponse {
     pages?: Record<string, WikipediaPage>;
     search?: unknown[];
     categorymembers?: CategoryMember[];
+    random?: RandomPage[];
   };
 }
 

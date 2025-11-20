@@ -1,28 +1,16 @@
-import { fetchArticleSummariesBatch } from '@/api/articles';
+import { fetchArticleSummaries } from '@/api/articles';
 import { actionAxiosInstance, WIKIPEDIA_API_CONFIG } from '@/api/shared';
 import { CategoryArticle, CategoryPagesResponse, CategorySubcategory } from '@/types/api';
 import { CategoryMember, ImageThumbnail, WikipediaActionApiParams, WikipediaPage, WikipediaQueryResponse } from '@/types/api/base';
 
-/**
- * Fetch category pages with Wikipedia API compliance
- *
- * This function demonstrates proper mixed API usage:
- * - Uses Action API for category members (no REST equivalent)
- * - Uses REST API for article summaries (preferred for performance)
- * - Falls back to alternative methods if primary API fails
- *
- */
 export const fetchCategoryPages = async (categoryTitle: string): Promise<CategoryPagesResponse> => {
   try {
-    // Category members still requires Action API as REST API doesn't have equivalent
-
-    // Fetch both articles and subcategories
     const params: WikipediaActionApiParams = {
       action: 'query',
       list: 'categorymembers',
       cmtitle: `Category:${categoryTitle}`,
       cmtype: 'page|subcat',
-      cmlimit: 50, // Fetch more items to provide better recommendations
+      cmlimit: 50,
       format: 'json',
       origin: '*',
     };
@@ -41,24 +29,19 @@ export const fetchCategoryPages = async (categoryTitle: string): Promise<Categor
     const subcategories: CategorySubcategory[] = [];
     const articleMembers: CategoryMember[] = [];
 
-    // Separate articles and subcategories
     for (const member of data.query.categorymembers as CategoryMember[]) {
       if (member.ns === 14) {
-        // Subcategory namespace
         subcategories.push({
           title: member.title.replace('Category:', ''),
           description: '',
         });
       } else if (member.ns === 0) {
-        // Main namespace (articles) - collect for parallel processing
         articleMembers.push(member);
       }
     }
 
-    // Batch fetch article data using Action API (much faster than individual REST calls)
     if (articleMembers.length > 0) {
       const articleTitles = articleMembers.map((m) => m.title);
-      // Wikipedia API allows up to 50 titles per request, so we may need to batch
       const BATCH_SIZE = 50;
       const batches: string[][] = [];
       
@@ -78,7 +61,7 @@ export const fetchCategoryPages = async (categoryTitle: string): Promise<Categor
             pilimit: 50,
             exintro: true,
             explaintext: true,
-            exlimit: 50,
+            exlimit: 20,
             format: 'json',
             origin: '*',
           };
@@ -90,7 +73,6 @@ export const fetchCategoryPages = async (categoryTitle: string): Promise<Categor
 
           const pages = batchResponse.data.query?.pages;
           if (pages) {
-            // Pages are keyed by pageid (as string) in the response
             for (const page of Object.values(pages)) {
               const pageData = page as WikipediaPage & { extract?: string; thumbnail?: ImageThumbnail };
               const member = articleMembers.find((m) => m.pageid === pageData.pageid || m.title === pageData.title);
@@ -105,12 +87,11 @@ export const fetchCategoryPages = async (categoryTitle: string): Promise<Categor
             }
           }
         } catch (error) {
-          // If batch fails, try using the batch summary function as fallback
           const batchMembers = articleMembers.filter((m) => batch.includes(m.title));
           const batchTitles = batchMembers.map((m) => m.title);
           
           try {
-            const fallbackSummaries = await fetchArticleSummariesBatch(batchTitles);
+            const fallbackSummaries = await fetchArticleSummaries(batchTitles);
             for (const member of batchMembers) {
               const article = fallbackSummaries[member.title];
               if (article) {
@@ -121,7 +102,6 @@ export const fetchCategoryPages = async (categoryTitle: string): Promise<Categor
                   pageid: article.pageid || member.pageid,
                 });
               } else {
-                // Return basic article info without description/thumbnail
                 articles.push({
                   title: member.title,
                   description: '',
@@ -131,7 +111,6 @@ export const fetchCategoryPages = async (categoryTitle: string): Promise<Categor
               }
             }
           } catch (fallbackError) {
-            // If even fallback batch fails, return basic info for all
             for (const member of batchMembers) {
               articles.push({
                 title: member.title,
@@ -147,7 +126,6 @@ export const fetchCategoryPages = async (categoryTitle: string): Promise<Categor
 
     return { articles, subcategories };
   } catch (error: unknown) {
-    // Silently handle errors - return empty arrays
     return { articles: [], subcategories: [] };
   }
 };

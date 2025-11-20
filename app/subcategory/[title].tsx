@@ -138,9 +138,9 @@ export default function SubCategories() {
         )}
         <Card.Content style={{ padding: 12 }}>
           <Text variant="bodyMedium" numberOfLines={2} style={{ fontWeight: '500', marginBottom: 4 }}>
-            {article.title.replace(/_/g, ' ')}
+            {article.title ? article.title.replace(/_/g, ' ') : 'Untitled'}
           </Text>
-          {article.description && (
+          {article.description && article.description.trim() ? (
             <Text
               variant="bodySmall"
               numberOfLines={2}
@@ -148,7 +148,7 @@ export default function SubCategories() {
             >
               {article.description}
             </Text>
-          )}
+          ) : null}
         </Card.Content>
       </Card>
     );

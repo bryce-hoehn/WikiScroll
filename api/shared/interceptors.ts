@@ -26,8 +26,11 @@ export const createResponseInterceptor = (instance: AxiosInstance): void => {
         }
 
         // Network errors / timeouts (no response) - retry with exponential backoff
+        // Exclude CORS errors from retries (they won't succeed on retry)
+        const errorMessage = error.message?.toLowerCase() || '';
+        const isCorsError = errorMessage.includes('cors') || errorMessage.includes('cross-origin');
         const isNetworkError =
-          !error.response ||
+          (!error.response && !isCorsError) ||
           error.code === 'ECONNABORTED' ||
           (error.message && error.message.toLowerCase().includes('network error'));
         if (isNetworkError) {
