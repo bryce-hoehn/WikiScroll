@@ -266,7 +266,7 @@ export default function SearchScreen() {
         contentContainerStyle={{
           paddingTop: totalHeaderHeight + SPACING.base,
           paddingHorizontal: horizontalPadding,
-          paddingBottom: SPACING.base,
+          paddingBottom: SPACING.xl,
           flexGrow: 1,
           maxWidth: maxContentWidth,
           alignSelf: 'center',
