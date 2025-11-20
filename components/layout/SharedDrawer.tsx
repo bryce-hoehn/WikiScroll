@@ -6,7 +6,7 @@ import { useThemeContext } from '@/context/ThemeProvider';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { router, usePathname } from 'expo-router';
 import React, { useState } from 'react';
-import { Platform, useWindowDimensions, View } from 'react-native';
+import { Platform, ScrollView, useWindowDimensions, View } from 'react-native';
 import { Divider, Drawer as RNDrawer, Text, TouchableRipple, useTheme } from 'react-native-paper';
 
 interface SharedDrawerProps {
@@ -155,39 +155,47 @@ export default function SharedDrawer({ children }: SharedDrawerProps) {
           backgroundColor: theme.colors.surface,
           // No border - MD3 recommends using elevation or subtle dividers for sidebars
           // Sidebar separation is handled by background color contrast
-          paddingLeft: SPACING.base,
-          paddingRight: SPACING.md, // Increased right padding to create gap between buttons and divider
-          paddingTop: topPadding,
         }}
       >
-        <RNDrawer.Section showDivider={false}>
-          {navigationItems.map((item) => {
-            const active = isActive(item);
-            const isHighContrast =
-              currentTheme === 'light-high-contrast' || currentTheme === 'dark-high-contrast';
-            const iconColor = active ? theme.colors.primary : theme.colors.onSurfaceVariant;
-            const textColor = active ? theme.colors.primary : theme.colors.onSurfaceVariant;
-            // For high contrast themes, use a lighter background for better contrast with dark text
-            const backgroundColor = active
-              ? isHighContrast
-                ? theme.colors.surfaceVariant
-                : theme.colors.primaryContainer
-              : 'transparent';
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{
+            paddingLeft: SPACING.base,
+            paddingRight: SPACING.md, // Increased right padding to create gap between buttons and divider
+            paddingTop: topPadding,
+            paddingBottom: SPACING.base,
+          }}
+          showsVerticalScrollIndicator={false}
+        >
+          <RNDrawer.Section showDivider={false}>
+            {navigationItems.map((item) => {
+              const active = isActive(item);
+              const isHighContrast =
+                currentTheme === 'light-high-contrast' || currentTheme === 'dark-high-contrast';
+              const iconColor = active ? theme.colors.primary : theme.colors.onSurfaceVariant;
+              const textColor = active ? theme.colors.primary : theme.colors.onSurfaceVariant;
+              // For high contrast themes, use a lighter background for better contrast with dark text
+              const backgroundColor = active
+                ? isHighContrast
+                  ? theme.colors.surfaceVariant
+                  : theme.colors.primaryContainer
+                : 'transparent';
 
-            return (
-              <NavItem
-                key={item.route}
-                item={item}
-                active={active}
-                backgroundColor={backgroundColor}
-                iconColor={iconColor}
-                textColor={textColor}
-                theme={theme}
-                onPress={() => handleNavigation(item.route, item.pathname)}
-              />
-            );
-          })}
-        </RNDrawer.Section>
+              return (
+                <NavItem
+                  key={item.route}
+                  item={item}
+                  active={active}
+                  backgroundColor={backgroundColor}
+                  iconColor={iconColor}
+                  textColor={textColor}
+                  theme={theme}
+                  onPress={() => handleNavigation(item.route, item.pathname)}
+                />
+              );
+            })}
+          </RNDrawer.Section>
+        </ScrollView>
       </View>
 
       {/* Divider between Nav Drawer and feed */}

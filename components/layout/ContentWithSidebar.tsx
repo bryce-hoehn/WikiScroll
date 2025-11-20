@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, useWindowDimensions } from 'react-native';
+import { ScrollView, View, useWindowDimensions } from 'react-native';
 import { Card, Divider, Text, useTheme } from 'react-native-paper';
 import { LAYOUT } from '../../constants/layout';
 import { SPACING } from '../../constants/spacing';
@@ -35,18 +35,20 @@ export default function ContentWithSidebar({ children, sidebar }: ContentWithSid
       <View
         style={{
           width: LAYOUT.SIDEBAR_WIDTH,
+          height: '100%',
           // No border - MD3 recommends using elevation or subtle dividers for sidebars
           // Sidebar separation is handled by background color contrast
           backgroundColor: theme.colors.surface,
         }}
       >
-        <View
-          style={{
-            flex: 1,
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{
             padding: SPACING.base,
             gap: SPACING.base,
             backgroundColor: theme.colors.surface,
           }}
+          showsVerticalScrollIndicator={false}
         >
           {sidebar ? (
             sidebar
@@ -63,7 +65,7 @@ export default function ContentWithSidebar({ children, sidebar }: ContentWithSid
               </Card.Content>
             </Card>
           )}
-        </View>
+        </ScrollView>
       </View>
     </View>
   );

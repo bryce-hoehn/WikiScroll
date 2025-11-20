@@ -1,10 +1,6 @@
 import { ScrollViewStyleReset } from 'expo-router/html';
 import type { PropsWithChildren } from 'react';
 
-// This file is web-only and used to configure the root HTML for every
-// web page during static rendering.
-// The contents of this function only run in Node.js environments and
-// do not have access to the DOM or browser APIs.
 export default function Root({ children }: PropsWithChildren) {
   return (
     <html lang="en">
@@ -35,10 +31,7 @@ export default function Root({ children }: PropsWithChildren) {
         <meta name="apple-mobile-web-app-title" content="Wikiscroll" />
         <link rel="apple-touch-icon" href="/icon.png" />
 
-        {/*
-          Disable body scrolling on web. This makes ScrollView components work closer to how they do on native.
-          However, body scrolling is often nice to have for mobile web. If you want to enable it, remove this line.
-        */}
+
         <ScrollViewStyleReset />
 
         {/* Smooth scrolling for better UX on web */}
@@ -51,40 +44,29 @@ export default function Root({ children }: PropsWithChildren) {
             body {
               margin: 0;
               padding: 0;
-              /* Hide scrollbar for Firefox */
-              scrollbar-width: none;
-              /* Hide scrollbar for IE and Edge */
-              -ms-overflow-style: none;
-            }
-            /* Hide scrollbar for Chrome, Safari and Opera */
-            body::-webkit-scrollbar {
-              display: none;
             }
             #root {
               min-height: 100vh;
-              /* Hide scrollbar for Firefox */
-              scrollbar-width: none;
-              /* Hide scrollbar for IE and Edge */
-              -ms-overflow-style: none;
             }
-            /* Hide scrollbar for Chrome, Safari and Opera */
-            #root::-webkit-scrollbar {
-              display: none;
-            }
-            /* Ensure all potential white backgrounds are overridden */
             * {
               scroll-behavior: smooth;
             }
-            /* Hide scrollbars on all scrollable elements */
             * {
-              /* Hide scrollbar for Firefox */
-              scrollbar-width: none;
-              /* Hide scrollbar for IE and Edge */
-              -ms-overflow-style: none;
+              scrollbar-width: thin;
+              scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
             }
-            /* Hide scrollbar for Chrome, Safari and Opera */
-            *::-webkit-scrollbar {
-              display: none;
+            div {
+              scrollbar-width: thin;
+              scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+            }
+            /* Dark mode scrollbar support */
+            @media (prefers-color-scheme: dark) {
+              * {
+                scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+              }
+              div {
+                scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+              }
             }
           `,
           }}
@@ -162,12 +144,9 @@ export default function Root({ children }: PropsWithChildren) {
           }}
         />
 
-        {/* Add any additional <head> elements that you want globally available on web... */}
       </head>
       <body>
-        {/* Use static rendering with Expo Router to support running without JavaScript. */}
         <noscript>You need to enable JavaScript to run this app.</noscript>
-        {/* The root element for your Expo app. */}
         <div id="root">{children}</div>
       </body>
     </html>
