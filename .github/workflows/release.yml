@@ -82,7 +82,7 @@ jobs:
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: |
-          BUILD_ID=$(eas build --platform android --profile production --non-interactive --no-wait --json | jq -r '.id')
+          BUILD_ID=$(eas build --platform android --profile production --non-interactive --no-wait --json | jq -r 'if type == "array" then .[0].id else .id end')
           echo "Build ID: $BUILD_ID"
           if [ "$BUILD_ID" = "null" ] || [ -z "$BUILD_ID" ]; then
             echo "Failed to get build ID"
@@ -92,7 +92,7 @@ jobs:
           MAX_WAIT=3600
           ELAPSED=0
           while [ $ELAPSED -lt $MAX_WAIT ]; do
-            STATUS=$(eas build:view $BUILD_ID --json | jq -r '.status')
+            STATUS=$(eas build:view $BUILD_ID --json | jq -r 'if type == "array" then .[0].status else .status end')
             echo "Build status: $STATUS (elapsed: ${ELAPSED}s)"
             if [ "$STATUS" = "finished" ]; then
               echo "Build completed successfully"
