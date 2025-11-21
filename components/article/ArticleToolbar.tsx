@@ -16,7 +16,7 @@ import {
 } from 'react-native-paper';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LAYOUT } from '../../constants/layout';
+import { COMPONENT_HEIGHTS, LAYOUT } from '../../constants/layout';
 import { useReducedMotion } from '../../hooks';
 import ScrollToTopFAB from '../common/ScrollToTopFAB';
 
@@ -122,7 +122,7 @@ export default function ArticleToolbar({
   }, [fabVisible, isLargeScreen, alignmentProgress, reducedMotion]);
 
 
-  const fabWidth = 56;
+  const fabWidth = COMPONENT_HEIGHTS.STANDARD;
   const bottomSpacing = Platform.select({
     web: isLargeScreen ? SPACING.lg : SPACING.base,
     default: SPACING.base,
@@ -227,7 +227,7 @@ export default function ArticleToolbar({
           accessibilityHint={`Increases article font size. Current size: ${currentFontSize}px`}
         />
 
-        <View style={{ zIndex: 1002, position: 'relative' }}>
+        <View style={{ position: 'relative' }}>
           <IconButton
             icon="format-list-bulleted"
             size={24}
@@ -240,22 +240,19 @@ export default function ArticleToolbar({
       </Surface>
       </Animated.View>
 
-      {/* FAB positioned within toolbar container for coordinated touch handling */}
       {scrollRef && (
         <View 
           style={{
             position: 'absolute',
             bottom: 0,
             right: bottomSpacing,
-            zIndex: 998, // Lower than toolbar (1001) so toolbar buttons receive touches first
-            width: 56, // FAB standard size
-            height: 56, // FAB standard size
+            width: COMPONENT_HEIGHTS.STANDARD,
+            height: COMPONENT_HEIGHTS.STANDARD,
           }}
         >
           <ScrollToTopFAB 
             scrollRef={scrollRef} 
             visible={fabVisible} 
-            hasBottomTabBar={false}
             containerPositioned={true}
           />
         </View>

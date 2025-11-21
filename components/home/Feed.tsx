@@ -11,7 +11,8 @@ import { useBookmarkToggle, useImagePrefetching } from '../../hooks';
 import { FeedProps, RecommendationItem } from '../../types/components';
 import RecommendationCard from '../article/RecommendationCard';
 import CardSkeleton from '../common/CardSkeleton';
-import ScrollToTopFAB from '../common/ScrollToTopFAB';
+import ScrollToTopMiniFAB from '../common/ScrollToTopMiniFAB';
+import SearchFAB from '../common/SearchFAB';
 import LoadingFooter from './LoadingFooter';
 
 export default function Feed({
@@ -237,7 +238,8 @@ export default function Feed({
           )}
           scrollEventThrottle={16}
         />
-        <ScrollToTopFAB scrollRef={flashListRef} visible={fabVisible} />
+        <ScrollToTopMiniFAB scrollRef={flashListRef} visible={fabVisible} />
+        <SearchFAB />
       </View>
     );
   }
@@ -296,7 +298,8 @@ export default function Feed({
         )}
         scrollEventThrottle={16}
       />
-      <ScrollToTopFAB scrollRef={flashListRef} visible={fabVisible} />
+      <ScrollToTopMiniFAB scrollRef={flashListRef} visible={fabVisible} />
+      <SearchFAB />
     </View>
   );
 }

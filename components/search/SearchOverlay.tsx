@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import { Portal, Searchbar, useTheme } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { COMPONENT_HEIGHTS } from '../../constants/layout';
 import { EASING, MOTION } from '../../constants/motion';
 import { SPACING } from '../../constants/spacing';
 import {
@@ -257,7 +258,7 @@ export default function SearchOverlay({ visible, onClose, initialQuery = '' }: S
               {
                 paddingTop: insets.top,
                 backgroundColor: theme.colors.surface,
-                height: 56 + insets.top,
+                height: COMPONENT_HEIGHTS.STANDARD + insets.top,
                 ...Platform.select({
                   web: {
                     boxShadow: `0 1px 3px ${theme.colors.shadow}1A`,
@@ -272,8 +273,8 @@ export default function SearchOverlay({ visible, onClose, initialQuery = '' }: S
                 { 
                   justifyContent: 'center', 
                   flex: 1, 
-                  minHeight: 56,
-                  height: 56,
+                  minHeight: COMPONENT_HEIGHTS.STANDARD,
+                  height: COMPONENT_HEIGHTS.STANDARD,
                   paddingHorizontal: Platform.OS === 'web' ? SPACING.base : SPACING.sm,
                 },
               ]}
@@ -318,11 +319,11 @@ export default function SearchOverlay({ visible, onClose, initialQuery = '' }: S
                 style={[
                   styles.searchBar,
                   {
-                    elevation: 0,
-                    backgroundColor: 'transparent',
-                    borderRadius: 0,
-                    minHeight: 56,
-                    height: 56,
+                    elevation: Platform.select({ android: 2, ios: 0, web: 2 }),
+                    backgroundColor: theme.colors.surfaceVariant,
+                    borderRadius: theme.roundness * 3, // 12dp (corner.medium) - MD3 prominent variant
+                    minHeight: COMPONENT_HEIGHTS.STANDARD, // MD3: 56dp height
+                    height: COMPONENT_HEIGHTS.STANDARD,
                   },
                 ]}
                 inputStyle={{
@@ -358,7 +359,7 @@ export default function SearchOverlay({ visible, onClose, initialQuery = '' }: S
               styles.scrollView,
               Platform.OS !== 'web' && {
                 // MD3: Account for 56dp search bar + safe area
-                maxHeight: windowHeight - (56 + insets.top),
+                maxHeight: windowHeight - (COMPONENT_HEIGHTS.STANDARD + insets.top),
               },
             ]}
             contentContainerStyle={[

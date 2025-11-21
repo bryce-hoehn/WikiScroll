@@ -2,7 +2,7 @@ import SkipLinks from '@/components/common/SkipLinks';
 import AppSidebar from '@/components/layout/AppSidebar';
 import ContentWithSidebar from '@/components/layout/ContentWithSidebar';
 import SharedDrawer from '@/components/layout/SharedDrawer';
-import { LAYOUT } from '@/constants/layout';
+import { LAYOUT, COMPONENT_HEIGHTS } from '@/constants/layout';
 import { SPACING } from '@/constants/spacing';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Tabs } from 'expo-router';
@@ -43,7 +43,7 @@ export default function TabLayout() {
                     borderTopWidth: 0,
                     // Add safe area padding for iOS PWA home indicator
                     paddingBottom: Platform.OS === 'web' ? Math.max(insets.bottom, SPACING.sm) : insets.bottom,
-                    height: 56 + (Platform.OS === 'web' ? Math.max(insets.bottom, SPACING.sm) : insets.bottom),
+                    height: COMPONENT_HEIGHTS.STANDARD + (Platform.OS === 'web' ? Math.max(insets.bottom, SPACING.sm) : insets.bottom),
                     // Ensure tab bar is visible and positioned correctly on web mobile browsers
                     ...(Platform.OS === 'web' && {
                       position: 'fixed' as any,

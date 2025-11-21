@@ -1,4 +1,4 @@
-import { LAYOUT } from '@/constants/layout';
+import { COMPONENT_HEIGHTS, LAYOUT } from '@/constants/layout';
 import { SPACING } from '@/constants/spacing';
 import { router } from 'expo-router';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
@@ -225,8 +225,8 @@ export default function SearchBar({
             elevation,
             backgroundColor,
             borderRadius: theme.roundness * 3, // 12dp (corner.medium)
-            minHeight: 56, // MD3: 56dp height
-            height: 56,
+            minHeight: COMPONENT_HEIGHTS.STANDARD, // MD3: 56dp height
+            height: COMPONENT_HEIGHTS.STANDARD,
           }}
           inputStyle={{
             // fontSize removed - using variant default

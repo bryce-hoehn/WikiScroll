@@ -59,3 +59,19 @@ export const LAYOUT = {
   GRID_COLUMNS_TABLET: 8, // 8-column grid on tablet (medium)
   GRID_COLUMNS_DESKTOP: 12, // 12-column grid on desktop (expanded+)
 } as const;
+
+/**
+ * Material Design 3 Component Heights
+ * Standard heights for MD3 components that don't align with the 8dp grid
+ * 
+ * Reference: https://m3.material.io/components
+ */
+export const COMPONENT_HEIGHTS = {
+  // Standard FAB, Search Bar, and Tab Bar height
+  // MD3: Standard height for FAB, Search Bar, and Tab Bar is 56dp
+  // Reference: 
+  // - https://m3.material.io/components/floating-action-button/specs
+  // - https://m3.material.io/components/search/specs
+  // - https://m3.material.io/components/navigation-bar/specs
+  STANDARD: 56, // 56dp
+} as const;
