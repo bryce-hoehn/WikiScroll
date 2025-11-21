@@ -73,7 +73,7 @@ export const fetchArticleSummaries = async (
       const titlesParam = batch.map(t => normalizeWikipediaTitle(t)).join('|');
       const batchParams: WikipediaActionApiParams = {
         action: 'query',
-        prop: 'pageimages|extracts|info',
+        prop: 'pageimages|extracts|description|info',
         titles: titlesParam,
         piprop: 'thumbnail',
         pithumbsize: 300,
@@ -103,7 +103,8 @@ export const fetchArticleSummaries = async (
       if (pages) {
         for (const page of Object.values(pages)) {
           const pageData = page as WikipediaPage & { 
-            extract?: string; 
+            extract?: string;
+            description?: string;
             thumbnail?: ImageThumbnail;
             canonicalurl?: string;
             fullurl?: string;
@@ -137,7 +138,7 @@ export const fetchArticleSummaries = async (
               pageid: pageData.pageid,
               extract: pageData.extract || undefined,
               thumbnail: thumbnail,
-              description: pageData.extract ? pageData.extract.substring(0, 200) : undefined,
+              description: pageData.description || undefined, // Use API's short description field
               content_urls: pageData.canonicalurl || pageData.fullurl ? {
                 desktop: { page: pageData.canonicalurl || pageData.fullurl || '' },
                 mobile: { page: pageData.canonicalurl || pageData.fullurl || '' },
