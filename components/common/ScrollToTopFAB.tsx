@@ -37,44 +37,17 @@ export default function ScrollToTopFAB({ scrollRef, visible = true, hasBottomTab
       // On web, React Native Web ScrollView wraps a DOM element
       const element = scrollRef.current as any;
       
-      // Try to get the actual scrollable DOM node
       let scrollNode: any = null;
       
-      // Method 1: getScrollableNode (React Native Web method)
       if (element.getScrollableNode) {
         scrollNode = element.getScrollableNode();
       }
-      // Method 2: getNode (older React Native Web)
-      else if (element.getNode) {
-        const node = element.getNode();
-        if (node && node.getScrollableNode) {
-          scrollNode = node.getScrollableNode();
-        } else {
-          scrollNode = node;
-        }
-      }
-      // Method 3: Direct access to _component or _nativeNode
-      else if (element._component) {
-        const comp = element._component;
-        if (comp.getScrollableNode) {
-          scrollNode = comp.getScrollableNode();
-        } else {
-          scrollNode = comp;
-        }
-      }
-      // Method 4: Try the ref itself
-      else {
-        scrollNode = element;
-      }
-      
-      // Now try to scroll the DOM node
+
       if (scrollNode) {
-        // Check if it's a DOM element with scrollTo
         if (typeof scrollNode.scrollTo === 'function') {
           scrollNode.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
           return;
         }
-        // Check if it has scrollTop property
         if (typeof scrollNode.scrollTop === 'number') {
           scrollNode.scrollTop = 0;
           return;
@@ -93,17 +66,24 @@ export default function ScrollToTopFAB({ scrollRef, visible = true, hasBottomTab
     }
   };
 
-  const bottomSpacing = Platform.select({
-    web: isLargeScreen ? 24 : 16,
-    default: 16,
+  // Standard FAB positioning per React Native Paper docs: use margin instead of bottom/right
+  // MD3: FAB should be 16dp from edges, and 16dp above bottom tab bar
+  const baseMargin = 16;
+  const tabBarContentHeight = 56; // Tab bar content area (not including safe area padding)
+  const spacingFromTabBar = 16;
+  
+  // Calculate bottom margin: spacing above tab bar + tab bar content height
+  // On Android, the tab bar may be positioned differently, so we use a smaller value
+  const bottomMargin = hasBottomTabBar && !isLargeScreen
+    ? Platform.OS === 'web'
+      ? spacingFromTabBar + tabBarContentHeight + Math.max(insets.bottom, SPACING.sm)
+      : spacingFromTabBar
+    : baseMargin + (Platform.OS === 'web' ? Math.max(insets.bottom, SPACING.sm) : insets.bottom);
+  
+  const rightMargin = Platform.select({
+    web: isLargeScreen ? 24 : baseMargin,
+    default: baseMargin,
   });
-
-  // MD3: Bottom tab bar is 56dp tall, FAB should be positioned above it with 16dp spacing
-  const tabBarHeight = 56;
-  const spacingFromTabBar = 16; // MD3: 16dp spacing between FAB and tab bar
-  const bottomPosition = hasBottomTabBar && !isLargeScreen
-    ? tabBarHeight + spacingFromTabBar + (Platform.OS === 'web' ? Math.max(insets.bottom, SPACING.sm) : insets.bottom)
-    : insets.bottom + bottomSpacing;
 
   return (
     <AnimatedFAB
@@ -115,7 +95,7 @@ export default function ScrollToTopFAB({ scrollRef, visible = true, hasBottomTab
       animateFrom="right"
       iconMode="static"
       style={[
-        styles.fabStyle, // Always use absolute positioning
+        styles.fabStyle,
         {
           backgroundColor: theme.colors.secondaryContainer,
           borderRadius: SPACING.base, // M3: FAB corner radius is 16dp
@@ -124,9 +104,13 @@ export default function ScrollToTopFAB({ scrollRef, visible = true, hasBottomTab
             position: 'absolute',
             bottom: 0,
             right: 0,
+            margin: baseMargin,
           } : {
-            bottom: bottomPosition,
-            right: bottomSpacing,
+            position: 'absolute',
+            bottom: 0,
+            right: 0,
+            marginBottom: bottomMargin,
+            marginRight: rightMargin,
           }),
           zIndex: 998, // Lower than toolbar (1000) to ensure toolbar buttons receive touches
           elevation: 3, // M3: FAB elevation is 3dp (increases to 4dp when pressed)
