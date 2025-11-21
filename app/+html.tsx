@@ -9,22 +9,17 @@ export default function Root({ children }: PropsWithChildren) {
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
-        {/* Page title */}
         <title>Wikiscroll</title>
 
-        {/* Link the PWA manifest file. */}
         <link rel="manifest" href="/manifest.json" />
 
-        {/* Preconnect to Wikipedia/Wikimedia for faster API and image requests */}
         <link rel="preconnect" href="https://en.wikipedia.org" />
         <link rel="preconnect" href="https://upload.wikimedia.org" />
         <link rel="dns-prefetch" href="https://en.wikipedia.org" />
         <link rel="dns-prefetch" href="https://upload.wikimedia.org" />
 
-        {/* Theme color for mobile browsers - matches manifest */}
         <meta name="theme-color" content="#000000" />
 
-        {/* Apple specific meta tags */}
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -34,7 +29,6 @@ export default function Root({ children }: PropsWithChildren) {
 
         <ScrollViewStyleReset />
 
-        {/* Smooth scrolling for better UX on web */}
         <style
           dangerouslySetInnerHTML={{
             __html: `
@@ -59,7 +53,6 @@ export default function Root({ children }: PropsWithChildren) {
               scrollbar-width: thin;
               scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
             }
-            /* Dark mode scrollbar support */
             @media (prefers-color-scheme: dark) {
               * {
                 scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
@@ -71,18 +64,14 @@ export default function Root({ children }: PropsWithChildren) {
           `,
           }}
         />
-        {/* Set initial background immediately based on user's theme preference */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
             (function() {
-              // Determine background color based on theme preference
               function getInitialBackgroundColor() {
                 try {
-                  // Check localStorage for saved theme preference
                   const savedTheme = localStorage.getItem('wikipediaexpo_theme_preference');
                   
-                  // Theme color mappings
                   const themeColors = {
                     'light': '#F9F9FF',
                     'light-medium-contrast': '#F9F9FF',
@@ -97,18 +86,15 @@ export default function Root({ children }: PropsWithChildren) {
                     return themeColors[savedTheme];
                   }
                   
-                  // If automatic or no preference, check system preference
                   if (!savedTheme || savedTheme === 'automatic') {
                     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                      return '#111318'; // Dark theme
+                      return '#111318';
                     }
-                    return '#F9F9FF'; // Light theme (default)
+                    return '#F9F9FF';
                   }
                   
-                  // Fallback to dark theme
                   return '#111318';
                 } catch (e) {
-                  // If localStorage is not available, check system preference
                   if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
                     return '#111318';
                   }
@@ -117,8 +103,8 @@ export default function Root({ children }: PropsWithChildren) {
               }
               
               const bgColor = getInitialBackgroundColor();
+              const surfaceColor = bgColor;
               
-              // Set background color immediately
               if (document.documentElement) {
                 document.documentElement.style.backgroundColor = bgColor;
               }
@@ -131,13 +117,73 @@ export default function Root({ children }: PropsWithChildren) {
                 root.setAttribute('style', (root.getAttribute('style') || '') + '; background-color: ' + bgColor + ' !important;');
               }
               
-              // Create a global style tag immediately to override everything
               let style = document.getElementById('initial-background-style');
               if (!style) {
                 style = document.createElement('style');
                 style.id = 'initial-background-style';
                 style.textContent = 'html, body, #root { background-color: ' + bgColor + ' !important; }';
                 document.head.insertBefore(style, document.head.firstChild);
+              }
+              
+              function applyNavigationBarColor() {
+                try {
+                  const allElements = document.querySelectorAll('*');
+                  allElements.forEach(el => {
+                    if (el.getAttribute('data-theme-applied') === 'true') return;
+                    
+                    const computedStyle = window.getComputedStyle(el);
+                    if (computedStyle.position === 'fixed' && 
+                        (computedStyle.bottom === '0px' || computedStyle.bottom === '0') &&
+                        (computedStyle.left === '0px' || computedStyle.left === '0') &&
+                        (computedStyle.width === '100%' || computedStyle.right === '0px' || computedStyle.right === '0')) {
+                      el.style.backgroundColor = surfaceColor;
+                      el.setAttribute('data-theme-applied', 'true');
+                      
+                      const children = el.querySelectorAll('*');
+                      children.forEach(child => {
+                        const childStyle = window.getComputedStyle(child);
+                        if (childStyle.backgroundColor === 'rgba(0, 0, 0, 0)' || 
+                            childStyle.backgroundColor === 'transparent') {
+                        }
+                      });
+                    }
+                  });
+                } catch (e) {
+                }
+              }
+              
+              if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', applyNavigationBarColor);
+              } else {
+                applyNavigationBarColor();
+              }
+              
+              setTimeout(applyNavigationBarColor, 0);
+              setTimeout(applyNavigationBarColor, 50);
+              setTimeout(applyNavigationBarColor, 100);
+              
+              const observer = new MutationObserver(function(mutations) {
+                applyNavigationBarColor();
+              });
+              
+              if (document.body) {
+                observer.observe(document.body, {
+                  childList: true,
+                  subtree: true,
+                  attributes: true,
+                  attributeFilter: ['style', 'class']
+                });
+              } else {
+                document.addEventListener('DOMContentLoaded', function() {
+                  if (document.body) {
+                    observer.observe(document.body, {
+                      childList: true,
+                      subtree: true,
+                      attributes: true,
+                      attributeFilter: ['style', 'class']
+                    });
+                  }
+                });
               }
             })();
           `,
