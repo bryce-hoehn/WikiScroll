@@ -535,7 +535,7 @@ export default function SettingsScreen() {
           <List.Subheader>About</List.Subheader>
           <List.Item
             title="Version"
-            description={`${getAppVersion()} • Beta version`}
+            description={getAppVersion()}
             left={(props) => <List.Icon {...props} icon="information-outline" />}
             titleStyle={{ fontWeight: '500' }}
           />
