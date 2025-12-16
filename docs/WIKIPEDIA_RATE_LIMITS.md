@@ -141,7 +141,7 @@ These best practices come from the [Wikimedia Foundation API Usage Guidelines](h
 
 #### Batching Implementation
 
-WikiScroll implements batching for several API functions:
+WikiScape implements batching for several API functions:
 
 **Batch Functions**:
 
@@ -173,7 +173,7 @@ WikiScroll implements batching for several API functions:
 
 **Source**: [Robot Policy - Best Practices](https://wikitech.wikimedia.org/wiki/Robot_policy)
 
-**Current Status**: WikiScroll does not store cookies or execute JavaScript.
+**Current Status**: WikiScape does not store cookies or execute JavaScript.
 
 ### 9. CDN Optimization
 
@@ -196,7 +196,7 @@ According to the [Wikimedia Foundation API Usage Guidelines](https://foundation.
 
 ## Current Implementation
 
-WikiScroll uses **two separate Axios instances** with different rate limits optimized for each API type:
+WikiScape uses **two separate Axios instances** with different rate limits optimized for each API type:
 
 ### REST API Instance (`restAxiosInstance`)
 

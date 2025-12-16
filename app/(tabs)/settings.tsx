@@ -4,7 +4,7 @@ import { SPACING } from '@/constants/spacing';
 import { TYPOGRAPHY } from '@/constants/typography';
 import { useBookmarks } from '@/context/BookmarksContext';
 import { useThemeContext } from '@/context/ThemeProvider';
-import { useReducedMotion, useVisitedArticles, useFontFamily, useFontSize, useLineHeight, useParagraphSpacing, useReadingWidth, useAccordionBehavior } from '@/hooks';
+import { useAccordionBehavior, useFontFamily, useFontSize, useLineHeight, useParagraphSpacing, useReadingWidth, useReducedMotion, useVisitedArticles } from '@/hooks';
 import {
     exportUserProfile,
     importUserProfile,
@@ -545,7 +545,7 @@ export default function SettingsScreen() {
             left={(props) => <List.Icon {...props} icon="bug-outline" />}
             right={(props) => <List.Icon {...props} icon="open-in-new" />}
             onPress={() => {
-              const url = 'https://github.com/bryce-hoehn/Wikiscroll/issues';
+              const url = 'https://github.com/bryce-hoehn/WikiScape/issues';
               if (Platform.OS === 'web') {
                 window.open(url, '_blank', 'noopener,noreferrer');
               } else {
@@ -554,7 +554,7 @@ export default function SettingsScreen() {
                     console.error('Failed to open GitHub issues:', err);
                   }
                   showError(
-                    'Unable to open GitHub. Please visit: https://github.com/bryce-hoehn/Wikiscroll/issues'
+                    'Unable to open GitHub. Please visit: https://github.com/bryce-hoehn/WikiScape/issues'
                   );
                 });
               }

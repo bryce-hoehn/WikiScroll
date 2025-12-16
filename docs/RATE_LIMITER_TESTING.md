@@ -16,7 +16,7 @@ This will:
 
 ## What the Test Checks
 
-WikiScroll uses two separate rate limiters:
+WikiScape uses two separate rate limiters:
 
 ### REST API Instance (`restAxiosInstance`)
 

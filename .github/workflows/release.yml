@@ -30,11 +30,10 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Setup Expo and EAS
+      - name: Setup Expo
         uses: expo/expo-github-action@v8
         with:
           expo-version: latest
-          eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Setup Java
@@ -128,29 +127,33 @@ jobs:
           echo "  applicationId: $PACKAGE_NAME"
           echo "  namespace: $PACKAGE_NAME"
 
+      - name: Build Android AAB
+        run: |
+          cd android
+          ./gradlew bundleRelease
+          cd ..
+          cp android/app/build/outputs/bundle/release/app-release.aab ./WikiScape-v${{ steps.bump_version.outputs.version }}-android.aab
+          echo "Android App Bundle built successfully"
+      
       - name: Build Android APK
         run: |
           cd android
           ./gradlew assembleRelease
           cd ..
-          cp android/app/build/outputs/apk/release/app-release.apk ./WikiScroll-v${{ steps.bump_version.outputs.version }}-android.apk
-
-      - name: Build Web
-        run: |
-          npx expo export -p web --output-dir dist
-
-      - name: Compress Web Build
-        run: |
-          (cd dist && zip -r ../WikiScroll-v${{ steps.bump_version.outputs.version }}-web.zip .)
+          cp android/app/build/outputs/apk/release/app-release.apk ./WikiScape-v${{ steps.bump_version.outputs.version }}-android.apk
+          echo "Android APK built successfully"
+      
+      - name: Upload AAB as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-aab
+          path: ./WikiScape-v${{ steps.bump_version.outputs.version }}-android.aab
+          retention-days: 90
 
       - name: Commit version bump
         run: |
           git add app.json package.json android/app/build.gradle
           git commit -m "chore: bump version to ${{ steps.bump_version.outputs.version }}"
-
-      - name: Deploy to EAS
-        run: |
-          eas deploy --prod --non-interactive
 
       - name: Create Git Tag
         run: |
@@ -170,17 +173,16 @@ jobs:
             - Automated release build
             
             ### Downloads
-            - **Android APK**: Download from the assets below
-            - **Web Build**: Download the compressed web distribution from the assets below
+            - **Android APK**: Install directly on Android devices (download from assets below)
+            - **Android AAB**: Available as a GitHub Actions artifact for Google Play Store submission
             
             ### Installation
-            - **Android**: Install the APK on your Android device
-            - **Web**: Extract the web-dist.zip and serve the contents via a web server
+            - **APK**: Download and install the APK file on your Android device
+            - **Google Play**: Download the AAB from workflow artifacts and upload to Google Play Console
           draft: false
           prerelease: false
           files: |
-            ./WikiScroll-v${{ steps.bump_version.outputs.version }}-android.apk
-            ./WikiScroll-v${{ steps.bump_version.outputs.version }}-web.zip
+            ./WikiScape-v${{ steps.bump_version.outputs.version }}-android.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

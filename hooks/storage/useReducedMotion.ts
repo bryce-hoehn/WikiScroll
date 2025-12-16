@@ -1,6 +1,6 @@
 import useAsyncStorage from './useAsyncStorage';
 
-const REDUCED_MOTION_KEY = '@wikiscroll:reducedMotion';
+const REDUCED_MOTION_KEY = '@wikiscape:reducedMotion';
 const DEFAULT_REDUCED_MOTION = false;
 
 /**

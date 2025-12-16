@@ -35,7 +35,7 @@ let actionLastRequestTime = 0;
 const restAxiosInstance = axios.create({
   headers: {
     Accept: 'application/json',
-    'Api-User-Agent': 'Wikiscroll/1.0 (test@example.com)',
+    'Api-User-Agent': 'WikiScape/1.0 (test@example.com)',
   },
   timeout: 15000,
 });
@@ -94,7 +94,7 @@ restAxiosInstance.interceptors.response.use(
 const actionAxiosInstance = axios.create({
   headers: {
     Accept: 'application/json',
-    'Api-User-Agent': 'Wikiscroll/1.0 (test@example.com)',
+    'Api-User-Agent': 'WikiScape/1.0 (test@example.com)',
   },
   timeout: 15000,
 });
@@ -269,7 +269,7 @@ async function testRateLimiter(instance, instanceName, config, testUrl) {
 }
 
 async function runAllTests() {
-  console.log('🧪 Testing WikiScroll Rate Limiters');
+  console.log('🧪 Testing WikiScape Rate Limiters');
   console.log('=====================================\n');
 
   const restApiUrl = 'https://en.wikipedia.org/api/rest_v1/page/summary/Albert_Einstein';

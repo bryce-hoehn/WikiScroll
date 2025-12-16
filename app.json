@@ -1,18 +1,18 @@
 {
-  "name": "WikiScroll",
-  "slug": "wikiscroll",
+  "name": "WikiScape",
+  "slug": "wikiscape",
   "version": "0.3.0",
   "description": "A modern, cross-platform Wikipedia reader built with React Native and Expo.",
   "orientation": "portrait",
   "icon": "./assets/images/icon.png",
-  "scheme": "wikiscroll",
+  "scheme": "wikiscape",
   "primaryColor": "#000000",
   "userInterfaceStyle": "automatic",
   "newArchEnabled": true,
-  "githubUrl": "https://github.com/bryce-hoehn/WikiScroll",
+  "githubUrl": "https://github.com/bryce-hoehn/WikiScape",
   "ios": {
     "supportsTablet": true,
-    "bundleIdentifier": "com.brycehoehn.WikiScroll",
+    "bundleIdentifier": "com.brycehoehn.WikiScape",
     "infoPlist": {
       "NSAppTransportSecurity": {
         "NSAllowsArbitraryLoads": false,
@@ -36,7 +36,7 @@
   "android": {
     "edgeToEdgeEnabled": true,
     "predictiveBackGestureEnabled": true,
-    "package": "com.brycehoehn.WikiScroll",
+    "package": "com.brycehoehn.WikiScape",
     "adaptiveIcon": {
       "foregroundImage": "./assets/images/icon.png",
       "backgroundColor": "#ffffff"
@@ -47,8 +47,8 @@
     "output": "static",
     "favicon": "./assets/images/scroll.png",
     "bundler": "metro",
-    "name": "WikiScroll",
-    "shortName": "WikiScroll",
+    "name": "WikiScape",
+    "shortName": "WikiScape",
     "lang": "en",
     "scope": "/",
     "themeColor": "#000000",

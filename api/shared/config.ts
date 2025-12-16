@@ -8,7 +8,7 @@ import { getApiUserEmail, getAppVersion } from '../../utils/env';
  */
 
 export const WIKIPEDIA_API_CONFIG = {
-  API_USER_AGENT: `Wikiscroll/${getAppVersion()} (${getApiUserEmail()})`,
+  API_USER_AGENT: `WikiScape/${getAppVersion()} (${getApiUserEmail()})`,
   BASE_URL: 'https://en.wikipedia.org/w/api.php',
   WIKIMEDIA_BASE_URL: 'https://api.wikimedia.org',
   WIKIMEDIA_PAGEVIEWS_BASE_URL: 'https://wikimedia.org/api/rest_v1', // Pageviews API uses wikimedia.org (not api.wikimedia.org)

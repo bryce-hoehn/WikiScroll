@@ -27,7 +27,7 @@ const FONT_FAMILY_KEY = 'articleFontFamily';
 const LINE_HEIGHT_KEY = 'articleLineHeight';
 const PARAGRAPH_SPACING_KEY = 'articleParagraphSpacing';
 const READING_PADDING_KEY = 'articleReadingPadding';
-const REDUCED_MOTION_KEY = '@wikiscroll:reducedMotion';
+const REDUCED_MOTION_KEY = '@wikiscape:reducedMotion';
 const ACCORDION_BEHAVIOR_KEY = 'accordion_auto_close';
 
 export interface UserProfileExportData {
