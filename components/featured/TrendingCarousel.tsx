@@ -28,6 +28,7 @@ function TrendingCarousel({
   const carouselRef = useRef<ICarouselInstance>(null);
   const actualCarouselIndexRef = useRef<number>(0);
   const previousPageRef = useRef<number>(currentPage);
+  const isUpdatingFromExternalRef = useRef<boolean>(false);
 
   // Expose scrollToIndex method via ref with looping support
   React.useImperativeHandle(ref, () => ({
@@ -54,25 +55,22 @@ function TrendingCarousel({
     // Scroll to page when currentPage changes externally
     useEffect(() => {
       if (carouselRef.current && currentPage !== undefined && memoizedPages.length > 0) {
-      const previousPage = previousPageRef.current;
-      const pageDiff = currentPage - previousPage;
-      
-      // Use relative scrolling (next/prev) to maintain consistent animation speed
-      // This ensures we always scroll by exactly 1 position, avoiding the carousel
-      // choosing a closer copy of the target index in looped mode
-      if (pageDiff === 1 || (pageDiff === -(memoizedPages.length - 1))) {
-        // Moving forward (including wrap-around from last to first)
-        carouselRef.current.next({ animated: true });
-      } else if (pageDiff === -1 || (pageDiff === memoizedPages.length - 1)) {
-        // Moving backward (including wrap-around from first to last)
-        carouselRef.current.prev({ animated: true });
-      } else if (pageDiff !== 0) {
-        // For larger jumps (shouldn't happen with pagination buttons, but handle gracefully)
-        const normalizedIndex = ((currentPage % memoizedPages.length) + memoizedPages.length) % memoizedPages.length;
-        carouselRef.current.scrollTo({ index: normalizedIndex, animated: true });
-      }
-      
-      previousPageRef.current = currentPage;
+        // Only update if the change comes from external source (not from user interaction)
+        const currentNormalizedIndex = ((actualCarouselIndexRef.current % memoizedPages.length) + memoizedPages.length) % memoizedPages.length;
+        
+        if (currentNormalizedIndex !== currentPage && !isUpdatingFromExternalRef.current) {
+          // Mark that we're updating from external source to prevent feedback loop
+          isUpdatingFromExternalRef.current = true;
+          
+          // Directly scroll to the target page
+          const normalizedIndex = ((currentPage % memoizedPages.length) + memoizedPages.length) % memoizedPages.length;
+          carouselRef.current.scrollTo({ index: normalizedIndex, animated: true });
+          
+          // Reset the flag after a short delay to allow the animation to complete
+          setTimeout(() => {
+            isUpdatingFromExternalRef.current = false;
+          }, 300); // Match the scrollAnimationDuration
+        }
       }
     }, [currentPage, memoizedPages.length]);
 
