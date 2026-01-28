@@ -1,11 +1,16 @@
-name: Build Android
+name: Build Android APK
 
 on:
   workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+  release:
+    types: [published]
 
 jobs:
   build:
-    name: Build
+    name: Build APK
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -23,7 +28,6 @@ jobs:
         uses: expo/expo-github-action@v8
         with:
           expo-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -45,7 +49,7 @@ jobs:
       - name: Prebuild Android
         run: |
           npx expo prebuild --platform android --clean
-          
+
       - name: Setup Android Keystore
         run: |
           # Create keystore file from secret (base64 encoded)
@@ -61,15 +65,7 @@ jobs:
       - name: Get Version
         run : |
           echo "VERSION=$(node -p "require('./app.json').version")" >> $GITHUB_ENV
-          
-      - name: Build Android AAB
-        run: |
-          cd android
-          ./gradlew bundleRelease
-          cd ..
-          cp android/app/build/outputs/bundle/release/app-release.aab ./WikiScape-v${{ env.VERSION }}-android.aab
-          echo "Android App Bundle built successfully"
-      
+
       - name: Build Android APK
         run: |
           cd android
@@ -77,13 +73,6 @@ jobs:
           cd ..
           cp android/app/build/outputs/apk/release/app-release.apk ./WikiScape-v${{ env.VERSION }}-android.apk
           echo "Android APK built successfully"
-      
-      - name: Upload AAB as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-aab
-          path: ./WikiScape-v${{ env.VERSION }}-android.aab
-          retention-days: 90
 
       - name: Upload APK as artifact
         uses: actions/upload-artifact@v4
@@ -91,3 +80,14 @@ jobs:
           name: android-apk
           path: ./WikiScape-v${{ env.VERSION }}-android.apk
           retention-days: 90
+
+      - name: Upload APK to Release
+        if: github.event_name == 'release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./WikiScape-v${{ env.VERSION }}-android.apk
+          asset_name: WikiScape-v${{ env.VERSION }}-android.apk
+          asset_content_type: application/vnd.android.package-archive

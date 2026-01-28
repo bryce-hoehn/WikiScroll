@@ -1,5 +1,5 @@
 {
-  "name": "WikiScape",
+  "name": "wikiscape",
   "main": "expo-router/entry",
   "version": "0.3.0",
   "scripts": {
@@ -9,7 +9,11 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "test:rate-limit": "node scripts/test-rate-limiter.js"
+    "test:rate-limit": "node scripts/test-rate-limiter.js",
+    "build:android": "node scripts/build-android-local.js",
+    "build:android:aab": "node scripts/build-android-local.js --aab-only",
+    "build:android:apk": "node scripts/build-android-local.js --apk-only",
+    "publish:playstore": "node scripts/publish-playstore.js"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.4.2",
@@ -57,6 +61,7 @@
     "react-dom": "19.1.0",
     "react-native": "0.81.5",
     "react-native-gesture-handler": "~2.28.0",
+    "react-native-google-mobile-ads": "^16.0.3",
     "react-native-pager-view": "6.9.1",
     "react-native-paper": "^5.14.5",
     "react-native-reanimated": "~4.1.1",
@@ -72,6 +77,7 @@
     "@types/react": "~19.1.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
+    "googleapis": "^144.0.0",
     "lighthouse": "^13.0.1",
     "typescript": "~5.9.2"
   },

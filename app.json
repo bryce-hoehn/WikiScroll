@@ -12,7 +12,7 @@
   "githubUrl": "https://github.com/bryce-hoehn/WikiScape",
   "ios": {
     "supportsTablet": true,
-    "bundleIdentifier": "com.brycehoehn.WikiScape",
+    "bundleIdentifier": "com.wikiscape.app",
     "infoPlist": {
       "NSAppTransportSecurity": {
         "NSAllowsArbitraryLoads": false,
@@ -36,7 +36,7 @@
   "android": {
     "edgeToEdgeEnabled": true,
     "predictiveBackGestureEnabled": true,
-    "package": "com.brycehoehn.WikiScape",
+    "package": "com.wikiscape.app",
     "adaptiveIcon": {
       "foregroundImage": "./assets/images/icon.png",
       "backgroundColor": "#ffffff"
