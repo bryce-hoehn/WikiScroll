@@ -18,6 +18,15 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Cache Android prebuild
+        id: cache-android
+        uses: actions/cache@v4
+        with:
+          path: android/
+          key: android-${{ hashFiles('app.json', 'package.json', 'package-lock.json') }}
+          restore-keys: |
+            android-
+    
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
@@ -49,6 +58,11 @@ jobs:
       - name: Prebuild Android
         run: |
           npx expo prebuild --clean
+
+      - name: Configure release signing
+        run: |
+          # Change signingConfig from debug to release in build.gradle
+          sed -i 's/signingConfig signingConfigs\.debug/signingConfig signingConfigs.release/g' android/app/build.gradle
 
       - name: Get Version
         run: |
