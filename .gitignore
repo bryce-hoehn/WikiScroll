@@ -45,4 +45,3 @@ app-example
 .vercel
 
 *.keystore
-package-lock.json
