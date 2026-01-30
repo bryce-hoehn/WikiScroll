@@ -59,10 +59,10 @@ jobs:
         run: |
           npx expo prebuild --clean
 
-      - name: Configure release signing
+      - name: Configure unsigned release build
         run: |
-          # Change signingConfig from debug to release in build.gradle
-          sed -i 's/signingConfig signingConfigs\.debug/signingConfig signingConfigs.release/g' android/app/build.gradle
+          # Remove signingConfig from release build to create unsigned AAB
+          sed -i '/release {/,/}/ s/signingConfig signingConfigs\.debug//' android/app/build.gradle
 
       - name: Get Version
         run: |
