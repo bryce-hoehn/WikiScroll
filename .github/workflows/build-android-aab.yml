@@ -59,10 +59,23 @@ jobs:
         run: |
           npx expo prebuild --clean
 
-      - name: Configure unsigned release build
+      - name: Setup Android Keystore
         run: |
-          # Remove signingConfig from release build to create unsigned AAB
-          sed -i '/release {/,/}/ s/signingConfig signingConfigs\.debug//' android/app/build.gradle
+          # Create keystore file from secret (base64 encoded)
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/app/release.keystore
+          # Set up signing properties for Gradle
+          cat >> android/gradle.properties << EOF
+          RELEASE_STORE_FILE=app/release.keystore
+          RELEASE_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          RELEASE_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          EOF
+
+      - name: Configure release signing
+        run: |
+          # Add release signing config and use it for release builds
+          sed -i '/signingConfigs {/a\        release {\n            storeFile file(RELEASE_STORE_FILE)\n            storePassword RELEASE_STORE_PASSWORD\n            keyAlias RELEASE_KEY_ALIAS\n            keyPassword RELEASE_KEY_PASSWORD\n        }' android/app/build.gradle
+          sed -i 's/signingConfig signingConfigs\.debug/signingConfig signingConfigs.release/g' android/app/build.gradle
 
       - name: Get Version
         run: |
