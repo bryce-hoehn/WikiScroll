@@ -1,0 +1,74 @@
+name: Build Unsigned Android AAB
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version name (optional, defaults to app.json version)'
+        required: false
+        type: string
+
+jobs:
+  build:
+    name: Build Unsigned AAB
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Expo
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Prebuild Android
+        run: |
+          npx expo prebuild --platform android --clean
+
+      - name: Get Version
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+          else
+            echo "VERSION=$(node -p "require('./app.json').version")" >> $GITHUB_ENV
+          fi
+
+      - name: Build Unsigned Android AAB
+        run: |
+          cd android
+          ./gradlew bundleRelease
+          cd ..
+          cp android/app/build/outputs/bundle/release/app-release.aab ./WikiScape-v${{ env.VERSION }}-unsigned.aab
+          echo "Unsigned Android App Bundle built successfully"
+
+      - name: Upload AAB as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-aab-unsigned
+          path: ./WikiScape-v${{ env.VERSION }}-unsigned.aab
+          retention-days: 90
