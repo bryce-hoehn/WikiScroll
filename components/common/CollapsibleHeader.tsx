@@ -47,10 +47,10 @@ export default function CollapsibleHeader({
       return fixedHeightRef.current; // Fixed height when reduced motion is enabled
     }
     return scrollY.interpolate({
-        inputRange: [0, scrollThreshold, maxScroll],
-        outputRange: [headerHeight, headerHeight, 0],
-        extrapolate: 'clamp',
-      });
+      inputRange: [0, scrollThreshold, maxScroll],
+      outputRange: [headerHeight, headerHeight, 0],
+      extrapolate: 'clamp',
+    });
   }, [reducedMotion, scrollY, headerHeight, scrollThreshold, maxScroll]);
 
   // Fade out as it collapses
@@ -60,16 +60,15 @@ export default function CollapsibleHeader({
       return fixedOpacityRef.current; // Fixed opacity when reduced motion is enabled
     }
     return scrollY.interpolate({
-        inputRange: [0, scrollThreshold, maxScroll],
-        outputRange: [1, 1, 0],
-        extrapolate: 'clamp',
-      });
+      inputRange: [0, scrollThreshold, maxScroll],
+      outputRange: [1, 1, 0],
+      extrapolate: 'clamp',
+    });
   }, [reducedMotion, scrollY, scrollThreshold, maxScroll]);
 
   return (
     <Animated.View
-      // @ts-expect-error - main role is valid for React Native Web but not in TypeScript types
-      accessibilityRole="banner"
+      accessibilityRole="header"
       accessibilityLabel="App header"
       style={[
         styles.container,
@@ -115,27 +114,27 @@ export function useCollapsibleHeaderSpacing(
   maxScroll: number = 200
 ) {
   const { reducedMotion } = useReducedMotion();
-  
+
   // Create fixed animated value that persists across renders
   const fixedMarginTopRef = useRef(new Animated.Value(headerHeight));
-  
+
   // Update fixed value when reducedMotion or headerHeight changes
   useEffect(() => {
     if (reducedMotion) {
       fixedMarginTopRef.current.setValue(headerHeight);
     }
   }, [reducedMotion, headerHeight]);
-  
+
   // If reduced motion is enabled, keep margin fixed at headerHeight
   const animatedMarginTop = useMemo(() => {
     if (reducedMotion) {
       return fixedMarginTopRef.current; // Fixed margin when reduced motion is enabled
     }
     return scrollY.interpolate({
-    inputRange: [0, scrollThreshold, maxScroll],
-    outputRange: [headerHeight, headerHeight, 0],
-    extrapolate: 'clamp',
-  });
+      inputRange: [0, scrollThreshold, maxScroll],
+      outputRange: [headerHeight, headerHeight, 0],
+      extrapolate: 'clamp',
+    });
   }, [reducedMotion, scrollY, headerHeight, scrollThreshold, maxScroll]);
 
   return animatedMarginTop;
