@@ -1,0 +1,99 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version name (optional, defaults to app.json version)'
+        required: false
+        type: string
+
+jobs:
+  build:
+    name: Build APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cache Android prebuild
+        id: cache-android
+        uses: actions/cache@v4
+        with:
+          path: android/
+          key: android-${{ hashFiles('app.json', 'package.json', 'package-lock.json') }}
+          restore-keys: |
+            android-
+    
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Expo
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Prebuild Android
+        run: |
+          npx expo prebuild --clean
+
+      - name: Setup Android Keystore
+        run: |
+          # Create keystore file from secret (base64 encoded)
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/app/release.keystore
+          # Set up signing properties for Gradle
+          cat >> android/gradle.properties << EOF
+          RELEASE_STORE_FILE=release.keystore
+          RELEASE_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          RELEASE_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          EOF
+
+      - name: Configure release signing
+        run: |
+          # Add release signing config and use it for release builds
+          sed -i '/signingConfigs {/a\        release {\n            storeFile file(RELEASE_STORE_FILE)\n            storePassword RELEASE_STORE_PASSWORD\n            keyAlias RELEASE_KEY_ALIAS\n            keyPassword RELEASE_KEY_PASSWORD\n        }' android/app/build.gradle
+          sed -i 's/signingConfig signingConfigs\.debug/signingConfig signingConfigs.release/g' android/app/build.gradle
+
+      - name: Get Version
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+          else
+            echo "VERSION=$(node -p "require('./app.json').version")" >> $GITHUB_ENV
+          fi
+
+      - name: Build Android APK
+        run: |
+          npx react-native build-android --mode=release --extra-build-args="bundle assembleRelease"
+          cp android/app/build/outputs/apk/release/app-release.apk ./WikiScape-v${{ env.VERSION }}.apk
+          echo "Android APK built successfully"
+
+      - name: Upload APK as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: ./WikiScape-v${{ env.VERSION }}.apk
+          retention-days: 90
