@@ -1,4 +1,4 @@
-name: Build Android AAB
+name: Build Android
 
 on:
   workflow_dispatch:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    name: Build AAB
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
