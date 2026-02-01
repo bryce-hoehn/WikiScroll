@@ -10,29 +10,6 @@
   "userInterfaceStyle": "automatic",
   "newArchEnabled": true,
   "githubUrl": "https://github.com/bryce-hoehn/WikiScape",
-  "ios": {
-    "supportsTablet": true,
-    "bundleIdentifier": "com.wikiscape.app",
-    "infoPlist": {
-      "NSAppTransportSecurity": {
-        "NSAllowsArbitraryLoads": false,
-        "NSExceptionDomains": {
-          "wikipedia.org": {
-            "NSExceptionAllowsInsecureHTTPLoads": false,
-            "NSIncludesSubdomains": true
-          },
-          "wikimedia.org": {
-            "NSExceptionAllowsInsecureHTTPLoads": false,
-            "NSIncludesSubdomains": true
-          }
-        }
-      },
-      "UIBackgroundModes": []
-    },
-    "config": {
-      "usesNonExemptEncryption": false
-    }
-  },
   "android": {
     "edgeToEdgeEnabled": true,
     "predictiveBackGestureEnabled": true,
@@ -41,7 +18,13 @@
       "foregroundImage": "./assets/images/icon.png",
       "backgroundColor": "#ffffff"
     },
-    "permissions": []
+    "permissions": [],
+    "signingConfig": {
+      "keystorePath": "./android/app/release.keystore",
+      "keystorePassword": "${ANDROID_KEYSTORE_PASSWORD}",
+      "keyAlias": "${ANDROID_KEY_ALIAS}",
+      "keyPassword": "${ANDROID_KEYSTORE_PASSWORD}"
+    }
   },
   "web": {
     "output": "static",
@@ -83,13 +66,6 @@
   "experiments": {
     "typedRoutes": true
   },
-  "extra": {
-    "router": {},
-    "eas": {
-      "projectId": "544f5bef-88e1-4990-96da-18d922ed21df"
-    }
-  },
-  "owner": "17hoehbr",
   "runtimeVersion": {
     "policy": "appVersion"
   },
