@@ -90,12 +90,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: android-aab
-          path: ./WikiScape-v${{ env.VERSION }}.aab
+          path: ./android/WikiScape-v${{ env.VERSION }}.aab
           retention-days: 90
 
       - name: Upload APK as artifact
         uses: actions/upload-artifact@v4
         with:
           name: android-apk
-          path: ./WikiScape-v${{ env.VERSION }}.apk
+          path: ./android/WikiScape-v${{ env.VERSION }}.apk
           retention-days: 90
