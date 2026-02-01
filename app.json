@@ -20,7 +20,7 @@
     },
     "permissions": [],
     "signingConfig": {
-      "keystorePath": "./android/app/release.keystore",
+      "keystorePath": "./release.keystore",
       "keystorePassword": "${ANDROID_KEYSTORE_PASSWORD}",
       "keyAlias": "${ANDROID_KEY_ALIAS}",
       "keyPassword": "${ANDROID_KEYSTORE_PASSWORD}"
