@@ -4,7 +4,7 @@
   "version": "0.3.0",
   "description": "A modern, cross-platform Wikipedia reader built with React Native and Expo.",
   "orientation": "portrait",
-  "icon": "/src/assets/images/icon.png",
+  "icon": "./src/assets/images/icon.png",
   "scheme": "wikiscape",
   "primaryColor": "#000000",
   "userInterfaceStyle": "automatic",
@@ -15,14 +15,14 @@
     "predictiveBackGestureEnabled": true,
     "package": "com.wikiscape.app",
     "adaptiveIcon": {
-      "foregroundImage": "/src/assets/images/icon.png",
+      "foregroundImage": "./src/assets/images/icon.png",
       "backgroundColor": "#ffffff"
     },
     "permissions": []
   },
   "web": {
     "output": "static",
-    "favicon": "/src/assets/images/scroll.png",
+    "favicon": "./src/assets/images/scroll.png",
     "bundler": "metro",
     "name": "WikiScape",
     "shortName": "WikiScape",
@@ -39,7 +39,7 @@
     [
       "expo-splash-screen",
       {
-        "image": "/src/assets/images/icon.png",
+        "image": "./src/assets/images/icon.png",
         "imageWidth": 200,
         "resizeMode": "contain",
         "backgroundColor": "#ffffff",
