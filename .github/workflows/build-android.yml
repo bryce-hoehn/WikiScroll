@@ -69,8 +69,7 @@ jobs:
           npx expo prebuild --clean
 
           # Build AAB
-          cd android/
-          ./gradlew bundleRelease
+          npx react-native build-android --mode=release
           cp app/build/outputs/bundle/release/app-release.aab ./WikiScape-v${{ env.VERSION }}.aab
           echo "Android App Bundle built successfully"
 
@@ -81,8 +80,7 @@ jobs:
           export ANDROID_KEY_ALIAS="${{ secrets.ANDROID_KEY_ALIAS }}"
 
           # Build APK
-          cd android/
-          ./gradlew assembleRelease
+          npx react-native build-android --mode=release
           cp app/build/outputs/apk/release/app-release.apk ./WikiScape-v${{ env.VERSION }}.apk
           echo "Android APK built successfully"
 
