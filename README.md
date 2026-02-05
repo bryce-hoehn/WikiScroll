@@ -1,7 +1,7 @@
 # WikiScape
 
 <p align="center">
-  <img src="./assets/images/icon.png" alt="wikiscape logo" height=128 width=128 />
+  <img src="./src/assets/images/icon.png" alt="wikiscape logo" height=128 width=128 />
 </p>
 
 [Demo](https://wikiscape.app/)
@@ -103,7 +103,7 @@ The app is functional but not been thoroughly tested. Consider it a work in prog
 ## Project Structure
 
 ```
-WikiScape/
+WikiScape/src
 ├── app/                    # Expo Router screens
 │   ├── (tabs)/            # Main navigation tabs
 │   ├── article/            # Article detail screens
