@@ -1,0 +1,630 @@
+import { Image } from 'expo-image';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  Modal,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
+} from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { Appbar, IconButton, useTheme } from 'react-native-paper';
+import Animated, {
+  useAnimatedReaction,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { MOTION } from '@/constants/motion';
+import { SPACING } from '@/constants/spacing';
+import { useReducedMotion } from '@/hooks';
+
+interface ImageDialogProps {
+  visible: boolean;
+  selectedImage: { uri: string; alt?: string } | null;
+  onClose: () => void;
+  // Optional: Array of all images for navigation
+  images?: { uri: string; alt?: string }[];
+  initialIndex?: number;
+}
+
+export default function ImageDialog({
+  visible,
+  selectedImage,
+  onClose,
+  images,
+  initialIndex = 0,
+}: ImageDialogProps) {
+  const theme = useTheme();
+  const closeButtonRef = useRef<any>(null);
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+  const { reducedMotion } = useReducedMotion();
+  const insets = useSafeAreaInsets();
+
+  // Determine if we have multiple images for navigation
+  const imageArray =
+    images && images.length > 0 ? images : selectedImage ? [selectedImage] : [];
+  const hasMultipleImages = imageArray.length > 1;
+
+  // Current image index state
+  const [currentIndex, setCurrentIndex] = useState(() => {
+    if (
+      images &&
+      images.length > 0 &&
+      initialIndex >= 0 &&
+      initialIndex < images.length
+    ) {
+      return initialIndex;
+    }
+    return 0;
+  });
+
+  // Update current index when selectedImage changes (for backward compatibility)
+  useEffect(() => {
+    if (selectedImage && images && images.length > 0) {
+      const index = images.findIndex((img) => img.uri === selectedImage.uri);
+      if (index >= 0) {
+        setCurrentIndex(index);
+      }
+    } else if (selectedImage && !images) {
+      setCurrentIndex(0);
+    }
+  }, [selectedImage, images]);
+
+  // Reset to initial index when modal opens
+  useEffect(() => {
+    if (visible) {
+      if (
+        images &&
+        images.length > 0 &&
+        initialIndex >= 0 &&
+        initialIndex < images.length
+      ) {
+        setCurrentIndex(initialIndex);
+      } else {
+        setCurrentIndex(0);
+      }
+    }
+  }, [visible, images, initialIndex]);
+
+  // Helper function to convert thumbnail URL to full-size image URL
+  const getFullSizeImageUrl = useCallback((url: string): string => {
+    if (!url || !url.includes('upload.wikimedia.org')) {
+      return url;
+    }
+
+    try {
+      // Check if it's a thumbnail URL (contains /thumb/)
+      if (url.includes('/thumb/')) {
+        // Pattern: .../thumb/{hash}/{filename}/{width}px-{filename}
+        // We want: .../{hash}/{filename}
+
+        const urlObj = new URL(url);
+        const pathParts = urlObj.pathname.split('/').filter(Boolean);
+
+        const thumbIndex = pathParts.findIndex(
+          (part: string) => part === 'thumb',
+        );
+        if (thumbIndex !== -1) {
+          // Remove 'thumb' segment
+          pathParts.splice(thumbIndex, 1);
+
+          // Remove the last part if it's a size-prefixed filename (e.g., "220px-filename.jpg")
+          const lastPart = pathParts[pathParts.length - 1];
+          if (lastPart && lastPart.match(/^\d+px-/)) {
+            pathParts.pop();
+          }
+
+          // Reconstruct URL without /thumb/ and size prefix
+          urlObj.pathname = '/' + pathParts.join('/');
+          return urlObj.toString();
+        }
+      }
+
+      return url;
+    } catch {
+      // If URL parsing fails, return original
+      return url;
+    }
+  }, []);
+
+  // Get current image with full-size URL
+  const currentImage = imageArray[currentIndex] || null;
+  const fullSizeImageUri = currentImage
+    ? getFullSizeImageUrl(currentImage.uri)
+    : null;
+
+  // Track actual image dimensions for background sizing
+  const [imageDimensions, setImageDimensions] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
+  const loadedImageUriRef = useRef<string | null>(null);
+
+  // Reset dimensions when image changes
+  useEffect(() => {
+    setImageDimensions(null);
+    loadedImageUriRef.current = null;
+  }, [fullSizeImageUri]);
+
+  // Memoize onLoad handler to prevent infinite loops
+  const handleImageLoad = useCallback(
+    (event: any) => {
+      // Only set dimensions if we haven't already loaded this image
+      if (loadedImageUriRef.current === fullSizeImageUri) {
+        return;
+      }
+
+      // Get natural image dimensions from the load event
+      const source = event.source;
+      if (source && 'width' in source && 'height' in source) {
+        const width = source.width as number;
+        const height = source.height as number;
+        if (width > 0 && height > 0) {
+          loadedImageUriRef.current = fullSizeImageUri || null;
+          setImageDimensions({ width, height });
+        }
+      }
+    },
+    [fullSizeImageUri],
+  );
+
+  // Pinch-to-zoom state
+  const scale = useSharedValue(1);
+  const savedScale = useSharedValue(1);
+  const translateX = useSharedValue(0);
+  const translateY = useSharedValue(0);
+  const savedTranslateX = useSharedValue(0);
+  const savedTranslateY = useSharedValue(0);
+
+  // Swipe navigation state
+  const swipeTranslateX = useSharedValue(0);
+
+  // Shared value to trigger navigation from worklet (1 = next, -1 = previous)
+  const navigationDirection = useSharedValue(0);
+
+  // Shared values to track current index and array length for worklet access
+  const currentIndexShared = useSharedValue(currentIndex);
+  const imageArrayLengthShared = useSharedValue(imageArray.length);
+
+  // Update shared values when state changes
+  useEffect(() => {
+    currentIndexShared.value = currentIndex;
+    imageArrayLengthShared.value = imageArray.length;
+  }, [
+    currentIndex,
+    imageArray.length,
+    currentIndexShared,
+    imageArrayLengthShared,
+  ]);
+
+  // Navigation functions
+  const goToPrevious = useCallback(() => {
+    if (hasMultipleImages && currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+      // Reset zoom when changing images
+      scale.value = 1;
+      savedScale.value = 1;
+      translateX.value = 0;
+      translateY.value = 0;
+      savedTranslateX.value = 0;
+      savedTranslateY.value = 0;
+    }
+  }, [
+    hasMultipleImages,
+    currentIndex,
+    scale,
+    savedScale,
+    translateX,
+    translateY,
+    savedTranslateX,
+    savedTranslateY,
+  ]);
+
+  const goToNext = useCallback(() => {
+    if (hasMultipleImages && currentIndex < imageArray.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+      // Reset zoom when changing images
+      scale.value = 1;
+      savedScale.value = 1;
+      translateX.value = 0;
+      translateY.value = 0;
+      savedTranslateX.value = 0;
+      savedTranslateY.value = 0;
+    }
+  }, [
+    hasMultipleImages,
+    currentIndex,
+    imageArray.length,
+    scale,
+    savedScale,
+    translateX,
+    translateY,
+    savedTranslateX,
+    savedTranslateY,
+  ]);
+
+  // Store navigation callbacks in refs for worklet access
+  const goToPreviousRef = useRef(goToPrevious);
+  const goToNextRef = useRef(goToNext);
+
+  useEffect(() => {
+    goToPreviousRef.current = goToPrevious;
+    goToNextRef.current = goToNext;
+  }, [goToPrevious, goToNext]);
+
+  // Handle navigation triggered from gesture worklet
+  useAnimatedReaction(
+    () => navigationDirection.value,
+    (direction) => {
+      'worklet';
+      if (direction !== 0) {
+        navigationDirection.value = 0; // Reset
+        if (direction === -1) {
+          goToPreviousRef.current();
+        } else if (direction === 1) {
+          goToNextRef.current();
+        }
+      }
+    },
+  );
+
+  // Reset zoom and swipe when modal closes or image changes
+  useEffect(() => {
+    if (!visible) {
+      scale.value = 1;
+      savedScale.value = 1;
+      translateX.value = 0;
+      translateY.value = 0;
+      savedTranslateX.value = 0;
+      savedTranslateY.value = 0;
+      swipeTranslateX.value = 0;
+      setImageDimensions(null);
+    }
+  }, [
+    visible,
+    currentIndex,
+    scale,
+    savedScale,
+    translateX,
+    translateY,
+    savedTranslateX,
+    savedTranslateY,
+    swipeTranslateX,
+  ]);
+
+  // Focus management for accessibility
+  useEffect(() => {
+    if (visible && closeButtonRef.current) {
+      // Focus the close button when modal opens
+      const timeoutId = setTimeout(() => {
+        closeButtonRef.current?.focus?.();
+      }, 100);
+
+      return () => {
+        clearTimeout(timeoutId);
+      };
+    }
+  }, [visible]);
+
+  // Pinch gesture for zooming
+  const pinchGesture = Gesture.Pinch()
+    .onUpdate((e) => {
+      scale.value = savedScale.value * e.scale;
+    })
+    .onEnd(() => {
+      savedScale.value = scale.value;
+      // Clamp scale between 1 and 5
+      if (scale.value < 1) {
+        scale.value = withTiming(1, { duration: MOTION.durationShort });
+        savedScale.value = 1;
+      } else if (scale.value > 5) {
+        scale.value = withTiming(5, { duration: MOTION.durationShort });
+        savedScale.value = 5;
+      }
+    });
+
+  // Pan gesture for moving zoomed image (only when zoomed)
+  const panGesture = Gesture.Pan()
+    .enabled(true)
+    .onUpdate((e) => {
+      // Only allow panning when zoomed
+      if (scale.value > 1) {
+        translateX.value = savedTranslateX.value + e.translationX;
+        translateY.value = savedTranslateY.value + e.translationY;
+      }
+    })
+    .onEnd(() => {
+      if (scale.value > 1) {
+        savedTranslateX.value = translateX.value;
+        savedTranslateY.value = translateY.value;
+      }
+    });
+
+  // Horizontal swipe gesture for navigation (only when not zoomed)
+  const swipeGesture = Gesture.Pan()
+    .enabled(hasMultipleImages)
+    .activeOffsetX([-10, 10])
+    .failOffsetY([-5, 5])
+    .onUpdate((e) => {
+      // Only allow horizontal swiping when not zoomed
+      if (scale.value === 1) {
+        swipeTranslateX.value = e.translationX;
+      }
+    })
+    .onEnd((e) => {
+      if (scale.value === 1) {
+        const swipeThreshold = windowWidth * 0.25; // 25% of screen width
+        const velocity = e.velocityX;
+
+        if (e.translationX > swipeThreshold || velocity > 500) {
+          // Swipe right - go to previous
+          if (currentIndexShared.value > 0) {
+            navigationDirection.value = -1;
+          }
+        } else if (e.translationX < -swipeThreshold || velocity < -500) {
+          // Swipe left - go to next
+          if (currentIndexShared.value < imageArrayLengthShared.value - 1) {
+            navigationDirection.value = 1;
+          }
+        }
+        // Reset swipe position
+        swipeTranslateX.value = withSpring(0, {
+          damping: 20,
+          stiffness: 300,
+        });
+      } else {
+        swipeTranslateX.value = withSpring(0);
+      }
+    });
+
+  // Combined gestures - prioritize swipe when not zoomed, pan when zoomed
+  const composedGesture = Gesture.Simultaneous(
+    pinchGesture,
+    Gesture.Race(swipeGesture, panGesture),
+  );
+
+  // Animated style for image container (swipe navigation)
+  const containerAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateX: swipeTranslateX.value }],
+    };
+  });
+
+  // Animated style for image (zoom and pan)
+  const imageAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { translateX: translateX.value },
+        { translateY: translateY.value },
+        { scale: scale.value },
+      ],
+    };
+  });
+
+  // Handle double tap to reset zoom
+  const doubleTapGesture = Gesture.Tap()
+    .numberOfTaps(2)
+    .onEnd(() => {
+      if (scale.value > 1) {
+        // Reset zoom
+        if (reducedMotion) {
+          scale.value = 1;
+          savedScale.value = 1;
+          translateX.value = 0;
+          translateY.value = 0;
+          savedTranslateX.value = 0;
+          savedTranslateY.value = 0;
+        } else {
+          scale.value = withTiming(1, { duration: MOTION.durationShort });
+          savedScale.value = 1;
+          translateX.value = withTiming(0, { duration: MOTION.durationShort });
+          translateY.value = withTiming(0, { duration: MOTION.durationShort });
+          savedTranslateX.value = 0;
+          savedTranslateY.value = 0;
+        }
+      } else {
+        // Zoom in
+        if (reducedMotion) {
+          scale.value = 2;
+          savedScale.value = 2;
+        } else {
+          scale.value = withTiming(2, { duration: MOTION.durationShort });
+          savedScale.value = 2;
+        }
+      }
+    });
+
+  const allGestures = Gesture.Simultaneous(composedGesture, doubleTapGesture);
+
+  return (
+    <Modal
+      visible={visible}
+      transparent={true}
+      animationType={reducedMotion ? 'none' : 'fade'}
+      onRequestClose={onClose}
+      statusBarTranslucent={true}
+      accessibilityViewIsModal={true}
+      accessible={true}
+      accessibilityLabel="Image modal"
+    >
+      <View style={{ flex: 1, backgroundColor: theme.colors.scrim + 'E6' }}>
+        <Appbar.Header
+          style={{
+            backgroundColor: 'transparent',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            paddingTop: insets.top,
+            zIndex: 10,
+          }}
+          accessibilityRole="toolbar"
+        >
+          <Appbar.Action
+            ref={closeButtonRef}
+            icon="close"
+            onPress={onClose}
+            color="#FFFFFF"
+            accessible={true}
+            accessibilityLabel="Close image modal"
+            accessibilityRole="button"
+            accessibilityHint="Closes the image modal and returns to the article"
+          />
+          <Appbar.Content
+            title={
+              hasMultipleImages
+                ? `${currentImage?.alt || 'Image'} (${currentIndex + 1} of ${imageArray.length})`
+                : currentImage?.alt || 'Image'
+            }
+            titleStyle={{ color: '#FFFFFF' }}
+          />
+        </Appbar.Header>
+
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingTop: 56 + insets.top,
+          }}
+        >
+          {currentImage && (
+            <GestureDetector gesture={allGestures}>
+              <Animated.View
+                style={[
+                  {
+                    width: windowWidth,
+                    height: windowHeight * 0.8,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  },
+                  containerAnimatedStyle,
+                ]}
+              >
+                <Animated.View style={imageAnimatedStyle}>
+                  <View
+                    style={{
+                      backgroundColor: theme.colors.surfaceVariant,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      alignSelf: 'center',
+                      opacity: imageDimensions ? 1 : 0,
+                      ...(imageDimensions
+                        ? (() => {
+                            const maxWidth = windowWidth;
+                            const maxHeight = windowHeight * 0.8;
+                            const aspectRatio =
+                              imageDimensions.width / imageDimensions.height;
+                            let width = maxWidth;
+                            let height = maxWidth / aspectRatio;
+
+                            if (height > maxHeight) {
+                              height = maxHeight;
+                              width = maxHeight * aspectRatio;
+                            }
+
+                            return { width, height };
+                          })()
+                        : {
+                            width: 0,
+                            height: 0,
+                          }),
+                    }}
+                  >
+                    <Image
+                      source={{ uri: fullSizeImageUri || currentImage.uri }}
+                      style={{
+                        width: windowWidth,
+                        height: windowHeight * 0.8,
+                      }}
+                      contentFit="contain"
+                      onLoad={handleImageLoad}
+                      accessible={true}
+                      accessibilityLabel={currentImage.alt || 'Article image'}
+                      accessibilityRole="image"
+                      accessibilityHint={
+                        hasMultipleImages
+                          ? 'Pinch to zoom, double tap to zoom in/out, drag to pan when zoomed, swipe left/right to navigate'
+                          : 'Pinch to zoom, double tap to zoom in/out, drag to pan when zoomed'
+                      }
+                    />
+                  </View>
+                </Animated.View>
+              </Animated.View>
+            </GestureDetector>
+          )}
+
+          <View
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+            }}
+            pointerEvents="box-none"
+          >
+            <TouchableOpacity
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+              }}
+              onPress={onClose}
+              activeOpacity={1}
+              accessible={true}
+              accessibilityLabel="Close image modal"
+              accessibilityRole="button"
+              accessibilityHint="Tap outside image to close the modal"
+            />
+          </View>
+
+          {/* Navigation Buttons */}
+          {hasMultipleImages && (
+            <>
+              {currentIndex > 0 && (
+                <IconButton
+                  icon="chevron-left"
+                  iconColor={theme.colors.onSurface}
+                  size={40}
+                  style={{
+                    position: 'absolute',
+                    left: SPACING.base,
+                    backgroundColor: theme.colors.surface + 'E6', // 90% opacity
+                    zIndex: 10,
+                  }}
+                  onPress={goToPrevious}
+                  accessible={true}
+                  accessibilityLabel="Previous image"
+                  accessibilityHint={`Go to image ${currentIndex} of ${imageArray.length}`}
+                />
+              )}
+              {currentIndex < imageArray.length - 1 && (
+                <IconButton
+                  icon="chevron-right"
+                  iconColor={theme.colors.onSurface}
+                  size={40}
+                  style={{
+                    position: 'absolute',
+                    right: SPACING.base,
+                    backgroundColor: theme.colors.surface + 'E6', // 90% opacity
+                    zIndex: 10,
+                  }}
+                  onPress={goToNext}
+                  accessible={true}
+                  accessibilityLabel="Next image"
+                  accessibilityHint={`Go to image ${currentIndex + 2} of ${imageArray.length}`}
+                />
+              )}
+            </>
+          )}
+        </View>
+      </View>
+    </Modal>
+  );
+}

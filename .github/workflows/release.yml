@@ -17,7 +17,7 @@ jobs:
   release:
     name: Build and Release
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -107,19 +107,19 @@ jobs:
           # Get version and package name from app.json
           VERSION="${{ steps.bump_version.outputs.version }}"
           PACKAGE_NAME=$(node -p "require('./app.json').expo.android.package")
-          
+
           # Extract version code from version (e.g., 0.3.0 -> 3000, 1.2.3 -> 1002003)
           IFS='.' read -r -a VERSION_PARTS <<< "$VERSION"
           VERSION_CODE=$((${VERSION_PARTS[0]} * 1000000 + ${VERSION_PARTS[1]} * 1000 + ${VERSION_PARTS[2]}))
-          
+
           # Update versionName and versionCode
           sed -i "s/versionName \".*\"/versionName \"$VERSION\"/" android/app/build.gradle
           sed -i "s/versionCode [0-9]*/versionCode $VERSION_CODE/" android/app/build.gradle
-          
+
           # Update applicationId and namespace to match app.json
           sed -i "s/applicationId '.*'/applicationId '$PACKAGE_NAME'/" android/app/build.gradle
           sed -i "s/namespace '.*'/namespace '$PACKAGE_NAME'/" android/app/build.gradle
-          
+
           echo "Updated Android build.gradle:"
           echo "  versionName: $VERSION"
           echo "  versionCode: $VERSION_CODE"
@@ -133,7 +133,7 @@ jobs:
           cd ..
           cp android/app/build/outputs/bundle/release/app-release.aab ./WikiScape-v${{ steps.bump_version.outputs.version }}-android.aab
           echo "Android App Bundle built successfully"
-      
+
       - name: Build Android APK
         run: |
           cd android
@@ -141,7 +141,7 @@ jobs:
           cd ..
           cp android/app/build/outputs/apk/release/app-release.apk ./WikiScape-v${{ steps.bump_version.outputs.version }}-android.apk
           echo "Android APK built successfully"
-      
+
       - name: Upload AAB as artifact
         uses: actions/upload-artifact@v4
         with:
@@ -167,14 +167,14 @@ jobs:
           name: Release v${{ steps.bump_version.outputs.version }}
           body: |
             ## Release v${{ steps.bump_version.outputs.version }}
-            
+
             ### Changes
             - Automated release build
-            
+
             ### Downloads
             - **Android APK**: Install directly on Android devices (download from assets below)
             - **Android AAB**: Available as a GitHub Actions artifact for Google Play Store submission
-            
+
             ### Installation
             - **APK**: Download and install the APK file on your Android device
             - **Google Play**: Download the AAB from workflow artifacts and upload to Google Play Console
@@ -184,4 +184,3 @@ jobs:
             ./WikiScape-v${{ steps.bump_version.outputs.version }}-android.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-

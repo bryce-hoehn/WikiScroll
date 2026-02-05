@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
@@ -64,10 +64,10 @@ jobs:
           # Set signing config as environment variables for Expo prebuild
           export ANDROID_KEYSTORE_PASSWORD="${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
           export ANDROID_KEY_ALIAS="${{ secrets.ANDROID_KEY_ALIAS }}"
-          
+
           # Run Expo prebuild to generate native code with signing config
           npx expo prebuild --clean
-          
+
           # Build AAB
           cd android/
           ./gradlew bundleRelease
@@ -79,7 +79,7 @@ jobs:
           # Set signing config as environment variables
           export ANDROID_KEYSTORE_PASSWORD="${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
           export ANDROID_KEY_ALIAS="${{ secrets.ANDROID_KEY_ALIAS }}"
-          
+
           # Build APK
           cd android/
           ./gradlew assembleRelease
