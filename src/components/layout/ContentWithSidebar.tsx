@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, View, useWindowDimensions } from 'react-native';
+import { View, useWindowDimensions } from 'react-native';
 import { Card, Divider, Text, useTheme } from 'react-native-paper';
 
 import { LAYOUT } from '@/constants/layout';
@@ -27,19 +27,15 @@ export default function ContentWithSidebar({
   return (
     <View style={{ flex: 1, flexDirection: 'row' }}>
       {/* Main content area */}
-      <ScrollView
+      <View
         style={{
           flex: isLargeScreen ? 1 : 1,
           maxWidth: isLargeScreen ? LAYOUT.MAX_CONTENT_WIDTH : '100%',
           backgroundColor: theme.colors.background,
         }}
-        contentContainerStyle={{
-          maxWidth: LAYOUT.MAX_CONTENT_WIDTH,
-          paddingHorizontal: SPACING.md,
-        }}
       >
         {children}
-      </ScrollView>
+      </View>
 
       {/* Right sidebar - only shown on large screens */}
       {isLargeScreen && (
