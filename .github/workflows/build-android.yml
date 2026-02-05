@@ -70,7 +70,7 @@ jobs:
 
           # Build AAB
           npx react-native build-android --mode=release
-          cp app/build/outputs/bundle/release/app-release.aab ./WikiScape-v${{ env.VERSION }}.aab
+          cp android/app/build/outputs/bundle/release/app-release.aab ./WikiScape-v${{ env.VERSION }}.aab
           echo "Android App Bundle built successfully"
 
       - name: Build Android APK
@@ -81,7 +81,7 @@ jobs:
 
           # Build APK
           npx react-native build-android --mode=release
-          cp app/build/outputs/apk/release/app-release.apk ./WikiScape-v${{ env.VERSION }}.apk
+          cp android/app/build/outputs/apk/release/app-release.apk ./WikiScape-v${{ env.VERSION }}.apk
           echo "Android APK built successfully"
 
       - name: Upload AAB as artifact
