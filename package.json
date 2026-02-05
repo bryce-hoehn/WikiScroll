@@ -76,7 +76,6 @@
     "eslint-plugin-import-x": "^4.16.1",
     "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-native-a11y": "^3.5.1",
     "globals": "^17.3.0",
     "googleapis": "^144.0.0",
     "jiti": "^2.6.1",
