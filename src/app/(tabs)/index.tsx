@@ -58,14 +58,18 @@ export default function HomeScreen() {
 
   const [index, setIndex] = useState(() => getInitialIndex());
 
-  // Update index when tab query parameter changes
+  // Only update index from query parameter on initial mount, not on every change
+  // This prevents resetting the tab when user switches tabs manually
+  const hasInitializedRef = useRef(false);
   useEffect(() => {
-    const newIndex = getInitialIndex();
-    setIndex((currentIndex) => {
-      // Only update if the new index is different
-      return newIndex !== currentIndex ? newIndex : currentIndex;
-    });
-  }, [tab, routes, getInitialIndex]);
+    if (!hasInitializedRef.current) {
+      const newIndex = getInitialIndex();
+      if (newIndex !== index) {
+        setIndex(newIndex);
+      }
+      hasInitializedRef.current = true;
+    }
+  }, []); // Empty dependency array - only run once on mount
 
   // Register a scroll ref for the home route that scrolls the currently active feed
   // Use ref to access current index without causing re-renders
@@ -113,13 +117,13 @@ export default function HomeScreen() {
   }, [index]);
 
   const handleTabPress = useCallback(
-    (tabIndex: number, routeKey: string) => {
+    (tabIndex: number, routeKey: string, jumpTo?: (key: string) => void) => {
       if (tabIndex === indexRef.current) {
         // Already on this tab, scroll to top
         scrollToTop(routeKey);
-      } else {
-        // Switch to the tab
-        setIndex(tabIndex);
+      } else if (jumpTo) {
+        // Switch to the tab using TabView's jumpTo function
+        jumpTo(routeKey);
       }
     },
     [scrollToTop],
@@ -223,7 +227,7 @@ export default function HomeScreen() {
               return (
                 <TouchableRipple
                   key={route.key}
-                  onPress={() => handleTabPress(i, route.key)}
+                  onPress={() => handleTabPress(i, route.key, props.jumpTo)}
                   style={{
                     flex: 1,
                     alignItems: 'center',
