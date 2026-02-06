@@ -82,6 +82,8 @@ jobs:
 
       - name: Build Android
         run: |
+          export ANDROID_KEYSTORE_PASSWORD="${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
+          export ANDROID_KEY_ALIAS="${{ secrets.ANDROID_KEY_ALIAS }}"
           npx react-native build-android --mode=release --tasks="bundleRelease,assembleRelease"
 
       - name: Prepare Artifacts
