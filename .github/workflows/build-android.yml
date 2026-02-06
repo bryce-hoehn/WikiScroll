@@ -70,12 +70,11 @@ jobs:
             echo "VERSION=$(node -p "require('./app.json').version")" >> $GITHUB_ENV
           fi
 
-      - name: Configure Expo Build
+      - name: Setup Android Keystore
         run: |
-          # Set environment variables for signing
-          echo "ANDROID_KEYSTORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
-          echo "ANDROID_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}" >> $GITHUB_ENV
-
+          # Create keystore file from secret (base64 encoded)
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > release.keystore
+          
       - name: Run Expo Prebuild (with caching)
         run: |
           # Only run prebuild if native files don't exist or have changed
@@ -97,13 +96,8 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: android-aab
-          path: ./android/WikiScape-v${{ env.VERSION }}.aab
-          retention-days: 90
-
-      - name: Upload APK as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-apk
-          path: ./android/WikiScape-v${{ env.VERSION }}.apk
+          name: android-builds
+          path: |
+            ./WikiScape-v${{ env.VERSION }}.aab
+            ./WikiScape-v${{ env.VERSION }}.apk
           retention-days: 90
