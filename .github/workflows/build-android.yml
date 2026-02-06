@@ -15,14 +15,31 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup Node.js
+      - name: Setup Node.js with caching
         uses: actions/setup-node@v6
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            android/.gradle
+            android/app/build
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', '**/build.gradle') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
 
       - name: Setup Expo
         uses: expo/expo-github-action@v8
@@ -39,17 +56,11 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Install dependencies
-        run: npm install
-
-      - name: Configure Git
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+        run: npm ci
 
       - name: Setup Android Keystore
         run: |
-          # Create keystore file from secret (base64 encoded)
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > release.keystore
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/app/release.keystore
 
       - name: Get Version
         run: |
@@ -59,41 +70,35 @@ jobs:
             echo "VERSION=$(node -p "require('./app.json').version")" >> $GITHUB_ENV
           fi
 
-      - name: Build Android AAB
+      - name: Configure Expo Build
         run: |
-          # Set signing config as environment variables for Expo prebuild
-          export ANDROID_KEYSTORE_PASSWORD="${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
-          export ANDROID_KEY_ALIAS="${{ secrets.ANDROID_KEY_ALIAS }}"
+          # Set environment variables for signing
+          echo "ANDROID_KEYSTORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
+          echo "ANDROID_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}" >> $GITHUB_ENV
 
-          # Run Expo prebuild to generate native code with signing config
-          npx expo prebuild --clean
+      - name: Run Expo Prebuild (with caching)
+        run: |
+          # Only run prebuild if native files don't exist or have changed
+          if [ ! -d "android/app/src/main/java/com/wikiscape" ] || [ -n "$(git diff HEAD~1 --name-only | grep -E '(app\.json|app\.config\.js|package\.json)')" ]; then
+            npx expo prebuild --clean
+          else
+            echo "Native files unchanged, skipping prebuild"
+          fi
 
-          # Build AAB
-          npx react-native build-android --mode=release
+      - name: Build Android
+        run: |
+          npx react-native build-android --mode=release --tasks="bundleRelease,assembleRelease"
+
+      - name: Prepare Artifacts
+        run: |
           cp android/app/build/outputs/bundle/release/app-release.aab ./WikiScape-v${{ env.VERSION }}.aab
-          echo "Android App Bundle built successfully"
-
-      - name: Build Android APK
-        run: |
-          # Set signing config as environment variables
-          export ANDROID_KEYSTORE_PASSWORD="${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
-          export ANDROID_KEY_ALIAS="${{ secrets.ANDROID_KEY_ALIAS }}"
-
-          # Build APK using Gradle through react-native-cli
-          npx react-native build-android --mode=release --extra-params "bundle assembleRelease"
           cp android/app/build/outputs/apk/release/app-release.apk ./WikiScape-v${{ env.VERSION }}.apk
-          echo "Android APK built successfully"
 
-      - name: Upload AAB as artifact
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: android-aab
-          path: ./android/WikiScape-v${{ env.VERSION }}.aab
-          retention-days: 90
-
-      - name: Upload APK as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-apk
-          path: ./android/WikiScape-v${{ env.VERSION }}.apk
+          name: android-builds
+          path: |
+            ./WikiScape-v${{ env.VERSION }}.aab
+            ./WikiScape-v${{ env.VERSION }}.apk
           retention-days: 90
