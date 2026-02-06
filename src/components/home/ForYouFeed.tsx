@@ -109,7 +109,7 @@ function ForYouFeed({ scrollY }: ForYouFeedProps) {
         setRefreshing(false);
       }
     },
-    [], // Empty dependencies - all values accessed via refs
+    [],
   );
 
   const handleRefresh = useCallback(() => {
@@ -120,9 +120,7 @@ function ForYouFeed({ scrollY }: ForYouFeedProps) {
     loadRecommendations(false, true);
   }, [loadRecommendations]);
 
-  // Single useEffect for initial load
   useEffect(() => {
-    // Only load once when visited articles are ready
     if (
       !visitedArticlesLoading &&
       visitedArticles.length > 0 &&

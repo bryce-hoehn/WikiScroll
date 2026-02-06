@@ -1,6 +1,12 @@
 import { useFocusEffect } from '@react-navigation/native';
 import { FlashList, FlashListRef } from '@shopify/flash-list';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   Animated,
   Platform,
@@ -16,12 +22,19 @@ import { useFeedScroll } from '@/context/FeedScrollContext';
 import { useScrollToTop } from '@/context/ScrollToTopContext';
 import { useBookmarkToggle, useImagePrefetching } from '@/hooks';
 import { FeedProps, RecommendationItem } from '@/types/components';
+import AdMobManager from '../AdMobManager';
 import RecommendationCard from '../article/RecommendationCard';
 import CardSkeleton from '../common/CardSkeleton';
 import ScrollToTopMiniFAB from '../common/ScrollToTopMiniFAB';
 import SearchFAB from '../common/SearchFAB';
 
 import LoadingFooter from './LoadingFooter';
+
+// Type for feed items that can be either content or ads
+type FeedItem = RecommendationItem | { type: 'ad'; id: string };
+
+// Configuration for ad insertion
+const AD_INTERVAL = 7; // Show ad every 7 items
 
 export default function Feed({
   data,
@@ -37,7 +50,7 @@ export default function Feed({
 }: FeedProps & { feedKey?: string; scrollY?: Animated.Value }) {
   const theme = useTheme();
   const { width } = useWindowDimensions();
-  const flashListRef = useRef<FlashListRef<RecommendationItem>>(null);
+  const flashListRef = useRef<FlashListRef<FeedItem>>(null);
   const { handleBookmarkToggle, isBookmarked } = useBookmarkToggle();
   const { saveScrollPosition, getScrollPosition } = useFeedScroll();
   const { registerScrollRef, shouldScrollOnFocus, markFocused } =
@@ -45,9 +58,24 @@ export default function Feed({
   const [fabVisible, setFabVisible] = useState(false);
   const hasRestoredScrollRef = useRef(false);
 
+  // Transform data to include ads at regular intervals
+  const dataWithAds = useMemo(() => {
+    if (data.length === 0) return [];
+
+    const items: FeedItem[] = [];
+    data.forEach((item, index) => {
+      items.push(item);
+      // Insert ad after every AD_INTERVAL items (but not after the last item)
+      if ((index + 1) % AD_INTERVAL === 0 && index < data.length - 1) {
+        items.push({ type: 'ad', id: `ad-${index}` });
+      }
+    });
+    return items;
+  }, [data]);
+
   // Image prefetching: Prefetch images for items about to become visible
   const { onViewableItemsChanged } = useImagePrefetching({
-    data,
+    data: data, // Use original data for prefetching (ads don't have images)
     getImageUrl: (item: RecommendationItem) => item?.thumbnail?.source,
     preferredWidth: 800, // Standard width for feed images
   });
@@ -103,7 +131,7 @@ export default function Feed({
   const rightOffset = isLargeScreen ? 480 : 0; // sidebar
   const availableWidth = width - leftOffset - rightOffset;
 
-  const maxCardWidth = 650; // Reduced from 800 to 650 for tighter, more focused feed (Bluesky-like)
+  const maxCardWidth = 650;
   const horizontalPadding =
     availableWidth > maxCardWidth
       ? (availableWidth - maxCardWidth) / 2
@@ -112,13 +140,13 @@ export default function Feed({
   const cardWidth =
     availableWidth > maxCardWidth
       ? maxCardWidth
-      : availableWidth - SPACING.base * 2; // SPACING.base padding on each side
+      : availableWidth - SPACING.base * 2;
 
   const defaultRenderItem = useCallback(
     ({ item, index }: { item: RecommendationItem; index: number }) => (
       <View
         style={{
-          marginBottom: SPACING.lg, // Increased from SPACING.base (16dp) to SPACING.lg (24dp) for more breathing room
+          marginBottom: SPACING.lg,
           width: cardWidth,
           alignSelf: 'center',
         }}
@@ -134,6 +162,38 @@ export default function Feed({
     [isBookmarked, handleBookmarkToggle, cardWidth],
   );
 
+  // Render item with ad support
+  const renderItemWithAds = useCallback(
+    ({ item, index }: { item: FeedItem; index: number }) => {
+      if ('type' in item && item.type === 'ad') {
+        return (
+          <View
+            style={{
+              marginBottom: SPACING.lg,
+              width: cardWidth,
+              alignSelf: 'center',
+            }}
+          >
+            <AdMobManager />
+          </View>
+        );
+      }
+      return defaultRenderItem({ item: item as RecommendationItem, index });
+    },
+    [defaultRenderItem, cardWidth],
+  );
+
+  // Key extractor that handles both content and ad items
+  const keyExtractorWithAds = useCallback(
+    (item: FeedItem) => {
+      if ('type' in item && item.type === 'ad') {
+        return (item as { type: 'ad'; id: string }).id;
+      }
+      return keyExtractor(item as RecommendationItem);
+    },
+    [keyExtractor],
+  );
+
   const renderFooter = useCallback(
     () => <LoadingFooter loading={loading && data.length > 0} />,
     [loading, data.length],
@@ -141,19 +201,49 @@ export default function Feed({
 
   // Render skeleton loaders when initial loading
   const renderSkeletonItem = useCallback(
-    ({ index }: { index: number }) => (
-      <View
-        style={{
-          marginBottom: SPACING.lg, // Increased from SPACING.base (16dp) to SPACING.lg (24dp)
-          width: cardWidth,
-          alignSelf: 'center',
-        }}
-      >
-        <CardSkeleton index={index} />
-      </View>
-    ),
-    [cardWidth],
+    ({ item, index }: { item: FeedItem; index: number }) => {
+      if ('type' in item && item.type === 'ad') {
+        // Render ad placeholder skeleton
+        return (
+          <View
+            style={{
+              marginBottom: SPACING.lg,
+              width: cardWidth,
+              alignSelf: 'center',
+              height: 60, // Approximate height for banner ad
+              backgroundColor: theme.colors.surfaceVariant,
+              borderRadius: 8,
+            }}
+          />
+        );
+      }
+      return (
+        <View
+          style={{
+            marginBottom: SPACING.lg,
+            width: cardWidth,
+            alignSelf: 'center',
+          }}
+        >
+          <CardSkeleton index={index} />
+        </View>
+      );
+    },
+    [cardWidth, theme.colors.surfaceVariant],
   );
+
+  // Create skeleton data with ad placeholders for consistent loading experience
+  const skeletonDataWithAds = useMemo(() => {
+    const items: FeedItem[] = [];
+    for (let i = 0; i < 15; i++) {
+      items.push({ title: `skeleton-${i}` } as RecommendationItem);
+      // Insert ad placeholder after every AD_INTERVAL items
+      if ((i + 1) % AD_INTERVAL === 0 && i < 14) {
+        items.push({ type: 'ad', id: `skeleton-ad-${i}` });
+      }
+    }
+    return items;
+  }, []);
 
   // Register scroll ref for scroll-to-top functionality
   // Use refs to prevent infinite loops from context function changes
@@ -236,26 +326,23 @@ export default function Feed({
     }
   }, [data.length]);
 
-  // Show skeletons when loading and no data
   if (loading && data.length === 0) {
     return (
       <View
         style={{ flex: 1 }}
-        // @ts-expect-error - main role is valid for React Native Web but not in TypeScript types
-        accessibilityRole="main"
         {...(Platform.OS === 'web' &&
           feedKey === 'for-you' && { id: 'main-content' })}
       >
         <FlashList
           ref={flashListRef}
-          data={Array(15).fill(null)} // Show 15 skeleton cards for better perceived performance
+          data={skeletonDataWithAds} // Show skeleton cards with ad placeholders
           renderItem={renderSkeletonItem}
-          keyExtractor={(_, index) => `skeleton-${index}`}
+          keyExtractor={keyExtractorWithAds}
           {...({ estimatedItemSize: 280 } as any)}
           contentContainerStyle={{
             flexGrow: 1,
-            paddingTop: SPACING.md, // Increased from SPACING.sm (8dp) to SPACING.md (12dp)
-            paddingBottom: SPACING.lg, // Increased from SPACING.base (16dp) to SPACING.lg (24dp)
+            paddingTop: SPACING.md,
+            paddingBottom: SPACING.lg,
             paddingHorizontal: horizontalPadding,
             alignItems: 'center',
           }}
@@ -292,9 +379,9 @@ export default function Feed({
     >
       <FlashList
         ref={flashListRef}
-        data={data}
-        renderItem={renderItem || defaultRenderItem}
-        keyExtractor={keyExtractor}
+        data={dataWithAds}
+        renderItem={renderItemWithAds}
+        keyExtractor={keyExtractorWithAds}
         {...({
           estimatedItemSize: 280,
           initialNumToRender: 15, // Preload 15 items initially
