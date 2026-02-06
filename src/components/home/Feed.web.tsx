@@ -27,7 +27,6 @@ import RecommendationCard from '../article/RecommendationCard';
 import CardSkeleton from '../common/CardSkeleton';
 import ScrollToTopMiniFAB from '../common/ScrollToTopMiniFAB';
 import SearchFAB from '../common/SearchFAB';
-
 import LoadingFooter from './LoadingFooter';
 
 // Type for feed items that can be either content or ads
@@ -35,13 +34,6 @@ type FeedItem = RecommendationItem | { type: 'ad'; id: string };
 
 // Configuration for ad insertion
 const AD_INTERVAL = 7; // Show ad every 7 items
-
-// Lazy load AdMobManager to prevent web import errors
-const LazyAdMobManager = React.lazy(() =>
-  import('../AdMobManager').then((module) => ({
-    default: module.default,
-  })),
-);
 
 export default function Feed({
   data,
@@ -138,7 +130,7 @@ export default function Feed({
   const rightOffset = isLargeScreen ? 480 : 0; // sidebar
   const availableWidth = width - leftOffset - rightOffset;
 
-  const maxCardWidth = 650;
+  const maxCardWidth = 650; // Reduced from 800 to 650 for tighter, more focused feed (Bluesky-like)
   const horizontalPadding =
     availableWidth > maxCardWidth
       ? (availableWidth - maxCardWidth) / 2
@@ -147,13 +139,13 @@ export default function Feed({
   const cardWidth =
     availableWidth > maxCardWidth
       ? maxCardWidth
-      : availableWidth - SPACING.base * 2;
+      : availableWidth - SPACING.base * 2; // SPACING.base padding on each side
 
   const defaultRenderItem = useCallback(
     ({ item, index }: { item: RecommendationItem; index: number }) => (
       <View
         style={{
-          marginBottom: SPACING.lg,
+          marginBottom: SPACING.lg, // Increased from SPACING.base (16dp) to SPACING.lg (24dp) for more breathing room
           width: cardWidth,
           alignSelf: 'center',
         }}
@@ -182,7 +174,20 @@ export default function Feed({
             }}
           >
             <Suspense fallback={<View style={{ height: 90 }} />}>
-              <LazyAdMobManager />
+              {React.createElement('div', {
+                className: 'adsbygoogle',
+                style: {
+                  display: 'block',
+                  minHeight: 90,
+                  width: '100%',
+                },
+                'data-ad-client':
+                  process.env.ADSENSE_AD_CLIENT || 'ca-pub-5306494001256992',
+                'data-ad-slot': process.env.ADSENSE_AD_SLOT || '4212576009',
+                'data-ad-format': 'fluid',
+                'data-ad-layout-key':
+                  process.env.ADSENSE_AD_LAYOUT_KEY || '-fb+5w+4e-db+86',
+              })}
             </Suspense>
           </View>
         );
@@ -350,8 +355,8 @@ export default function Feed({
           {...({ estimatedItemSize: 280 } as any)}
           contentContainerStyle={{
             flexGrow: 1,
-            paddingTop: SPACING.md,
-            paddingBottom: SPACING.lg,
+            paddingTop: SPACING.md, // Increased from SPACING.sm (8dp) to SPACING.md (12dp)
+            paddingBottom: SPACING.lg, // Increased from SPACING.base (16dp) to SPACING.lg (24dp)
             paddingHorizontal: horizontalPadding,
             alignItems: 'center',
           }}

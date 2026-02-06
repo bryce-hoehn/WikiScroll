@@ -4,8 +4,11 @@ import { Animated } from 'react-native';
 import { useSnackbar } from '@/context/SnackbarContext';
 import { useBacklinkRecommendations, useVisitedArticles } from '@/hooks';
 
+import { Platform } from 'react-native';
 import EmptyState from './EmptyState';
 import Feed from './Feed';
+// Use web-specific feed on web platform to avoid native ad imports
+import WebFeed from './Feed.web';
 
 interface ForYouFeedProps {
   scrollY?: Animated.Value;
@@ -136,8 +139,10 @@ function ForYouFeed({ scrollY }: ForYouFeedProps) {
 
   // Show welcome screen if no recommendations found and not loading
   // Feed component will handle skeleton loading when loading && data.length === 0
+  const FeedComponent = Platform.OS === 'web' ? WebFeed : Feed;
+
   return (
-    <Feed
+    <FeedComponent
       data={recommendations}
       loading={loading || visitedArticlesLoading}
       refreshing={refreshing}

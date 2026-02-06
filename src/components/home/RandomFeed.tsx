@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated } from 'react-native';
+import { Animated, Platform } from 'react-native';
 
 import { fetchRandomArticles } from '@/api';
 import { ArticleResponse } from '@/types/api/articles';
@@ -8,6 +8,8 @@ import { RecommendationItem } from '@/types/components';
 import StandardEmptyState from '../common/StandardEmptyState';
 
 import Feed from './Feed';
+// Use web-specific feed on web platform to avoid native ad imports
+import WebFeed from './Feed.web';
 
 interface RandomFeedProps {
   scrollY?: Animated.Value;
@@ -168,8 +170,10 @@ function RandomFeed({ scrollY }: RandomFeedProps) {
   const shouldShowEmptyState =
     (hasError || randomArticles.length === 0) && !loading && !refreshing;
 
+  const FeedComponent = Platform.OS === 'web' ? WebFeed : Feed;
+
   return (
-    <Feed
+    <FeedComponent
       data={randomArticles}
       feedKey="random"
       loading={loading && !hasError}

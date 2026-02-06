@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import React, { useCallback } from 'react';
-import { Animated } from 'react-native';
+import { Animated, Platform } from 'react-native';
 
 import useHotArticles from '@/hooks/content/useHotArticles';
 import useTrendingArticles from '@/hooks/content/useTrendingArticles';
@@ -8,6 +8,8 @@ import { RecommendationItem } from '@/types/components';
 import StandardEmptyState from '../common/StandardEmptyState';
 
 import Feed from './Feed';
+// Use web-specific feed on web platform to avoid native ad imports
+import WebFeed from './Feed.web';
 
 interface HotFeedProps {
   scrollY?: Animated.Value;
@@ -64,8 +66,10 @@ function HotFeed({ scrollY }: HotFeedProps) {
   const isInitialLoading =
     isLoading || (displayedArticles.length === 0 && loadingMore);
 
+  const FeedComponent = Platform.OS === 'web' ? WebFeed : Feed;
+
   return (
-    <Feed
+    <FeedComponent
       data={displayedArticles}
       feedKey="hot"
       loading={isInitialLoading || loadingMore}
