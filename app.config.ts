@@ -59,7 +59,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       './plugins/withAndroidSigningConfig.ts',
       {
-        storeFile: './release.keystore',
+        storeFile: '../../release.keystore',
         keyAlias: process.env.ANDROID_KEY_ALIAS,
         storePassword: process.env.ANDROID_KEYSTORE_PASSWORD,
         keyPassword: process.env.ANDROID_KEYSTORE_PASSWORD
