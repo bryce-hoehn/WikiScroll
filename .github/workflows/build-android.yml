@@ -69,8 +69,8 @@ jobs:
       - name: Setup Android Keystore
         run: |
           # Create keystore file from secret (base64 encoded)
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > release.keystore
-          
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/app/release.keystore
+
       - name: Run Expo Prebuild (with caching)
         run: |
           # Only run prebuild if native files don't exist or have changed
