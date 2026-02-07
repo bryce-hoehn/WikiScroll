@@ -45,6 +45,20 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   plugins: [
     'expo-router',
     [
+      'expo-build-properties',
+      {
+        android: {
+          compileSdkVersion: 35,
+          targetSdkVersion: 35,
+          buildToolsVersion: '35.0.0'
+        },
+        ios: {
+          deploymentTarget: '15.1',
+          useFrameworks: 'static'
+        }
+      }
+    ],
+    [
       'expo-splash-screen',
       {
         image: './src/assets/images/icon.png',
@@ -63,6 +77,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         keyAlias: process.env.ANDROID_KEY_ALIAS,
         storePassword: process.env.ANDROID_KEYSTORE_PASSWORD,
         keyPassword: process.env.ANDROID_KEYSTORE_PASSWORD
+      }
+    ],
+    [
+      'react-native-google-mobile-ads',
+      {
+        androidAppId: 'ca-app-pub-5306494001256992~4631663817',
+        iosAppId: 'ca-app-pub-5306494001256992~4631663817'
       }
     ],
     'expo-web-browser',

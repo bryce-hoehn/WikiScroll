@@ -9,16 +9,13 @@ import {
 // Configure Ad Units for native platforms
 const BANNER_AD_UNIT_ID: string = __DEV__
   ? 'ca-app-pub-3940256099942544/6300978111' // Test banner ad unit
-  : process.env.ADMOB_BANNER_AD_UNIT_ID_IOS ||
-    process.env.ADMOB_BANNER_AD_UNIT_ID_ANDROID ||
-    process.env.ADMOB_BANNER_AD_UNIT_ID ||
-    '';
+  : 'ca-app-pub-5306494001256992/9013466807';
 
-interface NativeAdManagerProps {
+interface AdManagerProps {
   style?: ViewStyle;
 }
 
-const NativeAdManager = ({ style }: NativeAdManagerProps) => {
+const AdManager = ({ style }: AdManagerProps) => {
   useEffect(() => {
     // Initialize MobileAds
     MobileAds()
@@ -45,4 +42,4 @@ const NativeAdManager = ({ style }: NativeAdManagerProps) => {
   );
 };
 
-export default NativeAdManager;
+export default AdManager;
