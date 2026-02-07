@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COMPONENT_HEIGHTS, LAYOUT } from '@/constants/layout';
 import { SPACING } from '@/constants/spacing';
 
-import SearchOverlay from '@/components/SearchOverlay';
+import SearchOverlay from '@/components/search/SearchOverlay';
 
 interface SearchFABProps {
   hasBottomTabBar?: boolean;

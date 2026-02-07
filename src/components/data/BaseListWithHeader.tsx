@@ -3,7 +3,7 @@ import React, { memo, useCallback, useRef } from 'react';
 import { Animated, Platform, View } from 'react-native';
 import { Divider, List, Text, useTheme } from 'react-native-paper';
 
-import ResponsiveImage from '@/components/ResponsiveImage';
+import ResponsiveImage from '@/components/ui/media/ResponsiveImage';
 import { MOTION } from '@/constants/motion';
 import { SPACING } from '@/constants/spacing';
 import { useImagePrefetching, useReducedMotion } from '@/hooks';

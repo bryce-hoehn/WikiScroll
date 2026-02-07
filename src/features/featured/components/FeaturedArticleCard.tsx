@@ -10,8 +10,8 @@ import { SPACING } from '@/constants/spacing';
 import { useReducedMotion } from '@/hooks';
 import { useFeaturedContent } from '@/stores/FeaturedContentContext';
 
-import HtmlRenderer from '@/components/HtmlRenderer';
-import ResponsiveImage from '@/components/ResponsiveImage';
+import HtmlRenderer from '@/components/data/HtmlRenderer';
+import ResponsiveImage from '@/components/ui/media/ResponsiveImage';
 
 interface FeaturedArticleCardProps {
   variant?: 'default' | 'compact';

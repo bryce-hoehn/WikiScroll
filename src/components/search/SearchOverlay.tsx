@@ -33,8 +33,8 @@ import {
 } from '@/hooks';
 import { SearchOverlayProps } from '@/types';
 
-import NoResultsState from './NoResultsState';
-import RecentArticlesList from './RecentArticlesList';
+import NoResultsState from '../data/NoResultsState';
+import RecentArticlesList from '../RecentArticlesList';
 import SearchResultSkeleton from './SearchResultSkeleton';
 import SearchResultsList from './SearchResultsList';
 

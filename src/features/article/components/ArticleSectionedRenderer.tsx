@@ -4,7 +4,7 @@ import { Platform, useWindowDimensions, View } from 'react-native';
 import { useTheme, type MD3Theme } from 'react-native-paper';
 
 import { fetchArticleHtml } from '@/api';
-import ResponsiveImage from '@/components/ResponsiveImage';
+import ResponsiveImage from '@/components/ui/media/ResponsiveImage';
 import { LAYOUT } from '@/constants/layout';
 import { useArticleSections } from '@/hooks/articles/useArticleSections';
 import {

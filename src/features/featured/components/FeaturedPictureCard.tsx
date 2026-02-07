@@ -8,8 +8,8 @@ import { SPACING } from '@/constants/spacing';
 import { useReducedMotion } from '@/hooks';
 import { useFeaturedContent } from '@/stores/FeaturedContentContext';
 
-import HtmlRenderer from '@/components/HtmlRenderer';
-import ImageDialog from '@/components/ImageDialog';
+import HtmlRenderer from '@/components/data/HtmlRenderer';
+import ImageDialog from '@/components/ui/feedback/ImageDialog';
 
 export default function FeaturedImageCard() {
   const { featuredContent } = useFeaturedContent();

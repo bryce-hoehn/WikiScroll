@@ -1,6 +1,6 @@
 import React from 'react';
 
-import BaseListWithHeader from '@/components/BaseListWithHeader';
+import BaseListWithHeader from '@/components/data/BaseListWithHeader';
 import { SearchSuggestion } from '@/types';
 
 interface SearchResultsListProps {

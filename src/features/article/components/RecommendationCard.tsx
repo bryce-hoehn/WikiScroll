@@ -39,7 +39,7 @@ import { RecommendationCardProps } from '@/types/components';
 import { hapticLight, hapticMedium } from '@/utils/haptics';
 import { copyArticleUrl, shareArticle } from '@/utils/shareUtils';
 
-import ResponsiveImage from '@/components/ResponsiveImage';
+import ResponsiveImage from '@/components/ui/media/ResponsiveImage';
 
 const RecommendationCard = React.memo(function RecommendationCard({
   item,

@@ -12,8 +12,8 @@ import { Animated, View, useWindowDimensions } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import CollapsibleHeader from '@/components/CollapsibleHeader';
-import SearchBar from '@/components/SearchBar';
+import SearchBar from '@/components/search/SearchBar';
+import CollapsibleHeader from '@/components/ui/layout/CollapsibleHeader';
 import { LAYOUT } from '@/constants/layout';
 import { SPACING } from '@/constants/spacing';
 import FeaturedArticleSection from '@/features/discover/components/FeaturedArticleSection';

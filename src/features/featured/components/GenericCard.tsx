@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import { Text, type MD3Theme } from 'react-native-paper';
 
-import HtmlRenderer from '@/components/HtmlRenderer';
+import HtmlRenderer from '@/components/data/HtmlRenderer';
 import { TYPOGRAPHY } from '@/constants/typography';
 import { RecommendationItem } from '@/types/components';
 

@@ -13,8 +13,8 @@ import {
 
 import CollapsibleHeader, {
   useCollapsibleHeaderSpacing
-} from '@/components/CollapsibleHeader';
-import ResponsiveContainer from '@/components/ResponsiveContainer';
+} from '@/components/ui/layout/CollapsibleHeader';
+import ResponsiveContainer from '@/components/ui/layout/ResponsiveContainer';
 import { LAYOUT } from '@/constants/layout';
 import { SPACING } from '@/constants/spacing';
 import { TYPOGRAPHY } from '@/constants/typography';

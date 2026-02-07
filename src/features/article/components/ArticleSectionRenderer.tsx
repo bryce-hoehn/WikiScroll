@@ -3,7 +3,7 @@ import { ActivityIndicator, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import RenderHtml from 'react-native-render-html';
 
-import ExpansionPanel from '@/components/ExpansionPanel';
+import ExpansionPanel from '@/components/ui/ExpansionPanel';
 import { SPACING } from '@/constants/spacing';
 import type { SectionState } from '@/hooks/articles/useArticleSections';
 

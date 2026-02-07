@@ -13,7 +13,7 @@ import { Animated, Platform, View, useWindowDimensions } from 'react-native';
 import { Card, Text, useTheme, type MD3Theme } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import CollapsibleHeader from '@/components/CollapsibleHeader';
+import CollapsibleHeader from '@/components/ui/layout/CollapsibleHeader';
 import { LAYOUT } from '@/constants/layout';
 import { getHoverStyles } from '@/constants/motion';
 import { useReducedMotion } from '@/hooks';

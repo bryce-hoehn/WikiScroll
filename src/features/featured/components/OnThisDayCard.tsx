@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import React, { memo, useCallback } from 'react';
 import { Text, type MD3Theme } from 'react-native-paper';
 
-import HtmlRenderer from '@/components/HtmlRenderer';
+import HtmlRenderer from '@/components/data/HtmlRenderer';
 import { SPACING } from '@/constants/spacing';
 import { RecommendationItem } from '@/types/components';
 

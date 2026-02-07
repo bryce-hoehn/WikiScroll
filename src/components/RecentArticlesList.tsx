@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import React, { useMemo } from 'react';
 
 import { fetchArticleSummaries } from '@/api';
-import BaseListWithHeader from '@/components/BaseListWithHeader';
+import BaseListWithHeader from '@/components/data/BaseListWithHeader';
 import { VisitedArticle } from '@/hooks/storage/useVisitedArticles';
 import { Article } from '@/types/api';
 

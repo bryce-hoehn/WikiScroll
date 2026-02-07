@@ -15,8 +15,8 @@ import { COMPONENT_HEIGHTS, LAYOUT } from '@/constants/layout';
 import { SPACING } from '@/constants/spacing';
 import { useDebounce, useSearchSuggestions, useVisitedArticles } from '@/hooks';
 
-import NoResultsState from './NoResultsState';
-import RecentArticlesList from './RecentArticlesList';
+import NoResultsState from '../data/NoResultsState';
+import RecentArticlesList from '../RecentArticlesList';
 import SearchOverlay from './SearchOverlay';
 import SearchResultSkeleton from './SearchResultSkeleton';
 import SearchResultsList from './SearchResultsList';

@@ -17,8 +17,8 @@ import {
 } from 'react-native';
 import { useTheme } from 'react-native-paper';
 
-import ErrorState from '@/components/ErrorState';
 import StandardEmptyState from '@/components/StandardEmptyState';
+import ErrorState from '@/components/ui/feedback/ErrorState';
 import {
   useArticleHtml,
   useFontFamily,

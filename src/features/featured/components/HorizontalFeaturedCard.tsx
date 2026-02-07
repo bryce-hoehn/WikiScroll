@@ -11,7 +11,7 @@ import {
 import { Card, IconButton, Text, useTheme } from 'react-native-paper';
 
 import { fetchArticleHtml } from '@/api';
-import HtmlRenderer from '@/components/HtmlRenderer';
+import HtmlRenderer from '@/components/data/HtmlRenderer';
 import { LAYOUT } from '@/constants/layout';
 import { getHoverStyles, MOTION } from '@/constants/motion';
 import { SPACING } from '@/constants/spacing';
@@ -23,7 +23,7 @@ import { RecommendationItem } from '@/types/components';
 import { CardType } from '@/utils/cardUtils';
 import { shareArticle } from '@/utils/shareUtils';
 
-import ResponsiveImage from '@/components/ResponsiveImage';
+import ResponsiveImage from '@/components/ui/media/ResponsiveImage';
 
 export type HorizontalFeaturedCardItem = RecommendationItem | DidYouKnowItem;
 

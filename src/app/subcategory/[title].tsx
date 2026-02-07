@@ -21,11 +21,11 @@ import {
 } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import CollapsibleHeader from '@/components/CollapsibleHeader';
-import ErrorState from '@/components/ErrorState';
-import ImageDialog from '@/components/ImageDialog';
 import StandardEmptyState from '@/components/StandardEmptyState';
 import SubcategorySkeleton from '@/components/SubcategorySkeleton';
+import ErrorState from '@/components/ui/feedback/ErrorState';
+import ImageDialog from '@/components/ui/feedback/ImageDialog';
+import CollapsibleHeader from '@/components/ui/layout/CollapsibleHeader';
 import { LAYOUT } from '@/constants/layout';
 import { getHoverStyles } from '@/constants/motion';
 import { SPACING } from '@/constants/spacing';

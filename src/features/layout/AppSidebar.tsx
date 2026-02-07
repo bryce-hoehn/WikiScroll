@@ -6,7 +6,7 @@ import { Button, Divider, useTheme } from 'react-native-paper';
 import { fetchRandomArticle } from '@/api';
 import { SPACING } from '@/constants/spacing';
 
-import SearchBar from '@/components/SearchBar';
+import SearchBar from '@/components/search/SearchBar';
 import TrendingSection from '../discover/components/TrendingSection';
 
 export default function AppSidebar() {

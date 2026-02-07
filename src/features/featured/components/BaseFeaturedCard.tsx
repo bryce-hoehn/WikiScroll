@@ -5,7 +5,7 @@ import { Platform, useWindowDimensions, View } from 'react-native';
 import { Card, IconButton, Text, type MD3Theme } from 'react-native-paper';
 
 import { fetchArticleHtml } from '@/api';
-import HtmlRenderer from '@/components/HtmlRenderer';
+import HtmlRenderer from '@/components/data/HtmlRenderer';
 import { LAYOUT } from '@/constants/layout';
 import { getHoverStyles } from '@/constants/motion';
 import { SPACING } from '@/constants/spacing';
@@ -17,7 +17,7 @@ import { DidYouKnowItem } from '@/types/api/featured';
 import { RecommendationItem } from '@/types/components';
 import { shareArticle } from '@/utils/shareUtils';
 
-import ResponsiveImage from '@/components/ResponsiveImage';
+import ResponsiveImage from '@/components/ui/media/ResponsiveImage';
 
 export type FeaturedCardItem = RecommendationItem | DidYouKnowItem;
 

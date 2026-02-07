@@ -7,7 +7,7 @@ import { LogBox, Platform, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useTheme } from 'react-native-paper';
 
-import ErrorBoundary from '@/components/ErrorBoundary';
+import ErrorBoundary from '@/components/ui/feedback/ErrorBoundary';
 import { BookmarksProvider } from '@/stores/BookmarksContext';
 import { FeaturedContentProvider } from '@/stores/FeaturedContentContext';
 import { FeedScrollProvider } from '@/stores/FeedScrollContext';

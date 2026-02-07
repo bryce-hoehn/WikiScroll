@@ -3,7 +3,7 @@ import React from 'react';
 
 import { useFeaturedContent } from '@/stores/FeaturedContentContext';
 
-import ErrorState from '@/components/ErrorState';
+import ErrorState from '@/components/ui/feedback/ErrorState';
 import { getUserFriendlyError } from '@/utils/errorHandling';
 
 /**

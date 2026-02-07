@@ -8,7 +8,7 @@ import { TYPOGRAPHY } from '@/constants/typography';
 import { useReadingProgress } from '@/hooks';
 import { BookmarkCardProps } from '@/types/components';
 
-import ResponsiveImage from '@/components/ResponsiveImage';
+import ResponsiveImage from '@/components/ui/media/ResponsiveImage';
 import { LAYOUT } from '@/constants/layout';
 import ReadingProgressIndicator from './ReadingProgressIndicator';
 

@@ -5,7 +5,7 @@ import { Platform, View, useWindowDimensions } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import SkipLinks from '@/components/SkipLinks';
+import SkipLinks from '@/components/ui/accessibility/SkipLinks';
 import { COMPONENT_HEIGHTS, LAYOUT } from '@/constants/layout';
 import { SPACING } from '@/constants/spacing';
 import AppSidebar from '@/features/layout/AppSidebar';

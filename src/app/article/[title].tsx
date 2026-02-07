@@ -12,11 +12,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { fetchArticleBacklinks, fetchArticleLinks } from '@/api';
 import { fetchArticleThumbnail } from '@/api/articles/fetchArticleThumbnail';
+import SearchOverlay from '@/components/search/SearchOverlay';
+import ImageDialog from '@/components/ui/feedback/ImageDialog';
 import CollapsibleHeader, {
   useCollapsibleHeaderSpacing
-} from '@/components/CollapsibleHeader';
-import ImageDialog from '@/components/ImageDialog';
-import SearchOverlay from '@/components/SearchOverlay';
+} from '@/components/ui/layout/CollapsibleHeader';
 import { SPACING } from '@/constants/spacing';
 import { TYPOGRAPHY } from '@/constants/typography';
 import { Article } from '@/features/article';

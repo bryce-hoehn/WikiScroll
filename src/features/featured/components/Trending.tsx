@@ -5,7 +5,7 @@ import { IconButton, useTheme } from 'react-native-paper';
 import { SPACING } from '@/constants/spacing';
 import { useFeaturedContent } from '@/stores/FeaturedContentContext';
 
-import CardSkeleton from '@/components/CardSkeleton';
+import CardSkeleton from '@/components/skeleton/CardSkeleton';
 import StandardEmptyState from '@/components/StandardEmptyState';
 
 import TrendingCarousel from './TrendingCarousel';

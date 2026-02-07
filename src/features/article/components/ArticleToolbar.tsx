@@ -24,7 +24,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import ScrollToTopFAB from '@/components/ScrollToTopFAB';
+import ScrollToTopFAB from '@/components/ui/buttons/ScrollToTopFAB';
 import { COMPONENT_HEIGHTS, LAYOUT } from '@/constants/layout';
 import { MOTION } from '@/constants/motion';
 import { SPACING } from '@/constants/spacing';
