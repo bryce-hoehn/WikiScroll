@@ -42,3 +42,4 @@ app-example
 
 *.keystore
 .env
+.eslintcache
