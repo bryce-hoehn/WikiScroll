@@ -120,8 +120,8 @@ export default function SharedDrawer({ children }: SharedDrawerProps) {
       icon: 'category'
     },
     {
-      route: '/(tabs)/search',
-      pathname: '/search',
+      route: '/(tabs)/discover',
+      pathname: '/discover',
       title: 'Discover',
       icon: 'explore'
     },
