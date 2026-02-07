@@ -274,6 +274,8 @@ export function useArticleSections({
 
     const { infoboxHtml, introElementNodes, sectionElements } = parsedContent;
     const out: SectionState[] = [];
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    let idx = 0;
 
     // Infobox section (if present)
     if (infoboxHtml && infoboxHtml.trim()) {
