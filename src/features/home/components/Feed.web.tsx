@@ -17,9 +17,9 @@ import {
 } from 'react-native';
 import { useTheme } from 'react-native-paper';
 
-import CardSkeleton from '@/components/CardSkeleton';
-import ScrollToTopMiniFAB from '@/components/ScrollToTopMiniFAB';
-import SearchFAB from '@/components/SearchFAB';
+import SearchFAB from '@/components/search/SearchFAB';
+import CardSkeleton from '@/components/skeleton/CardSkeleton';
+import ScrollToTopMiniFAB from '@/components/ui/buttons/ScrollToTopMiniFAB';
 import { LAYOUT } from '@/constants/layout';
 import { SPACING } from '@/constants/spacing';
 import { RecommendationCard } from '@/features/article';

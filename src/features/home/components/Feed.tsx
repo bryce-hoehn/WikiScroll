@@ -17,9 +17,9 @@ import {
 } from 'react-native';
 import { useTheme } from 'react-native-paper';
 
-import CardSkeleton from '@/components/CardSkeleton';
-import ScrollToTopMiniFAB from '@/components/ScrollToTopMiniFAB';
-import SearchFAB from '@/components/SearchFAB';
+import SearchFAB from '@/components/search/SearchFAB';
+import CardSkeleton from '@/components/skeleton/CardSkeleton';
+import ScrollToTopMiniFAB from '@/components/ui/buttons/ScrollToTopMiniFAB';
 import { LAYOUT } from '@/constants/layout';
 import { SPACING } from '@/constants/spacing';
 import { useBookmarkToggle, useImagePrefetching } from '@/hooks';
@@ -30,18 +30,13 @@ import { FeedProps, RecommendationItem } from '@/types/components';
 import { RecommendationCard } from '@/features/article';
 import LoadingFooter from './LoadingFooter';
 
+import AdManager from '@/components/ads/AdManager';
+
 // Type for feed items that can be either content or ads
 type FeedItem = RecommendationItem | { type: 'ad'; id: string };
 
 // Configuration for ad insertion
 const AD_INTERVAL = 7; // Show ad every 7 items
-
-// Lazy load AdMobManager to prevent web import errors
-const LazyAdMobManager = React.lazy(() =>
-  import('../../../components/AdMobManager').then((module) => ({
-    default: module.default
-  }))
-);
 
 export default function Feed({
   data,
@@ -182,7 +177,7 @@ export default function Feed({
             }}
           >
             <Suspense fallback={<View style={{ height: 90 }} />}>
-              <LazyAdMobManager />
+              <AdManager />
             </Suspense>
           </View>
         );
