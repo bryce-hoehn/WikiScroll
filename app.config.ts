@@ -1,4 +1,5 @@
 import { ConfigContext, ExpoConfig } from '@expo/config';
+import 'tsx/cjs';
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
@@ -56,7 +57,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       }
     ],
     [
-      './plugins/withAndroidSigningConfig',
+      './plugins/withAndroidSigningConfig.ts',
       {
         storeFile: './release.keystore',
         keyAlias: process.env.ANDROID_KEY_ALIAS,
