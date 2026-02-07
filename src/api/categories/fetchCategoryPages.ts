@@ -3,18 +3,18 @@ import { actionAxiosInstance, WIKIPEDIA_API_CONFIG } from '@/api/shared';
 import {
   CategoryArticle,
   CategoryPagesResponse,
-  CategorySubcategory,
+  CategorySubcategory
 } from '@/types/api';
 import {
   CategoryMember,
   ImageThumbnail,
   WikipediaActionApiParams,
   WikipediaPage,
-  WikipediaQueryResponse,
+  WikipediaQueryResponse
 } from '@/types/api/base';
 
 export const fetchCategoryPages = async (
-  categoryTitle: string,
+  categoryTitle: string
 ): Promise<CategoryPagesResponse> => {
   try {
     const params: WikipediaActionApiParams = {
@@ -24,12 +24,12 @@ export const fetchCategoryPages = async (
       cmtype: 'page|subcat',
       cmlimit: 50,
       format: 'json',
-      origin: '*',
+      origin: '*'
     };
 
     const response = await actionAxiosInstance.get<WikipediaQueryResponse>('', {
       baseURL: WIKIPEDIA_API_CONFIG.BASE_URL,
-      params,
+      params
     });
     const data = response.data;
 
@@ -49,7 +49,7 @@ export const fetchCategoryPages = async (
       if (member.ns === 14) {
         subcategories.push({
           title: member.title.replace('Category:', ''),
-          description: '',
+          description: ''
         });
       } else if (member.ns === 0) {
         articleMembers.push(member);
@@ -79,13 +79,13 @@ export const fetchCategoryPages = async (
             explaintext: true,
             exlimit: 20,
             format: 'json',
-            origin: '*',
+            origin: '*'
           };
 
           const batchResponse =
             await actionAxiosInstance.get<WikipediaQueryResponse>('', {
               baseURL: WIKIPEDIA_API_CONFIG.BASE_URL,
-              params: batchParams,
+              params: batchParams
             });
 
           const pages = batchResponse.data.query?.pages;
@@ -97,21 +97,21 @@ export const fetchCategoryPages = async (
               };
               const member = articleMembers.find(
                 (m) =>
-                  m.pageid === pageData.pageid || m.title === pageData.title,
+                  m.pageid === pageData.pageid || m.title === pageData.title
               );
               if (member) {
                 articles.push({
                   title: pageData.title,
                   description: pageData.extract?.substring(0, 150) || '',
                   thumbnail: pageData.thumbnail?.source || '',
-                  pageid: pageData.pageid || member.pageid,
+                  pageid: pageData.pageid || member.pageid
                 });
               }
             }
           }
         } catch {
           const batchMembers = articleMembers.filter((m) =>
-            batch.includes(m.title),
+            batch.includes(m.title)
           );
           const batchTitles = batchMembers.map((m) => m.title);
 
@@ -127,14 +127,14 @@ export const fetchCategoryPages = async (
                     article.description ||
                     '',
                   thumbnail: article.thumbnail?.source || '',
-                  pageid: article.pageid || member.pageid,
+                  pageid: article.pageid || member.pageid
                 });
               } else {
                 articles.push({
                   title: member.title,
                   description: '',
                   thumbnail: '',
-                  pageid: member.pageid,
+                  pageid: member.pageid
                 });
               }
             }
@@ -144,7 +144,7 @@ export const fetchCategoryPages = async (
                 title: member.title,
                 description: '',
                 thumbnail: '',
-                pageid: member.pageid,
+                pageid: member.pageid
               });
             }
           }

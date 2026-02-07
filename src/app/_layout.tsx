@@ -7,13 +7,13 @@ import { LogBox, Platform, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useTheme } from 'react-native-paper';
 
-import ErrorBoundary from '@/components/common/ErrorBoundary';
-import { BookmarksProvider } from '@/context/BookmarksContext';
-import { FeaturedContentProvider } from '@/context/FeaturedContentContext';
-import { FeedScrollProvider } from '@/context/FeedScrollContext';
-import { ScrollToTopProvider } from '@/context/ScrollToTopContext';
-import { SnackbarProvider } from '@/context/SnackbarContext';
-import { ThemeProvider } from '@/context/ThemeProvider';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import { BookmarksProvider } from '@/stores/BookmarksContext';
+import { FeaturedContentProvider } from '@/stores/FeaturedContentContext';
+import { FeedScrollProvider } from '@/stores/FeedScrollContext';
+import { ScrollToTopProvider } from '@/stores/ScrollToTopContext';
+import { SnackbarProvider } from '@/stores/SnackbarContext';
+import { ThemeProvider } from '@/stores/ThemeProvider';
 
 // Filter console warnings for known harmless messages (works in both dev and prod)
 if (typeof window !== 'undefined') {
@@ -67,12 +67,12 @@ if (typeof __DEV__ !== 'undefined' && !__DEV__) {
       'props.pointerEvents is deprecated',
       'Source map error',
       'request failed with status 404',
-      'installHook.js.map',
+      'installHook.js.map'
     ];
 
     // Only silence if it matches a known harmless error pattern
     const isHarmless = harmlessErrors.some((pattern) =>
-      errorMessage.toLowerCase().includes(pattern.toLowerCase()),
+      errorMessage.toLowerCase().includes(pattern.toLowerCase())
     );
 
     if (!isHarmless) {
@@ -89,11 +89,11 @@ if (typeof __DEV__ !== 'undefined' && !__DEV__) {
         "can't access property",
         'document.body is null',
         'useNativeDriver',
-        'Source map error',
+        'Source map error'
       ];
 
       const isHarmless = harmlessErrors.some((pattern) =>
-        errorMessage.toLowerCase().includes(pattern.toLowerCase()),
+        errorMessage.toLowerCase().includes(pattern.toLowerCase())
       );
 
       if (!isHarmless && originalOnError) {
@@ -111,11 +111,11 @@ if (typeof __DEV__ !== 'undefined' && !__DEV__) {
           event.reason?.message || String(event.reason || '');
         const harmlessErrors = [
           "can't access property",
-          'document.body is null',
+          'document.body is null'
         ];
 
         const isHarmless = harmlessErrors.some((pattern) =>
-          errorMessage.toLowerCase().includes(pattern.toLowerCase()),
+          errorMessage.toLowerCase().includes(pattern.toLowerCase())
         );
 
         if (isHarmless) {
@@ -126,7 +126,7 @@ if (typeof __DEV__ !== 'undefined' && !__DEV__) {
             originalUnhandledRejection.call(window, event);
           }
         }
-      },
+      }
     );
   }
 }
@@ -137,9 +137,9 @@ const queryClient = new QueryClient({
       retry: 2,
       staleTime: 5 * 60 * 1000, // 5 minutes
       gcTime: 30 * 60 * 1000, // 30 minutes - keep data in cache longer to reduce refetches
-      refetchOnWindowFocus: false, // Don't refetch when window regains focus - reduces unnecessary requests
-    },
-  },
+      refetchOnWindowFocus: false // Don't refetch when window regains focus - reduces unnecessary requests
+    }
+  }
 });
 
 // Keep the splash screen visible while fetching resources
@@ -198,7 +198,7 @@ function InnerLayout() {
                     headerShown: false,
                     contentStyle: { backgroundColor: theme.colors.background },
                     gestureEnabled: true, // Enable swipe-back gesture on iOS
-                    animation: 'default', // Use default slide animation
+                    animation: 'default' // Use default slide animation
                   }}
                 >
                   <Stack.Screen name="(tabs)" />

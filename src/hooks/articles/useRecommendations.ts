@@ -7,7 +7,7 @@ import {
   fetchArticleLinks,
   fetchArticleLinksBatch,
   fetchArticleSummaries,
-  fetchArticleSummary,
+  fetchArticleSummary
 } from '@/api';
 import useArticleLinks from '@/hooks/storage/useArticleLinks';
 import useVisitedArticles from '@/hooks/storage/useVisitedArticles';
@@ -54,11 +54,11 @@ export default function useBacklinkRecommendations() {
             // Also update React Query cache to keep it in sync
             queryClient.setQueryData(
               ['article-links', article.title],
-              storedLinks,
+              storedLinks
             );
             queryClient.setQueryData(
               ['article-backlinks', article.title],
-              storedLinks,
+              storedLinks
             );
           } else {
             // Article not in storage, add to batch fetch list
@@ -80,14 +80,14 @@ export default function useBacklinkRecommendations() {
                 queryKey: ['article-backlinks-batch', sortedTitlesForKey],
                 queryFn: () => fetchArticleBacklinksBatch(articlesNeedingFetch),
                 staleTime: 10 * 60 * 1000,
-                gcTime: 30 * 60 * 1000,
+                gcTime: 30 * 60 * 1000
               }),
               queryClient.fetchQuery({
                 queryKey: ['article-links-batch', sortedTitlesForKey],
                 queryFn: () => fetchArticleLinksBatch(articlesNeedingFetch),
                 staleTime: 10 * 60 * 1000,
-                gcTime: 30 * 60 * 1000,
-              }),
+                gcTime: 30 * 60 * 1000
+              })
             ]);
 
             // Combine backlinks and forward links for each article
@@ -97,7 +97,7 @@ export default function useBacklinkRecommendations() {
               const backlinks = backlinksBatch[title] || [];
               const forwardLinks = forwardLinksBatch[title] || [];
               const allLinks = Array.from(
-                new Set([...backlinks, ...forwardLinks]),
+                new Set([...backlinks, ...forwardLinks])
               );
               fetchedLinksMap[title] = allLinks;
               linkUpdates.push({ title, links: allLinks });
@@ -110,15 +110,15 @@ export default function useBacklinkRecommendations() {
             // Save all links in parallel (AsyncStorage handles concurrency)
             await Promise.all(
               linkUpdates.map(({ title, links }) =>
-                saveArticleLinks(title, links),
-              ),
+                saveArticleLinks(title, links)
+              )
             );
           } catch (error) {
             // If batch fetch fails, fall back to individual fetches
             if (typeof __DEV__ !== 'undefined' && __DEV__) {
               console.warn(
                 'Batch fetch failed, falling back to individual fetches:',
-                error,
+                error
               );
             }
             // Fallback: fetch individually (slower but more resilient)
@@ -126,10 +126,10 @@ export default function useBacklinkRecommendations() {
               try {
                 const [backlinks, forwardLinks] = await Promise.all([
                   fetchArticleBacklinks(title),
-                  fetchArticleLinks(title),
+                  fetchArticleLinks(title)
                 ]);
                 const allLinks = Array.from(
-                  new Set([...backlinks, ...forwardLinks]),
+                  new Set([...backlinks, ...forwardLinks])
                 );
                 fetchedLinksMap[title] = allLinks;
                 await saveArticleLinks(title, allLinks);
@@ -165,7 +165,7 @@ export default function useBacklinkRecommendations() {
           const j = Math.floor(Math.random() * (i + 1));
           [candidateArray[i], candidateArray[j]] = [
             candidateArray[j],
-            candidateArray[i],
+            candidateArray[i]
           ];
         }
 
@@ -184,14 +184,14 @@ export default function useBacklinkRecommendations() {
             queryKey: ['article-summaries-batch', sortedTitlesForKey],
             queryFn: () => fetchArticleSummaries(titlesToFetch),
             staleTime: 5 * 60 * 1000,
-            gcTime: 30 * 60 * 1000,
+            gcTime: 30 * 60 * 1000
           });
         } catch (error) {
           // If batch fails, fall back to individual fetches
           if (typeof __DEV__ !== 'undefined' && __DEV__) {
             console.warn(
               'Batch summary fetch failed, falling back to individual fetches:',
-              error,
+              error
             );
           }
           for (const title of titlesToFetch) {
@@ -203,7 +203,7 @@ export default function useBacklinkRecommendations() {
                   return response.article;
                 },
                 staleTime: 5 * 60 * 1000,
-                gcTime: 30 * 60 * 1000,
+                gcTime: 30 * 60 * 1000
               });
               if (response) {
                 summariesMap[title] = response;
@@ -227,13 +227,13 @@ export default function useBacklinkRecommendations() {
               description: article.description,
               extract: article.extract,
               thumbnail: article.thumbnail,
-              pageid: article.pageid,
+              pageid: article.pageid
             } as RecommendationItem);
           } else {
             // Include basic recommendation even if fetch failed
             recommendations.push({
               title,
-              displaytitle: title,
+              displaytitle: title
             } as RecommendationItem);
           }
         }
@@ -251,14 +251,14 @@ export default function useBacklinkRecommendations() {
       queryClient,
       getArticleLinks,
       hasArticleLinks,
-      saveArticleLinks,
-    ],
+      saveArticleLinks
+    ]
   );
 
   return {
     getRecommendations,
     visitedArticlesCount: visitedArticles.length,
     loading,
-    error,
+    error
   };
 }

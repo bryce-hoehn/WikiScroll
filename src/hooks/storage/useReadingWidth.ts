@@ -12,36 +12,36 @@ export default function useReadingWidth() {
   const {
     value: readingPadding,
     isLoading,
-    updateValue,
+    updateValue
   } = useAsyncStorage<number>(READING_PADDING_KEY, {
     defaultValue: DEFAULT_PADDING,
     validator: (val) => !isNaN(val) && val >= MIN_PADDING && val <= MAX_PADDING,
     serializer: (val) => String(val),
-    deserializer: (val) => parseInt(val, 10),
+    deserializer: (val) => parseInt(val, 10)
   });
 
   const updateReadingPadding = useCallback(
     async (newPadding: number) => {
       const clampedPadding = Math.max(
         MIN_PADDING,
-        Math.min(MAX_PADDING, newPadding),
+        Math.min(MAX_PADDING, newPadding)
       );
       await updateValue(clampedPadding);
     },
-    [updateValue],
+    [updateValue]
   );
 
   const increaseReadingPadding = useCallback(
     () => updateReadingPadding(readingPadding + STEP),
-    [readingPadding, updateReadingPadding],
+    [readingPadding, updateReadingPadding]
   );
   const decreaseReadingPadding = useCallback(
     () => updateReadingPadding(readingPadding - STEP),
-    [readingPadding, updateReadingPadding],
+    [readingPadding, updateReadingPadding]
   );
   const resetReadingPadding = useCallback(
     () => updateReadingPadding(DEFAULT_PADDING),
-    [updateReadingPadding],
+    [updateReadingPadding]
   );
 
   return useMemo(
@@ -53,7 +53,7 @@ export default function useReadingWidth() {
       decreaseReadingPadding,
       resetReadingPadding,
       canIncrease: readingPadding < MAX_PADDING,
-      canDecrease: readingPadding > MIN_PADDING,
+      canDecrease: readingPadding > MIN_PADDING
     }),
     [
       readingPadding,
@@ -61,7 +61,7 @@ export default function useReadingWidth() {
       updateReadingPadding,
       increaseReadingPadding,
       decreaseReadingPadding,
-      resetReadingPadding,
-    ],
+      resetReadingPadding
+    ]
   );
 }

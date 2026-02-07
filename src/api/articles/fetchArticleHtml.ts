@@ -20,7 +20,7 @@ import { normalizeWikipediaTitle } from '@/utils/titleNormalization';
  * ```
  */
 export const fetchArticleHtml = async (
-  title: string,
+  title: string
 ): Promise<string | null> => {
   try {
     const cleanTitle = normalizeWikipediaTitle(title);
@@ -31,10 +31,10 @@ export const fetchArticleHtml = async (
       {
         baseURL: WIKIPEDIA_API_CONFIG.REST_API_BASE_URL,
         headers: {
-          Accept: 'text/html',
-        },
+          Accept: 'text/html'
+        }
         // Uses centralized timeout from axiosInstance
-      },
+      }
     );
 
     return response.data;
@@ -45,12 +45,12 @@ export const fetchArticleHtml = async (
           'Failed to fetch article HTML:',
           title,
           error.response?.status,
-          error.response?.data,
+          error.response?.data
         );
 
         if (error.response?.status === 404) {
           console.error(
-            `Article not found: "${title}" - The page may not exist or the title format is incorrect`,
+            `Article not found: "${title}" - The page may not exist or the title format is incorrect`
           );
         } else if (error.code === 'ECONNABORTED') {
           console.error('Request timeout while fetching article HTML');

@@ -12,7 +12,7 @@ import { saveBookmarks, saveOfflineArticles } from '../utils/bookmarkStorage';
 export async function downloadArticle(
   queryClient: QueryClient,
   title: string,
-  currentOfflineArticles: Record<string, OfflineArticle>,
+  currentOfflineArticles: Record<string, OfflineArticle>
 ): Promise<boolean> {
   try {
     // Use React Query's cache first, then fetch if needed
@@ -27,7 +27,7 @@ export async function downloadArticle(
       if (articleResponse.article) {
         article = {
           ...articleResponse.article,
-          downloadedAt: new Date().toISOString(),
+          downloadedAt: new Date().toISOString()
         };
         queryClient.setQueryData(['article', title], article);
       }
@@ -36,7 +36,7 @@ export async function downloadArticle(
     if (article) {
       const updatedOfflineArticles = {
         ...currentOfflineArticles,
-        [title]: article,
+        [title]: article
       };
 
       await saveOfflineArticles(updatedOfflineArticles);
@@ -58,7 +58,7 @@ export async function addBookmark(
   currentBookmarks: Bookmark[],
   currentOfflineArticles: Record<string, OfflineArticle>,
   thumbnail?: ImageThumbnail,
-  summary?: string,
+  summary?: string
 ): Promise<Bookmark[]> {
   try {
     // Check if bookmark already exists to prevent duplicates
@@ -72,7 +72,7 @@ export async function addBookmark(
       title,
       thumbnail,
       summary,
-      bookmarkedAt: new Date().toISOString(),
+      bookmarkedAt: new Date().toISOString()
     };
 
     const updatedBookmarks = [newBookmark, ...currentBookmarks];
@@ -95,7 +95,7 @@ export async function addBookmark(
 export async function removeBookmark(
   title: string,
   currentBookmarks: Bookmark[],
-  currentOfflineArticles: Record<string, OfflineArticle>,
+  currentOfflineArticles: Record<string, OfflineArticle>
 ): Promise<{
   bookmarks: Bookmark[];
   offlineArticles: Record<string, OfflineArticle>;
@@ -103,21 +103,21 @@ export async function removeBookmark(
   try {
     // Find the first matching bookmark index
     const bookmarkIndex = currentBookmarks.findIndex(
-      (bookmark) => bookmark.title === title,
+      (bookmark) => bookmark.title === title
     );
 
     if (bookmarkIndex === -1) {
       // Bookmark not found, return current state
       return {
         bookmarks: currentBookmarks,
-        offlineArticles: currentOfflineArticles,
+        offlineArticles: currentOfflineArticles
       };
     }
 
     // Remove only the first matching bookmark (handles duplicates)
     const updatedBookmarks = [
       ...currentBookmarks.slice(0, bookmarkIndex),
-      ...currentBookmarks.slice(bookmarkIndex + 1),
+      ...currentBookmarks.slice(bookmarkIndex + 1)
     ];
     await saveBookmarks(updatedBookmarks);
 
@@ -132,13 +132,13 @@ export async function removeBookmark(
 
     return {
       bookmarks: updatedBookmarks,
-      offlineArticles: updatedOfflineArticles,
+      offlineArticles: updatedOfflineArticles
     };
   } catch (error) {
     console.error('Failed to remove bookmark:', error);
     return {
       bookmarks: currentBookmarks,
-      offlineArticles: currentOfflineArticles,
+      offlineArticles: currentOfflineArticles
     };
   }
 }
@@ -151,7 +151,7 @@ export async function downloadAllBookmarks(
   queryClient: QueryClient,
   currentBookmarks: Bookmark[],
   currentOfflineArticles: Record<string, OfflineArticle>,
-  onProgress?: (progress: number, current: number, total: number) => void,
+  onProgress?: (progress: number, current: number, total: number) => void
 ): Promise<Record<string, OfflineArticle>> {
   try {
     const bookmarkTitles = currentBookmarks.map((bookmark) => bookmark.title);
@@ -173,7 +173,7 @@ export async function downloadAllBookmarks(
       if (article) {
         const offlineArticle: OfflineArticle = {
           ...article,
-          downloadedAt,
+          downloadedAt
         };
         updatedOfflineArticles[article.title] = offlineArticle;
         downloaded++;

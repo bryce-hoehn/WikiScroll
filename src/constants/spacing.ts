@@ -48,5 +48,5 @@ export const SPACING = {
   // 3x Extra large - 64dp (8x base unit)
   // MD3: 8x the base 8dp unit
   // Reference: https://m3.material.io/foundations/layout/understanding-layout/spacing
-  xxxl: 64,
+  xxxl: 64
 } as const;

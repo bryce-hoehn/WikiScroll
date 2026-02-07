@@ -19,13 +19,13 @@ export interface BookmarksContextType {
   addBookmark: (
     title: string,
     thumbnail?: ImageThumbnail,
-    summary?: string,
+    summary?: string
   ) => Promise<boolean>;
   removeBookmark: (title: string) => Promise<boolean>;
   removeBookmarks: (titles: string[]) => Promise<boolean>;
   updateBookmarkFolder: (
     title: string,
-    folder: string | undefined,
+    folder: string | undefined
   ) => Promise<boolean>;
   updateBookmarkTags: (title: string, tags: string[]) => Promise<boolean>;
   isBookmarked: (title: string) => boolean;
@@ -37,6 +37,6 @@ export interface BookmarksContextType {
   getOfflineArticle: (title: string) => OfflineArticle | null;
   downloadArticle: (title: string) => Promise<boolean>;
   downloadAllBookmarks: (
-    onProgress?: (progress: number, current: number, total: number) => void,
+    onProgress?: (progress: number, current: number, total: number) => void
   ) => Promise<boolean>;
 }

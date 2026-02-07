@@ -19,7 +19,7 @@ interface BacklinkResponse {
 }
 
 export const fetchArticleBacklinks = async (
-  articleTitle: string,
+  articleTitle: string
 ): Promise<string[]> => {
   const results = await fetchArticleBacklinksBatch([articleTitle]);
   return results[articleTitle] || [];
@@ -30,7 +30,7 @@ export const fetchArticleBacklinks = async (
  * @returns Map of article title to array of backlink titles
  */
 export const fetchArticleBacklinksBatch = async (
-  articleTitles: string[],
+  articleTitles: string[]
 ): Promise<Record<string, string[]>> => {
   if (articleTitles.length === 0) {
     return {};
@@ -59,8 +59,8 @@ export const fetchArticleBacklinksBatch = async (
           lhlimit: 50,
           lhnamespace: 0,
           format: 'json',
-          origin: '*',
-        },
+          origin: '*'
+        }
       });
 
       const pages = response.data.query?.pages;
@@ -120,7 +120,7 @@ export const fetchArticleBacklinksBatch = async (
           `Failed to fetch backlinks batch:`,
           (error as { response?: { status?: number; data?: unknown } }).response
             ?.status,
-          (error as { response?: { data?: unknown } }).response?.data || error,
+          (error as { response?: { data?: unknown } }).response?.data || error
         );
       }
     }

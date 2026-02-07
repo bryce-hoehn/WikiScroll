@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { fetchArticleSummary } from '@/api';
-import { useBookmarks } from '@/context/BookmarksContext';
+import { useBookmarks } from '@/stores/BookmarksContext';
 import { Article } from '@/types/api';
 
 /**
@@ -45,6 +45,6 @@ export default function useArticle(title: string) {
     gcTime: 30 * 60 * 1000, // 30 minutes - explicit cache time
     retry: 2,
     refetchOnWindowFocus: false, // Don't refetch on focus
-    refetchOnReconnect: false, // Don't refetch on reconnect
+    refetchOnReconnect: false // Don't refetch on reconnect
   });
 }

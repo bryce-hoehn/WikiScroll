@@ -51,5 +51,5 @@ export const TYPOGRAPHY = {
   // MD3: Line heights are typically 1.2-1.5x the font size
   lineHeightTight: 1.2,
   lineHeightNormal: 1.5,
-  lineHeightRelaxed: 1.75,
+  lineHeightRelaxed: 1.75
 } as const;

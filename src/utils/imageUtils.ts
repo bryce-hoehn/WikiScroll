@@ -42,7 +42,7 @@ function roundToCommonThumbnailSize(width: number): number {
  */
 export function getOptimizedThumbnailUrl(
   originalUrl: string,
-  width: number,
+  width: number
 ): string {
   if (!originalUrl || !originalUrl.includes('upload.wikimedia.org')) {
     return originalUrl;
@@ -82,14 +82,14 @@ export function getOptimizedThumbnailUrl(
 
         // Remove trailing filename if it matches the actual filename (duplicate)
         const filteredAfterWidth = partsAfterWidth.filter(
-          (part, idx) => !(idx === 0 && part === actualFilename),
+          (part, idx) => !(idx === 0 && part === actualFilename)
         );
 
         // Build the path: everything before width + new width-prefixed filename + everything after (excluding duplicate filename)
         const newPathParts = [
           ...partsBeforeWidth,
           `${roundedWidth}px-${actualFilename}`,
-          ...filteredAfterWidth,
+          ...filteredAfterWidth
         ];
 
         return `https://upload.wikimedia.org/${newPathParts.join('/')}`;

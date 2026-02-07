@@ -2,7 +2,7 @@ import { actionAxiosInstance, WIKIPEDIA_API_CONFIG } from '@/api/shared';
 import { ArticleResponse } from '@/types/api/articles';
 import {
   WikipediaActionApiParams,
-  WikipediaQueryResponse,
+  WikipediaQueryResponse
 } from '@/types/api/base';
 
 import { fetchArticleSummaries } from './fetchArticleSummary';
@@ -11,7 +11,7 @@ import { fetchArticleSummaries } from './fetchArticleSummary';
  * Fetch a single random article
  */
 export const fetchRandomArticle = async (
-  maxRetries = 3,
+  maxRetries = 3
 ): Promise<ArticleResponse> => {
   const batch = await fetchRandomArticles(1);
   if (batch.length > 0 && batch[0].article) {
@@ -19,7 +19,7 @@ export const fetchRandomArticle = async (
   }
   return {
     article: null,
-    error: 'Failed to load random article',
+    error: 'Failed to load random article'
   };
 };
 
@@ -28,7 +28,7 @@ export const fetchRandomArticle = async (
  * @returns Array of ArticleResponse objects
  */
 export const fetchRandomArticles = async (
-  count: number,
+  count: number
 ): Promise<ArticleResponse[]> => {
   if (count <= 0) {
     return [];
@@ -50,13 +50,13 @@ export const fetchRandomArticles = async (
         rnnamespace: 0,
         rnlimit: batchSize,
         format: 'json',
-        origin: '*',
+        origin: '*'
       };
 
       const randomResponse =
         await actionAxiosInstance.get<WikipediaQueryResponse>('', {
           baseURL: WIKIPEDIA_API_CONFIG.BASE_URL,
-          params: randomParams,
+          params: randomParams
         });
 
       const randomPages = randomResponse.data.query?.random || [];
@@ -74,7 +74,7 @@ export const fetchRandomArticles = async (
         } else {
           results.push({
             article: null,
-            error: 'Failed to load article summary',
+            error: 'Failed to load article summary'
           });
         }
       }
@@ -85,7 +85,7 @@ export const fetchRandomArticles = async (
       for (let i = 0; i < batchSize; i++) {
         results.push({
           article: null,
-          error: 'Failed to load random article',
+          error: 'Failed to load random article'
         });
       }
     }

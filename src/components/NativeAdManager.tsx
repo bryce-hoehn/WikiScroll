@@ -3,7 +3,7 @@ import { ViewStyle } from 'react-native';
 import {
   BannerAd,
   BannerAdSize,
-  MobileAds,
+  MobileAds
 } from 'react-native-google-mobile-ads';
 
 // Configure Ad Units for native platforms
@@ -33,7 +33,7 @@ const NativeAdManager = ({ style }: NativeAdManagerProps) => {
       unitId={BANNER_AD_UNIT_ID}
       size={BannerAdSize.FULL_BANNER}
       requestOptions={{
-        requestNonPersonalizedAdsOnly: true,
+        requestNonPersonalizedAdsOnly: true
       }}
       onAdLoaded={() => {
         console.log('Banner ad loaded');

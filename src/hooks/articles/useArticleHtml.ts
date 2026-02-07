@@ -23,6 +23,6 @@ export default function useArticleHtml(title: string) {
     gcTime: 60 * 60 * 1000, // 1 hour - keep in cache longer
     retry: 1, // Only retry once for HTML content (large payload)
     refetchOnWindowFocus: false, // Don't refetch on focus
-    refetchOnReconnect: false, // Don't refetch on reconnect
+    refetchOnReconnect: false // Don't refetch on reconnect
   });
 }

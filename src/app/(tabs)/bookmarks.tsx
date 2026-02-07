@@ -5,7 +5,7 @@ import React, {
   useEffect,
   useMemo,
   useRef,
-  useState,
+  useState
 } from 'react';
 import { Alert, RefreshControl, View, useWindowDimensions } from 'react-native';
 import {
@@ -16,26 +16,26 @@ import {
   Modal,
   Portal,
   Text,
-  useTheme,
+  useTheme
 } from 'react-native-paper';
 
-import BookmarkCard from '@/components/bookmarks/BookmarkCard';
-import BookmarkEditDialog from '@/components/bookmarks/BookmarkEditDialog';
-import BookmarkFilters from '@/components/bookmarks/BookmarkFilters';
-import BookmarkSearchBar from '@/components/bookmarks/BookmarkSearchBar';
-import BookmarkSortMenu, {
-  SortOption,
-} from '@/components/bookmarks/BookmarkSortMenu';
-import BookmarkTagEditor from '@/components/bookmarks/BookmarkTagEditor';
-import BookmarksEmptyState from '@/components/bookmarks/BookmarksEmptyState';
-import ProgressDialog from '@/components/common/ProgressDialog';
-import StandardEmptyState from '@/components/common/StandardEmptyState';
+import ProgressDialog from '@/components/ProgressDialog';
+import StandardEmptyState from '@/components/StandardEmptyState';
 import { LAYOUT } from '@/constants/layout';
 import { SPACING } from '@/constants/spacing';
 import { TYPOGRAPHY } from '@/constants/typography';
-import { useScrollToTop } from '@/context/ScrollToTopContext';
-import { useSnackbar } from '@/context/SnackbarContext';
+import BookmarkCard from '@/features/bookmarks/components/BookmarkCard';
+import BookmarkEditDialog from '@/features/bookmarks/components/BookmarkEditDialog';
+import BookmarkFilters from '@/features/bookmarks/components/BookmarkFilters';
+import BookmarkSearchBar from '@/features/bookmarks/components/BookmarkSearchBar';
+import BookmarkSortMenu, {
+  SortOption
+} from '@/features/bookmarks/components/BookmarkSortMenu';
+import BookmarkTagEditor from '@/features/bookmarks/components/BookmarkTagEditor';
+import BookmarksEmptyState from '@/features/bookmarks/components/BookmarksEmptyState';
 import { useBookmarks, useImagePrefetching, useReadingProgress } from '@/hooks';
+import { useScrollToTop } from '@/stores/ScrollToTopContext';
+import { useSnackbar } from '@/stores/SnackbarContext';
 import { Bookmark } from '@/types/bookmarks';
 
 export default function BookmarksScreen() {
@@ -50,7 +50,7 @@ export default function BookmarksScreen() {
     isArticleDownloaded,
     updateBookmarkTags,
     loadBookmarks,
-    addBookmark,
+    addBookmark
   } = useBookmarks();
   const { getProgress, clearProgress, clearAllProgress, saveProgress } =
     useReadingProgress();
@@ -77,7 +77,7 @@ export default function BookmarksScreen() {
   const [bulkTags, setBulkTags] = useState<string[]>([]);
   const [tagsModalVisible, setTagsModalVisible] = useState(false);
   const [tagsModalBookmark, setTagsModalBookmark] = useState<Bookmark | null>(
-    null,
+    null
   );
   const flashListRef = useRef<any>(null);
 
@@ -88,7 +88,7 @@ export default function BookmarksScreen() {
         if (flashListRef.current) {
           flashListRef.current.scrollToOffset({ offset: 0, animated: true });
         }
-      },
+      }
     });
   }, [registerScrollRef]);
 
@@ -101,7 +101,7 @@ export default function BookmarksScreen() {
       }
       // Mark as focused for next time
       wasFocusedRef.current = true;
-    }, [scrollToTop]),
+    }, [scrollToTop])
   );
 
   // Calculate content width - match Feed layout (single column, 650px max)
@@ -137,7 +137,7 @@ export default function BookmarksScreen() {
         (b) =>
           (b.title && b.title.toLowerCase().includes(query)) ||
           (b.summary && b.summary.toLowerCase().includes(query)) ||
-          (b.tags && b.tags.some((tag) => tag.toLowerCase().includes(query))),
+          (b.tags && b.tags.some((tag) => tag.toLowerCase().includes(query)))
       );
     }
 
@@ -166,12 +166,12 @@ export default function BookmarksScreen() {
   const { onViewableItemsChanged } = useImagePrefetching({
     data: filteredAndSortedBookmarks,
     getImageUrl: (item: Bookmark) => item?.thumbnail?.source,
-    preferredWidth: 400, // Standard width for bookmark card images
+    preferredWidth: 400 // Standard width for bookmark card images
   });
 
   const viewabilityConfig = useRef({
     itemVisiblePercentThreshold: 50, // Item is considered visible when 50% is shown
-    minimumViewTime: 100, // Minimum time item must be visible (ms)
+    minimumViewTime: 100 // Minimum time item must be visible (ms)
   }).current;
 
   const handleRemoveBookmark = useCallback(
@@ -195,7 +195,7 @@ export default function BookmarksScreen() {
                 await addBookmark(
                   bookmarkToDelete.title,
                   bookmarkToDelete.thumbnail,
-                  bookmarkToDelete.summary,
+                  bookmarkToDelete.summary
                 );
 
                 // Restore progress if it existed
@@ -208,8 +208,8 @@ export default function BookmarksScreen() {
                 }
                 showError('Failed to restore bookmark');
               }
-            },
-          },
+            }
+          }
         });
       }
     },
@@ -221,15 +221,15 @@ export default function BookmarksScreen() {
       addBookmark,
       saveProgress,
       showSnackbar,
-      showError,
-    ],
+      showError
+    ]
   );
 
   const handleDownloadAll = useCallback(async () => {
     if (filteredAndSortedBookmarks.length === 0) return;
 
     const notDownloaded = filteredAndSortedBookmarks.filter(
-      (b) => !isArticleDownloaded(b.title),
+      (b) => !isArticleDownloaded(b.title)
     );
     if (notDownloaded.length === 0) {
       showSuccess('All bookmarks are already downloaded');
@@ -250,7 +250,7 @@ export default function BookmarksScreen() {
 
       if (success) {
         showSuccess(
-          `Downloaded ${notDownloaded.length} article${notDownloaded.length !== 1 ? 's' : ''} for offline reading`,
+          `Downloaded ${notDownloaded.length} article${notDownloaded.length !== 1 ? 's' : ''} for offline reading`
         );
       } else {
         showError('Failed to download some articles');
@@ -268,7 +268,7 @@ export default function BookmarksScreen() {
     isArticleDownloaded,
     downloadAllBookmarks,
     showSuccess,
-    showError,
+    showError
   ]);
 
   const handleClearAllBookmarks = useCallback(() => {
@@ -283,7 +283,7 @@ export default function BookmarksScreen() {
     if (bookmarks.length > 5) {
       if (typeof window !== 'undefined' && window.confirm) {
         const confirmed = window.confirm(
-          'Are you sure you want to clear all your bookmarks? This action cannot be undone.',
+          'Are you sure you want to clear all your bookmarks? This action cannot be undone.'
         );
         if (confirmed) confirmAction();
       } else {
@@ -292,8 +292,8 @@ export default function BookmarksScreen() {
           'Are you sure you want to clear all your bookmarks? This action cannot be undone.',
           [
             { text: 'Cancel', style: 'cancel' },
-            { text: 'Clear All', style: 'destructive', onPress: confirmAction },
-          ],
+            { text: 'Clear All', style: 'destructive', onPress: confirmAction }
+          ]
         );
       }
     } else {
@@ -330,7 +330,7 @@ export default function BookmarksScreen() {
       try {
         // Store bookmarks and progress for undo
         const bookmarksToDelete = bookmarks.filter((b) =>
-          selectedTitles.has(b.title),
+          selectedTitles.has(b.title)
         );
         const progressToDelete: Record<string, number> = {};
         for (const title of selectedTitles) {
@@ -360,13 +360,13 @@ export default function BookmarksScreen() {
                   await addBookmark(
                     bookmark.title,
                     bookmark.thumbnail,
-                    bookmark.summary,
+                    bookmark.summary
                   );
                 }
 
                 // Restore progress
                 for (const [title, progress] of Object.entries(
-                  progressToDelete,
+                  progressToDelete
                 )) {
                   await saveProgress(title, progress);
                 }
@@ -376,8 +376,8 @@ export default function BookmarksScreen() {
                 }
                 showError('Failed to restore bookmarks');
               }
-            },
-          },
+            }
+          }
         });
       } catch {
         showError('Failed to delete bookmarks');
@@ -386,7 +386,7 @@ export default function BookmarksScreen() {
 
     if (typeof window !== 'undefined' && window.confirm) {
       const confirmed = window.confirm(
-        `Delete ${count} bookmark${count !== 1 ? 's' : ''}?`,
+        `Delete ${count} bookmark${count !== 1 ? 's' : ''}?`
       );
       if (confirmed) confirmAction();
     } else {
@@ -395,8 +395,8 @@ export default function BookmarksScreen() {
         `Delete ${count} bookmark${count !== 1 ? 's' : ''}?`,
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Delete', style: 'destructive', onPress: confirmAction },
-        ],
+          { text: 'Delete', style: 'destructive', onPress: confirmAction }
+        ]
       );
     }
   }, [
@@ -408,7 +408,7 @@ export default function BookmarksScreen() {
     bookmarks,
     getProgress,
     addBookmark,
-    saveProgress,
+    saveProgress
   ]);
 
   const handleEditBookmark = useCallback((bookmark: Bookmark) => {
@@ -431,7 +431,7 @@ export default function BookmarksScreen() {
         showError('Failed to update bookmark');
       }
     },
-    [editingBookmark, updateBookmarkTags, showSuccess, showError],
+    [editingBookmark, updateBookmarkTags, showSuccess, showError]
   );
 
   const handleBulkTagSave = useCallback(async () => {
@@ -444,7 +444,7 @@ export default function BookmarksScreen() {
           // Merge existing tags with new tags, removing duplicates
           const existingTags = bookmark.tags || [];
           const mergedTags = Array.from(
-            new Set([...existingTags, ...bulkTags]),
+            new Set([...existingTags, ...bulkTags])
           );
           await updateBookmarkTags(title, mergedTags);
         }
@@ -463,7 +463,7 @@ export default function BookmarksScreen() {
     bookmarks,
     updateBookmarkTags,
     showSuccess,
-    showError,
+    showError
   ]);
 
   const handleLongPress = useCallback(
@@ -475,7 +475,7 @@ export default function BookmarksScreen() {
         toggleSelection(title);
       }
     },
-    [selectionMode, toggleSelection],
+    [selectionMode, toggleSelection]
   );
 
   const renderBookmarkCard = useCallback(
@@ -487,7 +487,7 @@ export default function BookmarksScreen() {
           style={{
             marginBottom: SPACING.lg,
             width: cardWidth,
-            alignSelf: 'center',
+            alignSelf: 'center'
           }}
         >
           <BookmarkCard
@@ -513,8 +513,8 @@ export default function BookmarksScreen() {
       selectionMode,
       selectedTitles,
       toggleSelection,
-      setSelectedTag,
-    ],
+      setSelectedTag
+    ]
   );
 
   const renderEmptyState = useCallback(() => {
@@ -569,7 +569,7 @@ export default function BookmarksScreen() {
                 // MD3: Center-aligned app bars use 22sp title
                 // Reference: https://m3.material.io/components/app-bars/overview
                 fontWeight: '500', // MD3: Medium weight (500) for app bar titles
-                fontSize: TYPOGRAPHY.appBarTitle,
+                fontSize: TYPOGRAPHY.appBarTitle
               }}
             />
             <Appbar.Action
@@ -606,7 +606,7 @@ export default function BookmarksScreen() {
                 fontWeight: '500', // MD3: Medium weight (500) for app bar titles
                 fontSize: 22, // 22sp per MD3 specification
                 color: theme.colors.onSurface,
-                textAlign: 'center',
+                textAlign: 'center'
               }}
             />
             {bookmarks.length > 0 && (
@@ -683,7 +683,7 @@ export default function BookmarksScreen() {
             alignItems: 'center',
             paddingHorizontal: SPACING.base,
             paddingVertical: SPACING.sm,
-            backgroundColor: theme.colors.surfaceVariant,
+            backgroundColor: theme.colors.surfaceVariant
           }}
         >
           <Button
@@ -721,8 +721,8 @@ export default function BookmarksScreen() {
           flexGrow: 1,
           paddingHorizontal: horizontalPadding,
           ...(filteredAndSortedBookmarks.length === 0 && {
-            justifyContent: 'center',
-          }),
+            justifyContent: 'center'
+          })
         }}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={renderEmptyState}
@@ -778,7 +778,7 @@ export default function BookmarksScreen() {
             backgroundColor: theme.colors.surface,
             padding: 24,
             margin: 20,
-            borderRadius: theme.roundness * 3, // 12dp equivalent (4dp * 3)
+            borderRadius: theme.roundness * 3 // 12dp equivalent (4dp * 3)
           }}
         >
           <Text
@@ -803,7 +803,7 @@ export default function BookmarksScreen() {
               flexDirection: 'row',
               gap: 8,
               justifyContent: 'flex-end',
-              marginTop: 24,
+              marginTop: 24
             }}
           >
             <Button
@@ -834,7 +834,7 @@ export default function BookmarksScreen() {
             margin: 20,
             borderRadius: theme.roundness * 3, // 12dp equivalent (4dp * 3)
             width: Math.min(width - 40, 500), // Constrain to container width with 20px margin on each side
-            alignSelf: 'center',
+            alignSelf: 'center'
           }}
         >
           <Text
@@ -856,7 +856,7 @@ export default function BookmarksScreen() {
                 flexDirection: 'row',
                 flexWrap: 'wrap',
                 gap: 8,
-                marginBottom: 16,
+                marginBottom: 16
               }}
             >
               {tagsModalBookmark.tags.map((tag) => (
@@ -869,7 +869,7 @@ export default function BookmarksScreen() {
                   }}
                   style={{
                     height: 32,
-                    marginBottom: 4,
+                    marginBottom: 4
                   }}
                   textStyle={{ fontSize: 13 }}
                   mode="flat"

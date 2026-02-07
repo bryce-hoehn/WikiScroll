@@ -19,33 +19,33 @@ const ERROR_MESSAGES: Record<
     recoverySteps: [
       'Check if the article title is spelled correctly',
       'Try searching for a similar article',
-      'The article may have been moved or deleted',
-    ],
+      'The article may have been moved or deleted'
+    ]
   },
   500: {
     message: 'Server error. Please try again in a moment.',
     canRetry: true,
     recoverySteps: [
       'Wait a few moments and try again',
-      'The Wikipedia servers may be temporarily unavailable',
-    ],
+      'The Wikipedia servers may be temporarily unavailable'
+    ]
   },
   502: {
     message: 'Server error. Please try again in a moment.',
     canRetry: true,
     recoverySteps: [
       'Wait a few moments and try again',
-      'The Wikipedia servers may be temporarily unavailable',
-    ],
+      'The Wikipedia servers may be temporarily unavailable'
+    ]
   },
   503: {
     message: 'Server error. Please try again in a moment.',
     canRetry: true,
     recoverySteps: [
       'Wait a few moments and try again',
-      'The Wikipedia servers may be temporarily unavailable',
-    ],
-  },
+      'The Wikipedia servers may be temporarily unavailable'
+    ]
+  }
 };
 
 /**
@@ -82,7 +82,7 @@ export function getUserFriendlyError(error: unknown): ErrorInfo {
       userFriendlyMessage: 'Something went wrong. Please try again.',
       canRetry: true,
       errorType: 'unknown',
-      recoverySteps: ['Try refreshing the page', 'Close and reopen the app'],
+      recoverySteps: ['Try refreshing the page', 'Close and reopen the app']
     };
   }
 
@@ -97,7 +97,7 @@ export function getUserFriendlyError(error: unknown): ErrorInfo {
         userFriendlyMessage: errorInfo.message,
         canRetry: errorInfo.canRetry,
         errorType: status === 404 ? 'not-found' : 'server',
-        recoverySteps: errorInfo.recoverySteps,
+        recoverySteps: errorInfo.recoverySteps
       };
     }
 
@@ -109,8 +109,8 @@ export function getUserFriendlyError(error: unknown): ErrorInfo {
         errorType: 'timeout',
         recoverySteps: [
           'Check your internet connection speed',
-          'Try again in a few moments',
-        ],
+          'Try again in a few moments'
+        ]
       };
     }
 
@@ -123,8 +123,8 @@ export function getUserFriendlyError(error: unknown): ErrorInfo {
         errorType: 'network',
         recoverySteps: [
           'Check your internet connection',
-          'Try switching between Wi-Fi and mobile data',
-        ],
+          'Try switching between Wi-Fi and mobile data'
+        ]
       };
     }
   }
@@ -136,7 +136,7 @@ export function getUserFriendlyError(error: unknown): ErrorInfo {
     userFriendlyMessage: 'Something went wrong. Please try again.',
     canRetry: true,
     errorType: 'unknown',
-    recoverySteps: ['Try refreshing the page', 'Close and reopen the app'],
+    recoverySteps: ['Try refreshing the page', 'Close and reopen the app']
   };
 }
 

@@ -57,7 +57,7 @@ export const LAYOUT = {
   // Reference: https://m3.material.io/foundations/layout/understanding-layout/parts-of-layout
   GRID_COLUMNS_MOBILE: 4, // 4-column grid on mobile (compact)
   GRID_COLUMNS_TABLET: 8, // 8-column grid on tablet (medium)
-  GRID_COLUMNS_DESKTOP: 12, // 12-column grid on desktop (expanded+)
+  GRID_COLUMNS_DESKTOP: 12 // 12-column grid on desktop (expanded+)
 } as const;
 
 /**
@@ -73,5 +73,5 @@ export const COMPONENT_HEIGHTS = {
   // - https://m3.material.io/components/floating-action-button/specs
   // - https://m3.material.io/components/search/specs
   // - https://m3.material.io/components/navigation-bar/specs
-  STANDARD: 56, // 56dp
+  STANDARD: 56 // 56dp
 } as const;

@@ -1,17 +1,7 @@
 /**
- * Main components exports for Wikipedia Expo
- *
- * Import from specific domains:
- * - import { DidYouKnowCarousel } from './featured';
- * - import { SearchOverlay } from './search';
- * - import { FeaturedArticleCard } from './featured';
- * - import { FeaturedPictureCard } from './featured';
- * - import { OnThisDay } from './featured';
+ * Unified UI components for consistent states across the app
  */
-
-// Re-export all components from domains
-export * from './article';
-export * from './common';
-export * from './featured';
-export * from './layout';
-export * from './search';
+export { default as ErrorState } from './ErrorState';
+export { default as HistoryCard } from './HistoryCard';
+export { default as StandardEmptyState } from './StandardEmptyState';
+export { default as SubcategorySkeleton } from './SubcategorySkeleton';

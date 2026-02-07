@@ -1,7 +1,7 @@
 import {
   actionAxiosInstance,
   restAxiosInstance,
-  WIKIPEDIA_API_CONFIG,
+  WIKIPEDIA_API_CONFIG
 } from '@/api/shared';
 import { Article, ArticleResponse } from '@/types/api';
 import {
@@ -9,7 +9,7 @@ import {
   isAxiosError,
   WikipediaActionApiParams,
   WikipediaPage,
-  WikipediaQueryResponse,
+  WikipediaQueryResponse
 } from '@/types/api/base';
 import { normalizeWikipediaTitle } from '@/utils/titleNormalization';
 
@@ -33,7 +33,7 @@ import { normalizeWikipediaTitle } from '@/utils/titleNormalization';
  * ```
  */
 export const fetchArticleSummary = async (
-  title: string,
+  title: string
 ): Promise<ArticleResponse> => {
   try {
     const cleanTitle = normalizeWikipediaTitle(title);
@@ -41,8 +41,8 @@ export const fetchArticleSummary = async (
     const response = await restAxiosInstance.get<Article>(
       `/page/summary/${encodeURIComponent(cleanTitle)}`,
       {
-        baseURL: WIKIPEDIA_API_CONFIG.REST_API_BASE_URL,
-      },
+        baseURL: WIKIPEDIA_API_CONFIG.REST_API_BASE_URL
+      }
     );
 
     return { article: response.data };
@@ -66,7 +66,7 @@ export const fetchArticleSummary = async (
  * @returns Map of article title to Article object
  */
 export const fetchArticleSummaries = async (
-  titles: string[],
+  titles: string[]
 ): Promise<Record<string, Article | null>> => {
   if (titles.length === 0) {
     return {};
@@ -97,13 +97,13 @@ export const fetchArticleSummaries = async (
         exlimit: 20,
         inprop: 'url',
         format: 'json',
-        origin: '*',
+        origin: '*'
       };
 
       const batchResponse =
         await actionAxiosInstance.get<WikipediaQueryResponse>('', {
           baseURL: WIKIPEDIA_API_CONFIG.BASE_URL,
-          params: batchParams,
+          params: batchParams
         });
 
       const pages = batchResponse.data.query?.pages;
@@ -147,7 +147,7 @@ export const fetchArticleSummaries = async (
               thumbnail = {
                 source: pageData.thumbnail.source,
                 width: pageData.thumbnail.width,
-                height: pageData.thumbnail.height,
+                height: pageData.thumbnail.height
               };
             }
 
@@ -162,13 +162,13 @@ export const fetchArticleSummaries = async (
                 pageData.canonicalurl || pageData.fullurl
                   ? {
                       desktop: {
-                        page: pageData.canonicalurl || pageData.fullurl || '',
+                        page: pageData.canonicalurl || pageData.fullurl || ''
                       },
                       mobile: {
-                        page: pageData.canonicalurl || pageData.fullurl || '',
-                      },
+                        page: pageData.canonicalurl || pageData.fullurl || ''
+                      }
                     }
-                  : undefined,
+                  : undefined
             };
           }
         }

@@ -6,7 +6,6 @@
 // Article hooks
 export { default as useArticle } from './articles/useArticle';
 export { default as useArticleHtml } from './articles/useArticleHtml';
-export { default as useArticleThumbnail } from './articles/useArticleThumbnail';
 export { default as useCategoryMembers } from './articles/useCategoryMembers';
 export { default as useBacklinkRecommendations } from './articles/useRecommendations';
 
@@ -14,11 +13,11 @@ export { default as useBacklinkRecommendations } from './articles/useRecommendat
 export { default as useSearchSuggestions } from './search/useSearchSuggestions';
 
 // Content hooks
-export { default as useFeaturedContent } from './content/useFeaturedContent';
-export { default as useTrendingArticles } from './content/useTrendingArticles';
+export { default as useFeaturedContent } from '../features/discover/hooks/useFeaturedContent';
+export { default as useTrendingArticles } from '../features/discover/hooks/useTrendingArticles';
 
 // Storage hooks
-export { useBookmarks } from '../context/BookmarksContext';
+export { useBookmarks } from '../stores/BookmarksContext';
 export { default as useAccordionBehavior } from './storage/useAccordionBehavior';
 export { default as useArticleLinks } from './storage/useArticleLinks';
 export { default as useFontFamily } from './storage/useFontFamily';

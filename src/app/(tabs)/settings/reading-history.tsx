@@ -12,20 +12,20 @@ import {
   List,
   Portal,
   Text,
-  useTheme,
+  useTheme
 } from 'react-native-paper';
 
 import { fetchArticleSummaries } from '@/api';
-import RecommendationCard from '@/components/article/RecommendationCard';
 import { LAYOUT } from '@/constants/layout';
 import { SPACING } from '@/constants/spacing';
 import { TYPOGRAPHY } from '@/constants/typography';
-import { useSnackbar } from '@/context/SnackbarContext';
+import { RecommendationCard } from '@/features/article';
 import {
   useBookmarkToggle,
   useReadingProgress,
-  useVisitedArticles,
+  useVisitedArticles
 } from '@/hooks';
+import { useSnackbar } from '@/stores/SnackbarContext';
 import { RecommendationItem } from '@/types/components';
 
 const ITEMS_PER_PAGE = 10;
@@ -38,7 +38,7 @@ export default function ReadingHistoryScreen() {
     clearVisitedArticles,
     visitedArticles,
     addVisitedArticle,
-    loadVisitedArticles,
+    loadVisitedArticles
   } = useVisitedArticles();
   const { clearAllProgress, saveProgress, getProgressData } =
     useReadingProgress();
@@ -67,13 +67,13 @@ export default function ReadingHistoryScreen() {
   // Batch fetch all article summaries at once (much faster)
   const articleTitles = useMemo(
     () => visitedArticles.map((visited) => visited.title),
-    [visitedArticles],
+    [visitedArticles]
   );
 
   // Sort for stable query key but don't mutate original array
   const sortedTitlesForKey = useMemo(
     () => [...articleTitles].sort().join('|'),
-    [articleTitles],
+    [articleTitles]
   );
 
   const { data: summariesMap } = useQuery({
@@ -81,7 +81,7 @@ export default function ReadingHistoryScreen() {
     queryFn: () => fetchArticleSummaries(articleTitles),
     enabled: articleTitles.length > 0,
     staleTime: 5 * 60 * 1000,
-    gcTime: 30 * 60 * 1000,
+    gcTime: 30 * 60 * 1000
   });
 
   // Convert summaries to RecommendationItems, preserving order of visitedArticles
@@ -98,7 +98,7 @@ export default function ReadingHistoryScreen() {
             description: article.description,
             extract: article.extract,
             thumbnail: article.thumbnail,
-            pageid: article.pageid,
+            pageid: article.pageid
           } as RecommendationItem;
         }
         return null;
@@ -120,7 +120,7 @@ export default function ReadingHistoryScreen() {
     if (flashListRef.current && currentPage !== undefined && pages.length > 0) {
       flashListRef.current.scrollToIndex({
         index: currentPage,
-        animated: true,
+        animated: true
       });
     }
   }, [currentPage, pages.length]);
@@ -163,12 +163,12 @@ export default function ReadingHistoryScreen() {
               }
 
               for (const [title, progressData] of Object.entries(
-                progressToRestore,
+                progressToRestore
               )) {
                 await saveProgress(
                   title,
                   progressData.progress,
-                  progressData.expandedSections,
+                  progressData.expandedSections
                 );
               }
 
@@ -179,8 +179,8 @@ export default function ReadingHistoryScreen() {
               }
               showError('Failed to restore reading history');
             }
-          },
-        },
+          }
+        }
       });
     } catch (error) {
       if (typeof __DEV__ !== 'undefined' && __DEV__) {
@@ -211,7 +211,7 @@ export default function ReadingHistoryScreen() {
 
   const renderPage = ({
     item: pageItems,
-    index: pageIndex,
+    index: pageIndex
   }: {
     item: RecommendationItem[];
     index: number;
@@ -222,7 +222,7 @@ export default function ReadingHistoryScreen() {
         paddingVertical: SPACING.sm,
         paddingBottom: SPACING.xl,
         alignItems: 'center',
-        flexGrow: 1,
+        flexGrow: 1
       }}
       showsVerticalScrollIndicator={true}
     >
@@ -232,7 +232,7 @@ export default function ReadingHistoryScreen() {
           style={{
             marginBottom: SPACING.base,
             width: cardWidth,
-            alignSelf: 'center',
+            alignSelf: 'center'
           }}
         >
           <RecommendationCard
@@ -251,7 +251,7 @@ export default function ReadingHistoryScreen() {
     <>
       <Appbar.Header
         style={{
-          backgroundColor: theme.colors.surface,
+          backgroundColor: theme.colors.surface
         }}
         mode="center-aligned"
       >
@@ -262,7 +262,7 @@ export default function ReadingHistoryScreen() {
             // MD3: Center-aligned app bars use 22sp title
             // Reference: https://m3.material.io/components/app-bars/overview
             fontWeight: '500', // MD3: Medium weight (500) for app bar titles
-            fontSize: TYPOGRAPHY.appBarTitle,
+            fontSize: TYPOGRAPHY.appBarTitle
           }}
         />
       </Appbar.Header>
@@ -278,7 +278,7 @@ export default function ReadingHistoryScreen() {
           <View
             style={{
               paddingHorizontal: SPACING.base,
-              paddingBottom: SPACING.base,
+              paddingBottom: SPACING.base
             }}
           >
             <Text
@@ -286,7 +286,7 @@ export default function ReadingHistoryScreen() {
               style={{
                 color: theme.colors.onSurfaceVariant,
                 marginBottom: 8,
-                lineHeight: 18,
+                lineHeight: 18
               }}
             >
               Permanently delete all reading history and reading progress. This
@@ -314,7 +314,7 @@ export default function ReadingHistoryScreen() {
             <View
               style={{
                 // Calculate height for 5 cards: 5 * cardHeight (140) + 4 * spacing (16) + padding (16) = 780px
-                height: 780,
+                height: 780
               }}
             >
               <FlashList
@@ -329,12 +329,12 @@ export default function ReadingHistoryScreen() {
                 decelerationRate="fast"
                 pagingEnabled
                 contentContainerStyle={{
-                  backgroundColor: theme.colors.background,
+                  backgroundColor: theme.colors.background
                 }}
                 style={{ backgroundColor: theme.colors.background, flex: 1 }}
                 onMomentumScrollEnd={(event) => {
                   const pageIndex = Math.round(
-                    event.nativeEvent.contentOffset.x / itemWidth,
+                    event.nativeEvent.contentOffset.x / itemWidth
                   );
                   setCurrentPage(pageIndex);
                 }}
@@ -344,14 +344,14 @@ export default function ReadingHistoryScreen() {
                       width: itemWidth,
                       justifyContent: 'center',
                       alignItems: 'center',
-                      padding: SPACING.base,
+                      padding: SPACING.base
                     }}
                   >
                     <Text
                       variant="bodyMedium"
                       style={{
                         color: theme.colors.onSurfaceVariant,
-                        textAlign: 'center',
+                        textAlign: 'center'
                       }}
                     >
                       Loading articles...
@@ -369,7 +369,7 @@ export default function ReadingHistoryScreen() {
                   justifyContent: 'center',
                   alignItems: 'center',
                   paddingVertical: SPACING.sm,
-                  gap: SPACING.md,
+                  gap: SPACING.md
                 }}
               >
                 <IconButton
@@ -386,7 +386,7 @@ export default function ReadingHistoryScreen() {
                       setCurrentPage(newPage);
                       flashListRef.current?.scrollToIndex({
                         index: newPage,
-                        animated: true,
+                        animated: true
                       });
                     }
                   }}
@@ -406,7 +406,7 @@ export default function ReadingHistoryScreen() {
                         backgroundColor:
                           index === currentPage
                             ? theme.colors.primary
-                            : theme.colors.surfaceVariant,
+                            : theme.colors.surfaceVariant
                       }}
                     />
                   ))}
@@ -426,7 +426,7 @@ export default function ReadingHistoryScreen() {
                       setCurrentPage(newPage);
                       flashListRef.current?.scrollToIndex({
                         index: newPage,
-                        animated: true,
+                        animated: true
                       });
                     }
                   }}
@@ -444,14 +444,14 @@ export default function ReadingHistoryScreen() {
               justifyContent: 'center',
               alignItems: 'center',
               padding: SPACING.base,
-              minHeight: 400,
+              minHeight: 400
             }}
           >
             <Text
               variant="bodyMedium"
               style={{
                 color: theme.colors.onSurfaceVariant,
-                textAlign: 'center',
+                textAlign: 'center'
               }}
             >
               No reading history yet
@@ -467,7 +467,7 @@ export default function ReadingHistoryScreen() {
           style={{
             maxWidth: Math.min(availableWidth - SPACING.base * 2, 500),
             alignSelf: 'center',
-            marginHorizontal: SPACING.base,
+            marginHorizontal: SPACING.base
           }}
         >
           <Dialog.Title>Reset Reading History</Dialog.Title>
@@ -482,7 +482,7 @@ export default function ReadingHistoryScreen() {
                 variant="bodySmall"
                 style={{
                   marginTop: 8,
-                  color: theme.colors.onSurfaceVariant,
+                  color: theme.colors.onSurfaceVariant
                 }}
               >
                 This will delete {visitedArticles.length} article

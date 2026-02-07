@@ -1,7 +1,16 @@
 // https://medium.com/@alessandro.orlich_17521/how-i-manage-signing-configs-with-expo-prebuild-6ea6b7576dff
-const { withAppBuildGradle } = require("@expo/config-plugins");
+import { withAppBuildGradle } from '@expo/config-plugins';
+import { ExpoConfig } from 'expo/config';
 
-module.exports = function withAndroidSigningConfig(config, signingConfig) {
+module.exports = function withAndroidSigningConfig(
+  config: ExpoConfig,
+  signingConfig: {
+    storeFile: string;
+    storePassword: string;
+    keyAlias: string;
+    keyPassword: string;
+  }
+) {
   const releaseBlock = `
         release {
           storeFile file('${signingConfig.storeFile}')

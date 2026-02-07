@@ -21,17 +21,17 @@ function normalizeHref(href: string): string {
 }
 
 const extractIdFromTitle = (
-  title: string,
+  title: string
 ): { kind: 'article' | 'category'; id: string } => {
   if (title.startsWith('Category:')) {
     return {
       kind: 'category',
-      id: title.replace(/^Category:/, ''),
+      id: title.replace(/^Category:/, '')
     };
   }
   return {
     kind: 'article',
-    id: title,
+    id: title
   };
 };
 
@@ -111,7 +111,7 @@ export function parseLink(href: string): ParsedLink {
       return {
         kind: 'category',
         id: decodeURIComponent(categoryMatch[1]),
-        url: normalizedHref,
+        url: normalizedHref
       };
     }
 

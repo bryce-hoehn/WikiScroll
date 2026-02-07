@@ -24,7 +24,7 @@ export const getAppVersion = (): string => {
  */
 export const getEnvVar = (
   key: string,
-  defaultValue?: string,
+  defaultValue?: string
 ): string | undefined => {
   const fullKey = `EXPO_PUBLIC_${key}`;
   return process.env[fullKey] || defaultValue;

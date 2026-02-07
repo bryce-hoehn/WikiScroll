@@ -23,7 +23,7 @@ const BLURHASHES = [
   // Additional variety - different patterns
   'L6PZfSi_.AyE_3t7t7R**0o#DgR4',
   'L8Sg}8_3~q%M_3~q%M_3~q%M_3~q',
-  'L5H2EC=PM+yV0gMqNGa#00bH?G-9',
+  'L5H2EC=PM+yV0gMqNGa#00bH?G-9'
 ] as const;
 
 /**

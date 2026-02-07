@@ -5,7 +5,7 @@ import { WikipediaPage, WikipediaQueryResponse } from '@/types/api/base';
  * Fetch categories for a specific article using Wikipedia API
  */
 export async function fetchArticleCategories(
-  articleTitle: string,
+  articleTitle: string
 ): Promise<string[]> {
   try {
     const params = {
@@ -14,12 +14,12 @@ export async function fetchArticleCategories(
       titles: articleTitle,
       cllimit: 10, // Limit to 10 categories per article
       format: 'json',
-      origin: '*',
+      origin: '*'
     };
 
     const response = await actionAxiosInstance.get<WikipediaQueryResponse>('', {
       baseURL: WIKIPEDIA_API_CONFIG.BASE_URL,
-      params,
+      params
     });
     const data = response.data;
 

@@ -17,7 +17,7 @@ import { createResponseInterceptor } from './interceptors';
 
 const ACTION_RATE_LIMIT_CONFIG = {
   REQUESTS_PER_SECOND: 5,
-  MIN_INTERVAL_MS: 200,
+  MIN_INTERVAL_MS: 200
 };
 
 let actionLastRequestTime = 0;
@@ -25,7 +25,7 @@ let actionLastRequestTime = 0;
 export const actionAxiosInstance: AxiosInstance = axios.create({
   headers: getApiHeaders(),
   withCredentials: false,
-  timeout: 15000,
+  timeout: 15000
 });
 
 actionAxiosInstance.interceptors.request.use(
@@ -46,14 +46,14 @@ actionAxiosInstance.interceptors.request.use(
   },
   (error: unknown) => {
     return Promise.reject(error);
-  },
+  }
 );
 
 createResponseInterceptor(actionAxiosInstance);
 
 export const fetchSequentially = async <T, R>(
   items: T[],
-  requestFn: (item: T) => Promise<R>,
+  requestFn: (item: T) => Promise<R>
 ): Promise<R[]> => {
   const fulfilledResults: R[] = [];
 

@@ -8,21 +8,21 @@ import {
   NavigationState,
   Route,
   SceneRendererProps,
-  TabView,
+  TabView
 } from 'react-native-tab-view';
 
 import CollapsibleHeader, {
-  useCollapsibleHeaderSpacing,
-} from '@/components/common/CollapsibleHeader';
-import ResponsiveContainer from '@/components/common/ResponsiveContainer';
-import ForYouFeed from '@/components/home/ForYouFeed';
-import HotFeed from '@/components/home/HotFeed';
-import RandomFeed from '@/components/home/RandomFeed';
+  useCollapsibleHeaderSpacing
+} from '@/components/CollapsibleHeader';
+import ResponsiveContainer from '@/components/ResponsiveContainer';
 import { LAYOUT } from '@/constants/layout';
 import { SPACING } from '@/constants/spacing';
 import { TYPOGRAPHY } from '@/constants/typography';
-import { useScrollToTop } from '@/context/ScrollToTopContext';
+import ForYouFeed from '@/features/home/components/ForYouFeed';
+import HotFeed from '@/features/home/components/HotFeed';
+import RandomFeed from '@/features/home/components/RandomFeed';
 import { useReducedMotion } from '@/hooks';
+import { useScrollToTop } from '@/stores/ScrollToTopContext';
 
 export default function HomeScreen() {
   const theme = useTheme();
@@ -43,18 +43,17 @@ export default function HomeScreen() {
   const [routes] = useState([
     { key: 'for-you', title: 'For You' },
     { key: 'hot', title: 'Popular' },
-    { key: 'random', title: 'Random' },
+    { key: 'random', title: 'Random' }
   ]);
 
   // Determine initial index from query parameter or default to 0
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const getInitialIndex = () => {
+  const getInitialIndex = useCallback(() => {
     if (tab) {
       const tabIndex = routes.findIndex((route) => route.key === tab);
       return tabIndex >= 0 ? tabIndex : 0;
     }
     return 0;
-  };
+  }, [routes, tab]);
 
   const [index, setIndex] = useState(() => getInitialIndex());
 
@@ -69,7 +68,7 @@ export default function HomeScreen() {
       }
       hasInitializedRef.current = true;
     }
-  }, []); // Empty dependency array - only run once on mount
+  }, [getInitialIndex, index]); // Empty dependency array - only run once on mount
 
   // Register a scroll ref for the home route that scrolls the currently active feed
   // Use ref to access current index without causing re-renders
@@ -87,7 +86,7 @@ export default function HomeScreen() {
 
   React.useEffect(() => {
     registerScrollRef('/(tabs)', {
-      scrollToTop: homeScrollToTop,
+      scrollToTop: homeScrollToTop
     });
   }, [registerScrollRef, homeScrollToTop]);
 
@@ -107,7 +106,7 @@ export default function HomeScreen() {
       }
       // Mark as focused for next time
       wasFocusedRef.current = true;
-    }, []),
+    }, [])
   );
 
   // Use ref to prevent stale closure in handleTabPress
@@ -126,7 +125,7 @@ export default function HomeScreen() {
         jumpTo(routeKey);
       }
     },
-    [scrollToTop],
+    [scrollToTop]
   );
 
   // Memoize renderScene to prevent TabView from re-rendering all scenes
@@ -143,7 +142,7 @@ export default function HomeScreen() {
           return null;
       }
     },
-    [scrollY],
+    [scrollY]
   );
 
   // Lazy loading placeholder - shows while tab is being loaded
@@ -155,14 +154,14 @@ export default function HomeScreen() {
             flex: 1,
             backgroundColor: theme.colors.background,
             justifyContent: 'center',
-            alignItems: 'center',
+            alignItems: 'center'
           }}
         >
           {/* Simple loading indicator - Feed components will show their own skeletons when loaded */}
         </View>
       );
     },
-    [theme.colors.background],
+    [theme.colors.background]
   );
 
   const HEADER_HEIGHT = 60;
@@ -178,7 +177,7 @@ export default function HomeScreen() {
       props: SceneRendererProps & {
         navigationState: NavigationState<Route>;
         jumpTo: (key: string) => void;
-      },
+      }
     ) => {
       const { routes, index } = props.navigationState;
       const { position } = props;
@@ -189,7 +188,7 @@ export default function HomeScreen() {
             width: '100%',
             zIndex: 10,
             backgroundColor: theme.colors.surface,
-            marginTop: tabBarMarginTop,
+            marginTop: tabBarMarginTop
           }}
         >
           <View
@@ -198,8 +197,8 @@ export default function HomeScreen() {
               backgroundColor: theme.colors.surface,
               ...(isLargeScreen && {
                 maxWidth: containerWidth,
-                alignSelf: 'center',
-              }),
+                alignSelf: 'center'
+              })
             }}
             onLayout={(event) => {
               const { width } = event.nativeEvent.layout;
@@ -221,7 +220,7 @@ export default function HomeScreen() {
               const opacity = position.interpolate({
                 inputRange,
                 outputRange: routes.map((_, j) => (j === i ? 1 : 0.6)),
-                extrapolate: 'clamp',
+                extrapolate: 'clamp'
               });
 
               return (
@@ -235,7 +234,7 @@ export default function HomeScreen() {
                     height: SPACING.xxl,
                     minHeight: SPACING.xxl,
                     paddingHorizontal: SPACING.base,
-                    minWidth: 120,
+                    minWidth: 120
                   }}
                   accessibilityRole="tab"
                   accessibilityLabel={route.title || `Tab ${i + 1}`}
@@ -252,7 +251,7 @@ export default function HomeScreen() {
                       alignItems: 'center',
                       justifyContent: 'center',
                       width: '100%',
-                      height: '100%',
+                      height: '100%'
                     }}
                   >
                     <Animated.Text
@@ -262,7 +261,7 @@ export default function HomeScreen() {
                         lineHeight: 20,
                         color: color,
                         opacity: opacity,
-                        textAlign: 'center',
+                        textAlign: 'center'
                       }}
                     >
                       {route.title}
@@ -293,10 +292,10 @@ export default function HomeScreen() {
                             const margin = (tabWidth - indicatorWidth) / 2;
                             return i * tabWidth + margin;
                           }),
-                          extrapolate: 'clamp',
-                        }),
-                      },
-                    ],
+                          extrapolate: 'clamp'
+                        })
+                      }
+                    ]
                   }}
                 />
               );
@@ -312,8 +311,8 @@ export default function HomeScreen() {
       theme,
       tabBarMarginTop,
       handleTabPress,
-      tabBarWidth,
-    ],
+      tabBarWidth
+    ]
   );
 
   return (
@@ -326,7 +325,7 @@ export default function HomeScreen() {
           style={{
             flex: 1,
             position: 'relative',
-            backgroundColor: theme.colors.surface,
+            backgroundColor: theme.colors.surface
           }}
         >
           {/* Collapsible header with app icon */}
@@ -346,7 +345,7 @@ export default function HomeScreen() {
             style={{
               backgroundColor: theme.colors.surface,
               width: '100%',
-              flex: 1,
+              flex: 1
             }}
             animationEnabled={!reducedMotion}
             swipeEnabled={!reducedMotion}

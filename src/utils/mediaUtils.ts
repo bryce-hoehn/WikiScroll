@@ -33,8 +33,8 @@ export async function getDirectFileUrl(fileName: string): Promise<string> {
         prop: 'imageinfo',
         iiprop: 'url',
         format: 'json',
-        origin: '*',
-      },
+        origin: '*'
+      }
     });
 
     const pages = response.data?.query?.pages;
@@ -98,7 +98,7 @@ export function resolveMediaUrl(raw: string): ResolvedMediaUrl {
     /^(File|Image):(.+)$/i,
     /^\.\/(File|Image):(.+)$/i,
     /^\/(?:wiki\/)?(File|Image):(.+)$/i,
-    /\/wiki\/(?:File|Image):(.+)$/i,
+    /\/wiki\/(?:File|Image):(.+)$/i
   ];
 
   for (const pattern of filePatterns) {
@@ -173,7 +173,7 @@ export function resolveMediaUrl(raw: string): ResolvedMediaUrl {
  * Resolve media URLs - get direct URLs for File: references via API
  */
 export async function resolveMediaRedirect(
-  resolved: ResolvedMediaUrl,
+  resolved: ResolvedMediaUrl
 ): Promise<string> {
   if (!resolved) return '';
 

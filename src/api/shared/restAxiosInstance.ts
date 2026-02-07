@@ -1,7 +1,7 @@
 import axios, {
   AxiosInstance,
   AxiosResponse,
-  InternalAxiosRequestConfig,
+  InternalAxiosRequestConfig
 } from 'axios';
 
 import { getApiHeaders } from './config';
@@ -23,7 +23,7 @@ import { createResponseInterceptor } from './interceptors';
 const REST_RATE_LIMIT_CONFIG = {
   REQUESTS_PER_SECOND: 10,
   MIN_INTERVAL_MS: 100,
-  MAX_CONCURRENT: 5,
+  MAX_CONCURRENT: 5
 };
 
 let restLastRequestTime = 0;
@@ -46,7 +46,7 @@ const processRestQueue = () => {
 export const restAxiosInstance: AxiosInstance = axios.create({
   headers: getApiHeaders(),
   withCredentials: false,
-  timeout: 15000,
+  timeout: 15000
 });
 
 restAxiosInstance.interceptors.request.use(
@@ -73,7 +73,7 @@ restAxiosInstance.interceptors.request.use(
   },
   (error: unknown) => {
     return Promise.reject(error);
-  },
+  }
 );
 
 restAxiosInstance.interceptors.response.use(
@@ -86,7 +86,7 @@ restAxiosInstance.interceptors.response.use(
     restConcurrentRequests = Math.max(0, restConcurrentRequests - 1);
     processRestQueue();
     return Promise.reject(error);
-  },
+  }
 );
 
 createResponseInterceptor(restAxiosInstance);
@@ -94,7 +94,7 @@ createResponseInterceptor(restAxiosInstance);
 export const fetchConcurrently = async <T, R>(
   items: T[],
   requestFn: (item: T) => Promise<R>,
-  maxConcurrent: number = REST_RATE_LIMIT_CONFIG.MAX_CONCURRENT,
+  maxConcurrent: number = REST_RATE_LIMIT_CONFIG.MAX_CONCURRENT
 ): Promise<R[]> => {
   const results: PromiseSettledResult<R>[] = [];
 
@@ -108,7 +108,7 @@ export const fetchConcurrently = async <T, R>(
   return results
     .filter(
       (result): result is PromiseFulfilledResult<R> =>
-        result.status === 'fulfilled',
+        result.status === 'fulfilled'
     )
     .map((result) => result.value);
 };

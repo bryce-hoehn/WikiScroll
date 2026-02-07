@@ -18,8 +18,8 @@ const withAndroidPlugin: ConfigPlugin = (config) => {
       mainApplication['meta-data'].push({
         $: {
           'android:name': 'com.google.android.gms.ads.APPLICATION_ID',
-          'android:value': adID,
-        },
+          'android:value': adID
+        }
       });
     }
 

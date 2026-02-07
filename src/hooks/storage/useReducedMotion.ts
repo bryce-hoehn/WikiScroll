@@ -12,14 +12,14 @@ export default function useReducedMotion() {
   const {
     value: reducedMotion,
     isLoading,
-    updateValue,
+    updateValue
   } = useAsyncStorage<boolean>(REDUCED_MOTION_KEY, {
-    defaultValue: DEFAULT_REDUCED_MOTION,
+    defaultValue: DEFAULT_REDUCED_MOTION
   });
 
   return {
     reducedMotion,
     setReducedMotion: updateValue,
-    isLoading,
+    isLoading
   };
 }

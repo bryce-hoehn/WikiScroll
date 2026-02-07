@@ -9,7 +9,7 @@ import { fetchArticleSummaries } from '@/api/articles/fetchArticleSummary';
  * @returns The best matching article title, or null if no match found
  */
 export async function findBestArticleMatch(
-  query: string,
+  query: string
 ): Promise<string | null> {
   if (!query.trim()) return null;
 

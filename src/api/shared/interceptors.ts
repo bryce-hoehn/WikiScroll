@@ -2,7 +2,7 @@ import {
   AxiosInstance,
   AxiosResponse,
   InternalAxiosRequestConfig,
-  isAxiosError,
+  isAxiosError
 } from 'axios';
 
 /**
@@ -60,6 +60,6 @@ export const createResponseInterceptor = (instance: AxiosInstance): void => {
         }
       }
       return Promise.reject(error);
-    },
+    }
   );
 };

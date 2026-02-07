@@ -12,37 +12,37 @@ export default function useLineHeight() {
   const {
     value: lineHeight,
     isLoading,
-    updateValue,
+    updateValue
   } = useAsyncStorage<number>(LINE_HEIGHT_KEY, {
     defaultValue: DEFAULT_LINE_HEIGHT,
     validator: (val) =>
       !isNaN(val) && val >= MIN_LINE_HEIGHT && val <= MAX_LINE_HEIGHT,
     serializer: (val) => String(val),
-    deserializer: (val) => parseFloat(val),
+    deserializer: (val) => parseFloat(val)
   });
 
   const updateLineHeight = useCallback(
     async (newHeight: number) => {
       const clampedHeight = Math.max(
         MIN_LINE_HEIGHT,
-        Math.min(MAX_LINE_HEIGHT, newHeight),
+        Math.min(MAX_LINE_HEIGHT, newHeight)
       );
       await updateValue(clampedHeight);
     },
-    [updateValue],
+    [updateValue]
   );
 
   const increaseLineHeight = useCallback(
     () => updateLineHeight(lineHeight + STEP),
-    [lineHeight, updateLineHeight],
+    [lineHeight, updateLineHeight]
   );
   const decreaseLineHeight = useCallback(
     () => updateLineHeight(lineHeight - STEP),
-    [lineHeight, updateLineHeight],
+    [lineHeight, updateLineHeight]
   );
   const resetLineHeight = useCallback(
     () => updateLineHeight(DEFAULT_LINE_HEIGHT),
-    [updateLineHeight],
+    [updateLineHeight]
   );
 
   return useMemo(
@@ -54,7 +54,7 @@ export default function useLineHeight() {
       decreaseLineHeight,
       resetLineHeight,
       canIncrease: lineHeight < MAX_LINE_HEIGHT,
-      canDecrease: lineHeight > MIN_LINE_HEIGHT,
+      canDecrease: lineHeight > MIN_LINE_HEIGHT
     }),
     [
       lineHeight,
@@ -62,7 +62,7 @@ export default function useLineHeight() {
       updateLineHeight,
       increaseLineHeight,
       decreaseLineHeight,
-      resetLineHeight,
-    ],
+      resetLineHeight
+    ]
   );
 }

@@ -8,7 +8,7 @@ import { PageViewResponse, TrendingArticle } from '@/types/api/featured';
  *               Pageviews API typically has complete data 2 days after the date.
  */
 export const fetchTrendingArticles = async (
-  date?: Date,
+  date?: Date
 ): Promise<TrendingArticle[]> => {
   try {
     const targetDate = date || new Date();
@@ -21,8 +21,8 @@ export const fetchTrendingArticles = async (
     const response = await restAxiosInstance.get<PageViewResponse>(url, {
       baseURL: WIKIPEDIA_API_CONFIG.WIKIMEDIA_PAGEVIEWS_BASE_URL,
       headers: {
-        Accept: 'application/json',
-      },
+        Accept: 'application/json'
+      }
     });
 
     if (!response.data?.items?.[0]?.articles) {
@@ -39,7 +39,7 @@ export const fetchTrendingArticles = async (
       return {
         ...article,
         trendingRatio,
-        todayViews: article.views,
+        todayViews: article.views
       };
     });
 

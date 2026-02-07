@@ -18,7 +18,7 @@ interface LinksResponse {
 }
 
 export const fetchArticleLinks = async (
-  articleTitle: string,
+  articleTitle: string
 ): Promise<string[]> => {
   const results = await fetchArticleLinksBatch([articleTitle]);
   return results[articleTitle] || [];
@@ -29,7 +29,7 @@ export const fetchArticleLinks = async (
  * @returns Map of article title to array of link titles
  */
 export const fetchArticleLinksBatch = async (
-  articleTitles: string[],
+  articleTitles: string[]
 ): Promise<Record<string, string[]>> => {
   if (articleTitles.length === 0) {
     return {};
@@ -57,8 +57,8 @@ export const fetchArticleLinksBatch = async (
           titles: titlesParam,
           pllimit: 50,
           format: 'json',
-          origin: '*',
-        },
+          origin: '*'
+        }
       });
 
       const pages = response.data.query?.pages;
@@ -121,7 +121,7 @@ export const fetchArticleLinksBatch = async (
           `Failed to fetch forward links batch:`,
           (error as { response?: { status?: number; data?: unknown } }).response
             ?.status,
-          (error as { response?: { data?: unknown } }).response?.data || error,
+          (error as { response?: { data?: unknown } }).response?.data || error
         );
       }
     }

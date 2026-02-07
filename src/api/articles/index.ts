@@ -4,14 +4,14 @@
 
 export {
   fetchArticleBacklinks,
-  fetchArticleBacklinksBatch,
+  fetchArticleBacklinksBatch
 } from './fetchArticleBacklinks';
 export { fetchArticleCategories } from './fetchArticleCategories';
 export { fetchArticleHtml } from './fetchArticleHtml';
 export { fetchArticleLinks, fetchArticleLinksBatch } from './fetchArticleLinks';
 export {
   fetchArticleSummaries,
-  fetchArticleSummary,
+  fetchArticleSummary
 } from './fetchArticleSummary';
 export { fetchArticleThumbnail } from './fetchArticleThumbnail';
 export { fetchDescription } from './fetchDescription';

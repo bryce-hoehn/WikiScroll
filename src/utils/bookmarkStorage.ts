@@ -74,7 +74,7 @@ export async function loadOfflineArticles(): Promise<
       ) {
         if (typeof __DEV__ !== 'undefined' && __DEV__) {
           console.error(
-            'Invalid offline articles data format, expected object',
+            'Invalid offline articles data format, expected object'
           );
         }
         // Clear corrupted data
@@ -102,7 +102,7 @@ export async function loadOfflineArticles(): Promise<
  * Save offline articles to storage
  */
 export async function saveOfflineArticles(
-  articles: Record<string, OfflineArticle>,
+  articles: Record<string, OfflineArticle>
 ): Promise<boolean> {
   try {
     await AsyncStorage.setItem(OFFLINE_ARTICLES_KEY, JSON.stringify(articles));

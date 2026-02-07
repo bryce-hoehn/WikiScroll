@@ -14,7 +14,7 @@ export const WIKIPEDIA_API_CONFIG = {
   WIKIMEDIA_BASE_URL: 'https://api.wikimedia.org',
   WIKIMEDIA_PAGEVIEWS_BASE_URL: 'https://wikimedia.org/api/rest_v1', // Pageviews API uses wikimedia.org (not api.wikimedia.org)
   REST_API_BASE_URL: 'https://en.wikipedia.org/api/rest_v1',
-  CORE_API_BASE_URL: 'https://api.wikimedia.org/core/v1/wikipedia/en',
+  CORE_API_BASE_URL: 'https://api.wikimedia.org/core/v1/wikipedia/en'
 };
 
 export const delay = (ms: number) =>
@@ -22,7 +22,7 @@ export const delay = (ms: number) =>
 
 export const getApiHeaders = (): Record<string, string> => {
   const headers: Record<string, string> = {
-    Accept: 'application/json',
+    Accept: 'application/json'
   };
 
   if (Platform.OS !== 'web') {

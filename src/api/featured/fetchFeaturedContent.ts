@@ -23,19 +23,19 @@ import { FeaturedContent, FeaturedContentResponse } from '@/types/api/featured';
 export const fetchFeaturedContent =
   async (): Promise<FeaturedContentResponse> => {
     const tryFetchForDate = async (
-      date: Date,
+      date: Date
     ): Promise<FeaturedContent | null> => {
       const formattedDate = [
         date.getUTCFullYear(),
         String(date.getUTCMonth() + 1).padStart(2, '0'),
-        String(date.getUTCDate()).padStart(2, '0'),
+        String(date.getUTCDate()).padStart(2, '0')
       ].join('/');
 
       const url = `/feed/v1/wikipedia/en/featured/${formattedDate}`;
 
       try {
         const response = await restAxiosInstance.get(url, {
-          baseURL: WIKIPEDIA_API_CONFIG.WIKIMEDIA_BASE_URL,
+          baseURL: WIKIPEDIA_API_CONFIG.WIKIMEDIA_BASE_URL
         });
 
         const data = response.data;
@@ -48,7 +48,7 @@ export const fetchFeaturedContent =
             onthisday:
               data.onthisday != null && Array.isArray(data.onthisday)
                 ? data.onthisday
-                : [],
+                : []
           };
           return normalized;
         }
@@ -69,7 +69,7 @@ export const fetchFeaturedContent =
     try {
       const now = new Date();
       const today = new Date(
-        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
+        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
       );
       let data = await tryFetchForDate(today);
 
@@ -81,12 +81,12 @@ export const fetchFeaturedContent =
 
       if (!data) {
         throw new Error(
-          'Featured content not available for current or previous day',
+          'Featured content not available for current or previous day'
         );
       }
 
       return {
-        data,
+        data
       };
     } catch (error: unknown) {
       throw error;

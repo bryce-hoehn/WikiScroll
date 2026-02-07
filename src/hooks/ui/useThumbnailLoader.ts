@@ -36,7 +36,7 @@ export default function useThumbnailLoader(item: ThumbnailItem | null) {
     enabled: !!titleFromHtml,
     staleTime: 60 * 60 * 1000, // 1 hour - thumbnails rarely change
     gcTime: 2 * 60 * 60 * 1000, // 2 hours
-    retry: 2,
+    retry: 2
   });
 
   // Determine thumbnail source based on item type

@@ -6,38 +6,34 @@ import {
   Appbar,
   ProgressBar,
   Text,
-  useTheme,
+  useTheme
 } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { fetchArticleBacklinks, fetchArticleLinks } from '@/api';
 import { fetchArticleThumbnail } from '@/api/articles/fetchArticleThumbnail';
-import { SearchOverlay } from '@/components';
-import Article from '@/components/article/Article';
 import CollapsibleHeader, {
-  useCollapsibleHeaderSpacing,
-} from '@/components/common/CollapsibleHeader';
-import AppSidebar from '@/components/layout/AppSidebar';
-import ArticleDrawerWrapper from '@/components/layout/ArticleDrawerWrapper';
-import ContentWithSidebar from '@/components/layout/ContentWithSidebar';
+  useCollapsibleHeaderSpacing
+} from '@/components/CollapsibleHeader';
+import ImageDialog from '@/components/ImageDialog';
+import SearchOverlay from '@/components/SearchOverlay';
 import { SPACING } from '@/constants/spacing';
 import { TYPOGRAPHY } from '@/constants/typography';
-import { useSnackbar } from '@/context/SnackbarContext';
+import { Article } from '@/features/article';
+import AppSidebar from '@/features/layout/AppSidebar';
+import ArticleDrawerWrapper from '@/features/layout/ArticleDrawerWrapper';
+import ContentWithSidebar from '@/features/layout/ContentWithSidebar';
 import {
   useArticle,
   useArticleHtml,
   useArticleLinks,
   useBookmarks,
-  useVisitedArticles,
+  useVisitedArticles
 } from '@/hooks';
+import { useSnackbar } from '@/stores/SnackbarContext';
 import { ImageThumbnail } from '@/types';
 import { extractAllImages } from '@/utils/articleParsing';
 import { shareArticle } from '@/utils/shareUtils';
-
-// Lazy load ImageDialog - only needed when user opens an image
-const ImageDialog = React.lazy(
-  () => import('@/components/article/ImageDialog'),
-);
 
 const HEADER_HEIGHT = 60;
 
@@ -60,10 +56,10 @@ export default function ArticleScreen() {
   const totalHeaderHeight = HEADER_HEIGHT + insets.top;
   const animatedPaddingTop = useCollapsibleHeaderSpacing(
     scrollY,
-    totalHeaderHeight,
+    totalHeaderHeight
   );
   const { data: article, isLoading: isLoadingArticle } = useArticle(
-    title as string,
+    title as string
   );
   const { data: articleHtml } = useArticleHtml(title as string);
   const { addVisitedArticle } = useVisitedArticles();
@@ -81,7 +77,7 @@ export default function ArticleScreen() {
   const currentImageIndex = useMemo(() => {
     if (!selectedImage || articleImages.length === 0) return 0;
     const index = articleImages.findIndex(
-      (img) => img.uri === selectedImage.uri,
+      (img) => img.uri === selectedImage.uri
     );
     return index >= 0 ? index : 0;
   }, [selectedImage, articleImages]);
@@ -167,7 +163,7 @@ export default function ArticleScreen() {
           // Fetch both backlinks and forward links in parallel
           const [backlinks, forwardLinks] = await Promise.all([
             fetchArticleBacklinks(title),
-            fetchArticleLinks(title),
+            fetchArticleLinks(title)
           ]);
 
           // Combine both arrays, removing duplicates
@@ -228,7 +224,7 @@ export default function ArticleScreen() {
       await shareArticle(
         article.title,
         article.description,
-        article.content_urls?.mobile.page,
+        article.content_urls?.mobile.page
       );
     } catch (error) {
       console.error('Failed to share article:', error);
@@ -265,7 +261,7 @@ export default function ArticleScreen() {
                           flex: 1,
                           flexDirection: 'row',
                           alignItems: 'center',
-                          marginLeft: SPACING.sm,
+                          marginLeft: SPACING.sm
                         }}
                       >
                         <Text
@@ -274,7 +270,7 @@ export default function ArticleScreen() {
                             // Reference: https://m3.material.io/components/app-bars/overview
                             fontWeight: '500', // MD3: Medium weight (500) for app bar titles
                             fontSize: TYPOGRAPHY.appBarTitle,
-                            flex: 1,
+                            flex: 1
                           }}
                         >
                           Loading...
@@ -293,7 +289,7 @@ export default function ArticleScreen() {
                           flex: 1,
                           marginLeft: SPACING.sm,
                           fontWeight: '500', // MD3: Medium weight (500) for app bar titles
-                          fontSize: TYPOGRAPHY.appBarTitle, // 22sp per MD3 specification
+                          fontSize: TYPOGRAPHY.appBarTitle // 22sp per MD3 specification
                         }}
                         numberOfLines={1}
                         ellipsizeMode="tail"
@@ -342,7 +338,7 @@ export default function ArticleScreen() {
                     top: animatedPaddingTop,
                     left: 0,
                     right: 0,
-                    zIndex: 1000,
+                    zIndex: 1000
                   }}
                 >
                   <ProgressBar
@@ -360,7 +356,7 @@ export default function ArticleScreen() {
                   articleTitle={article?.title}
                   onHeaderStateChange={(
                     collapsed: boolean,
-                    progress: number,
+                    progress: number
                   ) => {
                     setScrollProgress(progress);
                   }}

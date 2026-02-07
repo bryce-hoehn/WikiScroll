@@ -76,7 +76,7 @@ export interface FeedProps {
   keyExtractor: (item: RecommendationItem) => string;
   renderItem?: ({
     item,
-    index,
+    index
   }: {
     item: RecommendationItem;
     index: number;

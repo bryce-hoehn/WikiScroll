@@ -21,7 +21,7 @@ import { copyToClipboard } from './clipboard';
 export const shareArticle = async (
   title: string,
   description?: string,
-  url?: string,
+  url?: string
 ): Promise<void> => {
   try {
     const articleUrl =
@@ -29,7 +29,7 @@ export const shareArticle = async (
 
     await Share.share({
       message: articleUrl,
-      title: `Share "${title}"`,
+      title: `Share "${title}"`
     });
   } catch (error) {
     if (typeof __DEV__ !== 'undefined' && __DEV__) {
@@ -55,7 +55,7 @@ export const shareArticle = async (
  */
 export const copyArticleUrl = async (
   title: string,
-  url?: string,
+  url?: string
 ): Promise<void> => {
   const articleUrl =
     url || `https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`;

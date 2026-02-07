@@ -29,7 +29,7 @@ export function extractFilenameFromUrl(url: string): string {
 
   // Extract from URL path (last segment before query/hash)
   const urlMatch = url.match(
-    /\/([^/?#]+\.(jpg|jpeg|png|gif|webp|svg))(?:\?|#|$)/i,
+    /\/([^/?#]+\.(jpg|jpeg|png|gif|webp|svg))(?:\?|#|$)/i
   );
   if (urlMatch) {
     return decodeURIComponent(urlMatch[1])
@@ -58,7 +58,7 @@ export function extractFilenameFromUrl(url: string): string {
 export function extractAltText(
   attrs: Record<string, any>,
   parentAttrs?: Record<string, any>,
-  imageUrl?: string,
+  imageUrl?: string
 ): string {
   // 1. Primary: alt attribute
   if (attrs?.alt && typeof attrs.alt === 'string' && attrs.alt.trim()) {

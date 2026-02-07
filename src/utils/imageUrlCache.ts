@@ -72,6 +72,6 @@ export function cacheUrlResolution(url: string, resolves: boolean): void {
 
   urlResolutionCache.set(url, {
     resolves,
-    timestamp: Date.now(),
+    timestamp: Date.now()
   });
 }

@@ -3,9 +3,9 @@ import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { Platform } from 'react-native';
 
-import { ThemeType } from '../context/ThemeProvider';
 import { ReadingProgress } from '../hooks/storage/useReadingProgress';
 import { VisitedArticle } from '../hooks/storage/useVisitedArticles';
+import { ThemeType } from '../stores/ThemeProvider';
 import { Bookmark, OfflineArticle } from '../types/bookmarks';
 
 import * as BookmarkStorage from './bookmarkStorage';
@@ -82,7 +82,7 @@ export async function exportUserProfile(): Promise<boolean> {
       offlineArticlesForExport[title] = {
         ...articleMetadata,
         // Ensure downloadedAt is preserved
-        downloadedAt: article.downloadedAt,
+        downloadedAt: article.downloadedAt
       };
     }
 
@@ -100,7 +100,7 @@ export async function exportUserProfile(): Promise<boolean> {
         if (typeof __DEV__ !== 'undefined' && __DEV__) {
           console.error(
             'Failed to parse visited articles for export:',
-            parseError,
+            parseError
           );
         }
       }
@@ -120,7 +120,7 @@ export async function exportUserProfile(): Promise<boolean> {
         if (typeof __DEV__ !== 'undefined' && __DEV__) {
           console.error(
             'Failed to parse reading progress for export:',
-            parseError,
+            parseError
           );
         }
       }
@@ -132,12 +132,12 @@ export async function exportUserProfile(): Promise<boolean> {
     const fontFamily = await AsyncStorage.getItem(FONT_FAMILY_KEY);
     const lineHeightJson = await AsyncStorage.getItem(LINE_HEIGHT_KEY);
     const paragraphSpacingJson = await AsyncStorage.getItem(
-      PARAGRAPH_SPACING_KEY,
+      PARAGRAPH_SPACING_KEY
     );
     const readingPaddingJson = await AsyncStorage.getItem(READING_PADDING_KEY);
     const reducedMotionJson = await AsyncStorage.getItem(REDUCED_MOTION_KEY);
     const accordionAutoCloseJson = await AsyncStorage.getItem(
-      ACCORDION_BEHAVIOR_KEY,
+      ACCORDION_BEHAVIOR_KEY
     );
 
     const exportData: UserProfileExportData = {
@@ -163,7 +163,7 @@ export async function exportUserProfile(): Promise<boolean> {
       reducedMotion: reducedMotionJson ? reducedMotionJson === 'true' : null,
       accordionAutoClose: accordionAutoCloseJson
         ? accordionAutoCloseJson === 'true'
-        : null,
+        : null
     };
 
     const jsonString = JSON.stringify(exportData, null, 2);
@@ -203,7 +203,7 @@ export async function exportUserProfile(): Promise<boolean> {
       // Share the file
       await Sharing.shareAsync(fileUri, {
         mimeType: 'application/json',
-        dialogTitle: 'Export User Profile',
+        dialogTitle: 'Export User Profile'
       });
 
       return true;
@@ -238,7 +238,7 @@ export async function importUserProfile(fileContent: string): Promise<{
     } catch (parseError) {
       if (parseError instanceof SyntaxError) {
         throw new Error(
-          'Invalid JSON file. Please ensure the file is a valid JSON export.',
+          'Invalid JSON file. Please ensure the file is a valid JSON export.'
         );
       }
       throw parseError;
@@ -247,13 +247,13 @@ export async function importUserProfile(fileContent: string): Promise<{
     // Validate the structure
     if (!data.bookmarks || !Array.isArray(data.bookmarks)) {
       throw new Error(
-        'Invalid file format: bookmarks array is missing or invalid',
+        'Invalid file format: bookmarks array is missing or invalid'
       );
     }
 
     if (!data.offlineArticles || typeof data.offlineArticles !== 'object') {
       throw new Error(
-        'Invalid file format: offlineArticles object is missing or invalid',
+        'Invalid file format: offlineArticles object is missing or invalid'
       );
     }
 
@@ -272,12 +272,12 @@ export async function importUserProfile(fileContent: string): Promise<{
     for (const [title, article] of Object.entries(data.offlineArticles)) {
       if (!article || typeof article !== 'object') {
         throw new Error(
-          `Invalid offline article for "${title}": article is not an object`,
+          `Invalid offline article for "${title}": article is not an object`
         );
       }
       if (!article.downloadedAt || typeof article.downloadedAt !== 'string') {
         throw new Error(
-          `Invalid offline article for "${title}": missing downloadedAt`,
+          `Invalid offline article for "${title}": missing downloadedAt`
         );
       }
       // HTML field is optional - articles can be re-downloaded for offline reading if needed
@@ -287,7 +287,7 @@ export async function importUserProfile(fileContent: string): Promise<{
     if (data.visitedArticles !== undefined) {
       if (!Array.isArray(data.visitedArticles)) {
         throw new Error(
-          'Invalid file format: visitedArticles must be an array',
+          'Invalid file format: visitedArticles must be an array'
         );
       }
       for (const article of data.visitedArticles) {
@@ -296,7 +296,7 @@ export async function importUserProfile(fileContent: string): Promise<{
         }
         if (!article.visitedAt || typeof article.visitedAt !== 'string') {
           throw new Error(
-            'Invalid visited article: missing or invalid visitedAt',
+            'Invalid visited article: missing or invalid visitedAt'
           );
         }
       }
@@ -306,7 +306,7 @@ export async function importUserProfile(fileContent: string): Promise<{
     if (data.readingProgress !== undefined) {
       if (typeof data.readingProgress !== 'object') {
         throw new Error(
-          'Invalid file format: readingProgress must be an object',
+          'Invalid file format: readingProgress must be an object'
         );
       }
       // Validate structure
@@ -318,7 +318,7 @@ export async function importUserProfile(fileContent: string): Promise<{
           !('lastReadAt' in progress)
         ) {
           throw new Error(
-            `Invalid reading progress for "${title}": missing required fields`,
+            `Invalid reading progress for "${title}": missing required fields`
           );
         }
       }
@@ -332,7 +332,7 @@ export async function importUserProfile(fileContent: string): Promise<{
     if (data.visitedArticles !== undefined) {
       await AsyncStorage.setItem(
         VISITED_ARTICLES_KEY,
-        JSON.stringify(data.visitedArticles),
+        JSON.stringify(data.visitedArticles)
       );
     }
 
@@ -340,7 +340,7 @@ export async function importUserProfile(fileContent: string): Promise<{
     if (data.readingProgress !== undefined) {
       await AsyncStorage.setItem(
         READING_PROGRESS_KEY,
-        JSON.stringify(data.readingProgress),
+        JSON.stringify(data.readingProgress)
       );
     }
 
@@ -364,21 +364,21 @@ export async function importUserProfile(fileContent: string): Promise<{
     if (data.paragraphSpacing !== null && data.paragraphSpacing !== undefined) {
       await AsyncStorage.setItem(
         PARAGRAPH_SPACING_KEY,
-        String(data.paragraphSpacing),
+        String(data.paragraphSpacing)
       );
     }
 
     if (data.readingPadding !== null && data.readingPadding !== undefined) {
       await AsyncStorage.setItem(
         READING_PADDING_KEY,
-        String(data.readingPadding),
+        String(data.readingPadding)
       );
     }
 
     if (data.reducedMotion !== null && data.reducedMotion !== undefined) {
       await AsyncStorage.setItem(
         REDUCED_MOTION_KEY,
-        String(data.reducedMotion),
+        String(data.reducedMotion)
       );
     }
 
@@ -388,7 +388,7 @@ export async function importUserProfile(fileContent: string): Promise<{
     ) {
       await AsyncStorage.setItem(
         ACCORDION_BEHAVIOR_KEY,
-        String(data.accordionAutoClose),
+        String(data.accordionAutoClose)
       );
     }
 
@@ -404,7 +404,7 @@ export async function importUserProfile(fileContent: string): Promise<{
       paragraphSpacing: data.paragraphSpacing ?? null,
       readingPadding: data.readingPadding ?? null,
       reducedMotion: data.reducedMotion ?? null,
-      accordionAutoClose: data.accordionAutoClose ?? null,
+      accordionAutoClose: data.accordionAutoClose ?? null
     };
   } catch (error) {
     if (typeof __DEV__ !== 'undefined' && __DEV__) {
@@ -415,7 +415,7 @@ export async function importUserProfile(fileContent: string): Promise<{
       (error instanceof Error && error.message.includes('Invalid JSON'))
     ) {
       throw new Error(
-        'Invalid JSON file. Please ensure the file is a valid JSON export.',
+        'Invalid JSON file. Please ensure the file is a valid JSON export.'
       );
     }
     throw error;
@@ -426,7 +426,7 @@ export async function importUserProfile(fileContent: string): Promise<{
  * Read file content from a File object (web) or file URI (mobile)
  */
 export async function readFileContent(
-  file: File | { uri: string },
+  file: File | { uri: string }
 ): Promise<string> {
   if (Platform.OS === 'web') {
     // Web: Read File object
@@ -449,7 +449,7 @@ export async function readFileContent(
     // Mobile: Read from file URI using FileSystem
     if (!hasUri(file)) {
       throw new Error(
-        'Expected file object with uri property on mobile platform',
+        'Expected file object with uri property on mobile platform'
       );
     }
     try {

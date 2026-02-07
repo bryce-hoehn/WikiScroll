@@ -39,13 +39,13 @@ interface UseAsyncStorageOptions<T> {
  */
 export default function useAsyncStorage<T>(
   key: string,
-  options: UseAsyncStorageOptions<T>,
+  options: UseAsyncStorageOptions<T>
 ) {
   const {
     defaultValue,
     validator,
     serializer = (value: T) => JSON.stringify(value),
-    deserializer = (value: string) => JSON.parse(value) as T,
+    deserializer = (value: string) => JSON.parse(value) as T
   } = options;
 
   const [value, setValue] = useState<T>(defaultValue);
@@ -158,15 +158,15 @@ export default function useAsyncStorage<T>(
         });
       });
     },
-    [key, validator, serializer, isDeepEqual],
+    [key, validator, serializer, isDeepEqual]
   );
 
   return useMemo(
     () => ({
       value,
       isLoading,
-      updateValue,
+      updateValue
     }),
-    [value, isLoading, updateValue],
+    [value, isLoading, updateValue]
   );
 }

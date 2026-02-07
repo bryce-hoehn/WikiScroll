@@ -1,15 +1,15 @@
 import { restAxiosInstance, WIKIPEDIA_API_CONFIG } from '@/api/shared';
 
 export const fetchDescription = async (
-  title: string,
+  title: string
 ): Promise<string | null> => {
   try {
     // Use the REST API summary endpoint to get the description
     const response = await restAxiosInstance.get(
       `/page/summary/${encodeURIComponent(title)}`,
       {
-        baseURL: WIKIPEDIA_API_CONFIG.REST_API_BASE_URL,
-      },
+        baseURL: WIKIPEDIA_API_CONFIG.REST_API_BASE_URL
+      }
     );
     const summaryData = response.data;
 
@@ -21,7 +21,7 @@ export const fetchDescription = async (
         `Failed to fetch description for "${title}":`,
         (error as { response?: { status?: number; data?: unknown } }).response
           ?.status,
-        (error as { response?: { data?: unknown } }).response?.data || error,
+        (error as { response?: { data?: unknown } }).response?.data || error
       );
     }
     return null;

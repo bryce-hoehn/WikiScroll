@@ -1,0 +1,543 @@
+import { router } from 'expo-router';
+import React, {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
+import {
+  Animated,
+  Platform,
+  ScrollView,
+  UIManager,
+  useWindowDimensions,
+  View
+} from 'react-native';
+import { useTheme } from 'react-native-paper';
+
+import ErrorState from '@/components/ErrorState';
+import StandardEmptyState from '@/components/StandardEmptyState';
+import {
+  useArticleHtml,
+  useFontFamily,
+  useFontSize,
+  useLineHeight,
+  useParagraphSpacing,
+  useReadingProgress,
+  useReadingWidth
+} from '@/hooks';
+import { MAX_FONT_SIZE, MIN_FONT_SIZE } from '@/hooks/storage/useFontSize';
+import { getUserFriendlyError } from '@/utils/errorHandling';
+import { useLazyFonts } from '../hooks/useLazyFonts';
+import ArticleSkeleton from './ArticleSkeleton';
+import ArticleToolbar from './ArticleToolbar';
+
+// Lazy load heavy ArticleSectionedRenderer component (uses react-native-render-html)
+const ArticleSectionedRenderer = React.lazy(
+  () => import('./ArticleSectionedRenderer')
+);
+
+interface ArticleProps {
+  title?: string;
+  articleTitle?: string; // Article title (can be different from URL title)
+  onHeaderStateChange?: (collapsed: boolean, progress: number) => void;
+  onImagePress?: (image: { uri: string; alt?: string }) => void;
+  scrollY?: Animated.Value; // Optional scrollY from parent for CollapsibleHeader
+}
+
+export default function Article({
+  title,
+  articleTitle,
+  onHeaderStateChange,
+  onImagePress,
+  scrollY: externalScrollY
+}: ArticleProps) {
+  const theme = useTheme();
+  useWindowDimensions();
+  const { data: articleHtml, isLoading, error } = useArticleHtml(title || '');
+
+  // Global reading preferences (used as defaults)
+  const { fontSize: globalFontSize } = useFontSize();
+  const { lineHeight: globalLineHeight } = useLineHeight();
+  const { paragraphSpacing: globalParagraphSpacing } = useParagraphSpacing();
+  const { readingPadding } = useReadingWidth();
+  const { fontFamily: globalFontFamily } = useFontFamily();
+
+  // Lazy load fonts only when a custom font is selected
+  useLazyFonts(globalFontFamily);
+
+  // Per-article font size (local state, initialized from global)
+  const [localFontSize, setLocalFontSize] = useState<number | null>(null);
+
+  // Reset local font size when article changes (so each article starts with global default)
+  useEffect(() => {
+    setLocalFontSize(null); // Will be initialized to globalFontSize in next effect
+  }, [title, articleTitle]);
+
+  // Initialize local font size from global on mount or when global changes
+  useEffect(() => {
+    if (localFontSize === null) {
+      setLocalFontSize(globalFontSize);
+    }
+  }, [globalFontSize, localFontSize]);
+
+  // Use local font size if set, otherwise fall back to global
+  const fontSize = localFontSize ?? globalFontSize;
+
+  // Per-article font size handlers (don't persist globally)
+  const increaseFontSize = useCallback(() => {
+    setLocalFontSize((prev) => {
+      const current = prev ?? globalFontSize;
+      const newSize = Math.min(current + 2, MAX_FONT_SIZE);
+      return newSize;
+    });
+  }, [globalFontSize]);
+
+  const decreaseFontSize = useCallback(() => {
+    setLocalFontSize((prev) => {
+      const current = prev ?? globalFontSize;
+      const newSize = Math.max(current - 2, MIN_FONT_SIZE);
+      return newSize;
+    });
+  }, [globalFontSize]);
+
+  const resetFontSize = useCallback(() => {
+    // Reset to global default (or 16 if global is not set)
+    setLocalFontSize(globalFontSize);
+  }, [globalFontSize]);
+
+  const canIncrease = fontSize < MAX_FONT_SIZE;
+  const canDecrease = fontSize > MIN_FONT_SIZE;
+
+  // Use global values for other settings (lineHeight, paragraphSpacing, fontFamily)
+  const lineHeight = globalLineHeight;
+  const paragraphSpacing = globalParagraphSpacing;
+  const fontFamily = globalFontFamily;
+
+  // Pre-process HTML to remove <style> tags
+  const cleanedArticleHtml = useMemo(() => {
+    if (!articleHtml) return '';
+    return articleHtml.replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, '');
+  }, [articleHtml]);
+
+  const scrollViewRef = useRef<ScrollView>(null);
+  const internalScrollY = useRef(new Animated.Value(0)).current;
+  const scrollY = externalScrollY || internalScrollY;
+  const [fabVisible, setFabVisible] = useState(false);
+  const [sections, setSections] = useState<{ id: string; heading: string }[]>(
+    []
+  );
+  const [scrollToSection, setScrollToSection] = useState<string | null>(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [hasRestoredScroll, setHasRestoredScroll] = useState(false);
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Memoize callbacks to prevent re-renders
+  const handleSectionsExtracted = useCallback(
+    (newSections: { id: string; heading: string }[]) => {
+      setSections(newSections);
+    },
+    []
+  );
+
+  const handleExpandedSectionsChange = useCallback(
+    (newExpandedSections: string[]) => {
+      setExpandedSections(newExpandedSections);
+    },
+    []
+  );
+
+  // Use refs to track previous values and only update state when they change
+  const prevFabVisibleRef = useRef(false);
+  const prevHeaderCollapsedRef = useRef(false);
+  const prevScrollProgressRef = useRef(0);
+
+  // Reading progress tracking
+  const { saveProgress, getProgressData } = useReadingProgress();
+  const articleTitleForProgress = articleTitle || title || '';
+  const [expandedSections, setExpandedSections] = useState<string[]>([]);
+  const expandedSectionsRef = useRef<string[]>([]);
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    expandedSectionsRef.current = expandedSections;
+  }, [expandedSections]);
+
+  const handleSectionPress = useCallback((sectionId: string) => {
+    setScrollToSection(sectionId);
+  }, []);
+
+  // Minimal smooth scroll to section
+  useEffect(() => {
+    if (!scrollToSection || !scrollViewRef.current) return;
+
+    const scrollToElement = (retryCount = 0) => {
+      const maxRetries = 10;
+      if (retryCount >= maxRetries) {
+        setScrollToSection(null);
+        return;
+      }
+
+      if (Platform.OS === 'web') {
+        // Web: Use native scrollIntoView API
+        const element = document.getElementById(`section-${scrollToSection}`);
+        if (!element) {
+          setTimeout(() => scrollToElement(retryCount + 1), 100);
+          return;
+        }
+
+        // Use browser's native scrollIntoView for smooth scrolling
+        element.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+          inline: 'nearest'
+        });
+        setScrollToSection(null);
+      } else {
+        // Native: Use measure API (modern approach)
+        const reactTag = (UIManager as any).findViewByNativeID?.(
+          `section-${scrollToSection}`
+        );
+
+        if (reactTag && scrollViewRef.current) {
+          try {
+            // Measure target element position using UIManager
+            (UIManager as any).measure(
+              reactTag,
+              (
+                x: number,
+                y: number,
+                width: number,
+                height: number,
+                pageX: number,
+                pageY: number
+              ) => {
+                // Measure scroll view position to calculate relative offset
+                if (scrollViewRef.current) {
+                  (scrollViewRef.current as any).measure?.(
+                    (
+                      sx: number,
+                      sy: number,
+                      sw: number,
+                      sh: number,
+                      spx: number,
+                      spy: number
+                    ) => {
+                      const relativeY = pageY - spy;
+                      scrollViewRef.current?.scrollTo({
+                        y: Math.max(0, relativeY - 20),
+                        animated: true
+                      });
+                      setScrollToSection(null);
+                    }
+                  );
+                } else {
+                  setTimeout(() => scrollToElement(retryCount + 1), 100);
+                }
+              }
+            );
+          } catch {
+            // Retry if measurement fails
+            setTimeout(() => scrollToElement(retryCount + 1), 100);
+          }
+        } else {
+          setTimeout(() => scrollToElement(retryCount + 1), 100);
+        }
+      }
+    };
+
+    // Wait for section expansion animation to complete, then scroll
+    // Use requestAnimationFrame to ensure DOM is updated
+    const attemptScroll = () => {
+      if (typeof requestAnimationFrame !== 'undefined') {
+        requestAnimationFrame(() => {
+          setTimeout(() => scrollToElement(), 100);
+        });
+      } else {
+        setTimeout(() => scrollToElement(), 100);
+      }
+    };
+
+    const timeoutId = setTimeout(attemptScroll, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [scrollToSection]);
+
+  // Get initial expanded sections from saved progress
+  const progressData = getProgressData(articleTitleForProgress);
+  const initialExpandedSections = useMemo(() => {
+    return progressData?.expandedSections || undefined;
+  }, [progressData?.expandedSections]);
+
+  // Memoized scroll handler to prevent unnecessary re-renders
+  const handleScroll = useCallback(
+    (event: {
+      nativeEvent: {
+        contentOffset: { y: number };
+        contentSize: { height: number };
+        layoutMeasurement: { height: number };
+      };
+    }) => {
+      const yOffset = event.nativeEvent.contentOffset.y;
+      const contentHeight = event.nativeEvent.contentSize.height;
+      const scrollViewHeight = event.nativeEvent.layoutMeasurement.height;
+
+      // Only update state if values actually changed
+      const newFabVisible = yOffset > 300;
+      if (newFabVisible !== prevFabVisibleRef.current) {
+        prevFabVisibleRef.current = newFabVisible;
+        setFabVisible(newFabVisible);
+      }
+
+      const newCollapsed = yOffset > 50;
+      if (newCollapsed !== prevHeaderCollapsedRef.current) {
+        prevHeaderCollapsedRef.current = newCollapsed;
+        onHeaderStateChange?.(newCollapsed, scrollProgress);
+      }
+
+      // Calculate reading progress (0-100)
+      const maxScroll = Math.max(0, contentHeight - scrollViewHeight);
+      const progress =
+        maxScroll > 0
+          ? Math.min(100, Math.round((yOffset / maxScroll) * 100))
+          : 0;
+
+      // Only update progress if it changed by at least 1% to reduce re-renders
+      if (Math.abs(progress - prevScrollProgressRef.current) >= 1) {
+        prevScrollProgressRef.current = progress;
+        setScrollProgress(progress);
+      }
+
+      // Save progress (debounced to avoid too many writes)
+      // Defer to avoid blocking scroll performance
+      if (articleTitleForProgress && hasRestoredScroll) {
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current);
+        }
+        // Use requestIdleCallback on web for better performance, setTimeout as fallback
+        const saveProgressDeferred = () => {
+          saveProgress(
+            articleTitleForProgress,
+            progress,
+            expandedSectionsRef.current
+          );
+        };
+
+        if (typeof requestIdleCallback !== 'undefined') {
+          scrollTimeoutRef.current = setTimeout(() => {
+            requestIdleCallback(saveProgressDeferred, { timeout: 2000 });
+          }, 1000) as any;
+        } else {
+          scrollTimeoutRef.current = setTimeout(saveProgressDeferred, 1000);
+        }
+      }
+
+      // Notify parent of header state changes (only when values change)
+      const headerChanged = newCollapsed !== prevHeaderCollapsedRef.current;
+      const progressChanged =
+        Math.abs(progress - prevScrollProgressRef.current) >= 1;
+      if (onHeaderStateChange && (headerChanged || progressChanged)) {
+        onHeaderStateChange(newCollapsed, progress);
+      }
+    },
+    [
+      articleTitleForProgress,
+      hasRestoredScroll,
+      saveProgress,
+      onHeaderStateChange,
+      scrollProgress
+    ]
+  ); // Removed expandedSections to prevent re-render loops
+
+  // Restore scroll position when article loads using onContentSizeChange
+  const handleContentSizeChange = useCallback(
+    (contentWidth: number, contentHeight: number) => {
+      if (hasRestoredScroll || !scrollViewRef.current || contentHeight <= 0)
+        return;
+
+      if (progressData && progressData.progress > 0) {
+        // Wait for sections to expand and content to render
+        const targetY = (progressData.progress / 100) * contentHeight;
+        // Use requestAnimationFrame for smoother restoration, then small delay for sections
+        const restoreScroll = () => {
+          scrollViewRef.current?.scrollTo({
+            y: targetY,
+            animated: true
+          });
+          setHasRestoredScroll(true);
+        };
+
+        // Use requestAnimationFrame to ensure layout is complete, then small delay
+        if (typeof requestAnimationFrame !== 'undefined') {
+          requestAnimationFrame(() => {
+            setTimeout(restoreScroll, 100); // Reduced delay - sections should be ready
+          });
+        } else {
+          setTimeout(restoreScroll, 200); // Fallback with slightly longer delay
+        }
+
+        // Store timeout ID for cleanup
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current);
+        }
+      } else {
+        setHasRestoredScroll(true);
+      }
+    },
+    [hasRestoredScroll, progressData]
+  );
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Render states
+  if (!title) {
+    return (
+      <StandardEmptyState
+        icon="alert-circle-outline"
+        title="No Article Selected"
+        description="Please select an article to view its content."
+      />
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <>
+        <ArticleSkeleton />
+        <ArticleToolbar
+          onZoomIn={increaseFontSize}
+          onZoomOut={decreaseFontSize}
+          onResetZoom={resetFontSize}
+          canZoomIn={canIncrease}
+          canZoomOut={canDecrease}
+          sections={[]}
+          onSectionPress={() => {}}
+          currentFontSize={fontSize}
+          visible={true}
+        />
+      </>
+    );
+  }
+
+  if (error) {
+    const errorInfo = getUserFriendlyError(error);
+    const handleRetry = () => {
+      // Navigate to home instead of retrying
+      router.replace('/(tabs)');
+    };
+    return (
+      <ErrorState
+        title="Unable to Load Article"
+        message={errorInfo.userFriendlyMessage}
+        onRetry={handleRetry}
+        showDetails
+        error={error instanceof Error ? error : undefined}
+        recoverySteps={errorInfo.recoverySteps}
+      />
+    );
+  }
+
+  if (!articleHtml) {
+    return (
+      <StandardEmptyState
+        icon="file-document-outline"
+        title="No Content Available"
+        description="This article does not have any content available."
+      />
+    );
+  }
+
+  return (
+    <View style={{ flex: 1 }}>
+      <ScrollView
+        ref={scrollViewRef}
+        showsVerticalScrollIndicator={true}
+        // @ts-expect-error - main role is valid for React Native Web but not in TypeScript types
+        accessibilityRole="main"
+        accessibilityLabel={`Article: ${articleTitle || title}`}
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingBottom: 80,
+          width: '100%',
+          paddingHorizontal: readingPadding
+        }}
+        onContentSizeChange={handleContentSizeChange}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          {
+            useNativeDriver: false,
+            listener: handleScroll
+          }
+        )}
+        scrollEventThrottle={16}
+        minimumZoomScale={1.0}
+        maximumZoomScale={3.0}
+        bouncesZoom={true}
+        pinchGestureEnabled={true}
+        contentInsetAdjustmentBehavior="automatic"
+      >
+        <Suspense fallback={<ArticleSkeleton />}>
+          <ArticleSectionedRenderer
+            articleHtml={cleanedArticleHtml}
+            baseFontSize={fontSize}
+            lineHeight={lineHeight}
+            paragraphSpacing={paragraphSpacing}
+            fontFamily={fontFamily}
+            onSectionsExtracted={handleSectionsExtracted}
+            scrollToSection={scrollToSection}
+            articleTitle={articleTitle || title}
+            initialExpandedSections={initialExpandedSections}
+            onExpandedSectionsChange={handleExpandedSectionsChange}
+            onImagePress={onImagePress}
+            readingPadding={readingPadding}
+          />
+        </Suspense>
+        {/* Reading Progress Indicator */}
+        {scrollProgress > 0 && (
+          <View
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 2,
+              backgroundColor: theme.colors.surfaceVariant,
+              zIndex: 1000
+            }}
+          >
+            <View
+              style={{
+                height: '100%',
+                width: `${scrollProgress}%`,
+                backgroundColor: theme.colors.primary
+              }}
+            />
+          </View>
+        )}
+      </ScrollView>
+
+      <ArticleToolbar
+        onZoomIn={increaseFontSize}
+        onZoomOut={decreaseFontSize}
+        onResetZoom={resetFontSize}
+        canZoomIn={canIncrease}
+        canZoomOut={canDecrease}
+        sections={sections}
+        onSectionPress={handleSectionPress}
+        currentFontSize={fontSize}
+        visible={true}
+        fabVisible={fabVisible}
+        scrollRef={scrollViewRef}
+      />
+    </View>
+  );
+}

@@ -6,7 +6,7 @@ import {
   parseArticleStructure,
   parseDocument,
   render as renderDom,
-  type Element,
+  type Element
 } from '@/utils/articleParsing';
 
 export interface SectionState {
@@ -46,12 +46,12 @@ export function useArticleSections({
   onSectionsExtracted,
   onExpandedSectionsChange,
   scrollToSection,
-  articleTitle,
+  articleTitle
 }: UseArticleSectionsProps) {
   const { accordionAutoClose } = useAccordionBehavior();
 
   const [parsedContent, setParsedContent] = useState<ParsedContent | null>(
-    null,
+    null
   );
   const [isParsing, setIsParsing] = useState(false);
 
@@ -88,7 +88,7 @@ export function useArticleSections({
           infoboxHtml,
           infoboxImage: structure.infoboxImage,
           introElementNodes: structure.introElementNodes,
-          sectionElements: structure.sectionElements,
+          sectionElements: structure.sectionElements
         });
       } catch (error) {
         if (__DEV__) {
@@ -98,7 +98,7 @@ export function useArticleSections({
           infoboxHtml: '',
           infoboxImage: null,
           introElementNodes: [],
-          sectionElements: [],
+          sectionElements: []
         });
       } finally {
         setIsParsing(false);
@@ -157,7 +157,7 @@ export function useArticleSections({
       for (const section of parsedContent.sectionElements) {
         const currentCount = current.sections[section.id] || 0;
         const sectionChildren = getChildren(section.element).filter(
-          (node): node is Element => node.type === 'tag',
+          (node): node is Element => node.type === 'tag'
         );
         if (currentCount < sectionChildren.length) {
           return true;
@@ -187,12 +187,12 @@ export function useArticleSections({
         for (const section of parsedContent.sectionElements) {
           const currentCount = prev.sections[section.id] || 0;
           const sectionChildren = getChildren(section.element).filter(
-            (node): node is Element => node.type === 'tag',
+            (node): node is Element => node.type === 'tag'
           );
           if (currentCount < sectionChildren.length) {
             const next = {
               ...prev,
-              sections: { ...prev.sections, [section.id]: currentCount + 1 },
+              sections: { ...prev.sections, [section.id]: currentCount + 1 }
             };
             renderedElementsRef.current = next;
             return next;
@@ -267,14 +267,13 @@ export function useArticleSections({
           preloaded: false,
           error: null,
           elementNodes: [],
-          renderedElementCount: 0,
-        },
+          renderedElementCount: 0
+        }
       ];
     }
 
     const { infoboxHtml, introElementNodes, sectionElements } = parsedContent;
     const out: SectionState[] = [];
-    let idx = 0;
 
     // Infobox section (if present)
     if (infoboxHtml && infoboxHtml.trim()) {
@@ -285,7 +284,7 @@ export function useArticleSections({
         preloaded: true,
         error: null,
         elementNodes: [],
-        renderedElementCount: 0,
+        renderedElementCount: 0
       });
     }
 
@@ -293,7 +292,7 @@ export function useArticleSections({
     const introRenderedCount = renderedElements.intro;
     const introElementsToRender = introElementNodes.slice(
       0,
-      introRenderedCount,
+      introRenderedCount
     );
     const introDom = parseDocument('');
     introDom.children = introElementsToRender;
@@ -307,14 +306,14 @@ export function useArticleSections({
       preloaded: introRenderedCount >= introElementNodes.length,
       error: null,
       elementNodes: introElementNodes,
-      renderedElementCount: introRenderedCount,
+      renderedElementCount: introRenderedCount
     });
 
     // Section elements with incremental rendering
     sectionElements.forEach((sec) => {
       const sectionRenderedCount = renderedElements.sections[sec.id] || 0;
       const sectionChildren = getChildren(sec.element).filter(
-        (node): node is Element => node.type === 'tag',
+        (node): node is Element => node.type === 'tag'
       ) as Element[];
       const elementsToRender = sectionChildren.slice(0, sectionRenderedCount);
 
@@ -332,7 +331,7 @@ export function useArticleSections({
         preloaded: sectionRenderedCount >= sectionChildren.length,
         error: null,
         elementNodes: sectionChildren,
-        renderedElementCount: sectionRenderedCount,
+        renderedElementCount: sectionRenderedCount
       });
       idx++;
     });
@@ -347,8 +346,8 @@ export function useArticleSections({
       heading: 'Introduction',
       html: '<p>Loading...</p>',
       preloaded: false,
-      error: null,
-    },
+      error: null
+    }
   ]);
 
   const [expandedId, setExpandedId] = useState<string | null>(() => {
@@ -386,7 +385,7 @@ export function useArticleSections({
       if (sectionsKey !== prevSectionsRef.current) {
         prevSectionsRef.current = sectionsKey;
         onSectionsExtractedRef.current(
-          sections.map((s) => ({ id: s.id, heading: s.heading })),
+          sections.map((s) => ({ id: s.id, heading: s.heading }))
         );
       }
     }
@@ -485,7 +484,7 @@ export function useArticleSections({
           newExpandedSections = [...expandedSections, id];
         }
         setExpandedId(
-          newExpandedSections.length > 0 ? newExpandedSections[0] : null,
+          newExpandedSections.length > 0 ? newExpandedSections[0] : null
         );
       }
 
@@ -497,7 +496,7 @@ export function useArticleSections({
         }, 0);
       }
     },
-    [expandedSections, accordionAutoClose],
+    [expandedSections, accordionAutoClose]
   );
 
   return {
@@ -506,6 +505,6 @@ export function useArticleSections({
     sections,
     expandedSections,
     expandedId,
-    onAccordionPress,
+    onAccordionPress
   };
 }

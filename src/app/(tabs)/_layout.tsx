@@ -5,12 +5,12 @@ import { Platform, View, useWindowDimensions } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import SkipLinks from '@/components/common/SkipLinks';
-import AppSidebar from '@/components/layout/AppSidebar';
-import ContentWithSidebar from '@/components/layout/ContentWithSidebar';
-import SharedDrawer from '@/components/layout/SharedDrawer';
+import SkipLinks from '@/components/SkipLinks';
 import { COMPONENT_HEIGHTS, LAYOUT } from '@/constants/layout';
 import { SPACING } from '@/constants/spacing';
+import AppSidebar from '@/features/layout/AppSidebar';
+import ContentWithSidebar from '@/features/layout/ContentWithSidebar';
+import SharedDrawer from '@/features/layout/SharedDrawer';
 
 export default function TabLayout() {
   const theme = useTheme();
@@ -20,7 +20,7 @@ export default function TabLayout() {
 
   // Common screen options
   const commonScreenOptions = {
-    headerShown: false,
+    headerShown: false
   };
 
   return (
@@ -31,7 +31,7 @@ export default function TabLayout() {
           <View
             {...(!isLargeScreen && {
               accessibilityRole: 'navigation' as any,
-              accessibilityLabel: 'Tab navigation',
+              accessibilityLabel: 'Tab navigation'
             })}
             style={{ flex: 1 }}
           >
@@ -44,7 +44,7 @@ export default function TabLayout() {
                 tabBarStyle: isLargeScreen
                   ? {
                       display: 'none',
-                      height: 0,
+                      height: 0
                     }
                   : {
                       backgroundColor: theme.colors.surface,
@@ -65,9 +65,9 @@ export default function TabLayout() {
                         bottom: 0,
                         left: 0,
                         right: 0,
-                        zIndex: 1000,
-                      }),
-                    },
+                        zIndex: 1000
+                      })
+                    }
               }}
             >
               <Tabs.Screen
@@ -76,7 +76,7 @@ export default function TabLayout() {
                   title: 'Home',
                   tabBarIcon: ({ color, size }) => (
                     <MaterialIcons name="home" size={size} color={color} />
-                  ),
+                  )
                 }}
               />
               <Tabs.Screen
@@ -85,7 +85,7 @@ export default function TabLayout() {
                   title: 'Categories',
                   tabBarIcon: ({ color, size }) => (
                     <MaterialIcons name="category" size={size} color={color} />
-                  ),
+                  )
                 }}
               />
               <Tabs.Screen
@@ -94,7 +94,7 @@ export default function TabLayout() {
                   title: 'Discover',
                   tabBarIcon: ({ color, size }) => (
                     <MaterialIcons name="explore" size={size} color={color} />
-                  ),
+                  )
                 }}
               />
               <Tabs.Screen
@@ -103,7 +103,7 @@ export default function TabLayout() {
                   title: 'Bookmarks',
                   tabBarIcon: ({ color, size }) => (
                     <MaterialIcons name="bookmark" size={size} color={color} />
-                  ),
+                  )
                 }}
               />
               <Tabs.Screen
@@ -112,19 +112,19 @@ export default function TabLayout() {
                   title: 'Settings',
                   tabBarIcon: ({ color, size }) => (
                     <MaterialIcons name="settings" size={size} color={color} />
-                  ),
+                  )
                 }}
               />
               <Tabs.Screen
                 name="settings/reading-preferences"
                 options={{
-                  href: null, // Hide from tab bar
+                  href: null // Hide from tab bar
                 }}
               />
               <Tabs.Screen
                 name="settings/reading-history"
                 options={{
-                  href: null, // Hide from tab bar
+                  href: null // Hide from tab bar
                 }}
               />
             </Tabs>

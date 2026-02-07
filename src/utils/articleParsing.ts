@@ -29,7 +29,7 @@ export const DEFAULT_SELECTORS_TO_REMOVE = [
   '.mw-empty-elt',
   '.mw-valign-text-top',
   '.plainlinks',
-  'style',
+  'style'
 ];
 
 /**
@@ -78,7 +78,7 @@ export function parseArticleStructure(html: string): ParsedArticleStructure {
     // Find body element (Wikipedia HTML has body)
     const body = selectOne('body', dom) || dom;
     const bodyChildren = getChildren(body).filter(
-      (node): node is Element => node.type === 'tag',
+      (node): node is Element => node.type === 'tag'
     ) as Element[];
 
     // Extract infobox
@@ -135,7 +135,7 @@ export function parseArticleStructure(html: string): ParsedArticleStructure {
 
     // Find all section elements
     const sectionElements = bodyChildren.filter(
-      (child: any) => child.name === 'section',
+      (child: any) => child.name === 'section'
     );
 
     let introElementNodes: Element[] = [];
@@ -154,7 +154,7 @@ export function parseArticleStructure(html: string): ParsedArticleStructure {
       } else {
         // Find first h2 and split there
         const firstH2 = h2Elements.find(
-          (el) => 'name' in el && 'attribs' in el,
+          (el) => 'name' in el && 'attribs' in el
         ) as Element | undefined;
         if (!firstH2) {
           introElementNodes = bodyChildren;
@@ -168,7 +168,7 @@ export function parseArticleStructure(html: string): ParsedArticleStructure {
             }
             // Check if this child element contains the h2
             const childH2s: Element[] = selectAll('h2', [child]).filter(
-              (el): el is Element => 'name' in el && 'attribs' in el,
+              (el): el is Element => 'name' in el && 'attribs' in el
             );
             if (childH2s.includes(firstH2)) {
               firstH2Index = i;
@@ -195,7 +195,7 @@ export function parseArticleStructure(html: string): ParsedArticleStructure {
                 }
                 // Check if this child element contains the h2
                 const childH2s: Element[] = selectAll('h2', [child]).filter(
-                  (el): el is Element => 'name' in el && 'attribs' in el,
+                  (el): el is Element => 'name' in el && 'attribs' in el
                 );
                 if (childH2s.includes(h2Element)) {
                   h2ContainerIndex = i;
@@ -226,7 +226,7 @@ export function parseArticleStructure(html: string): ParsedArticleStructure {
                   }
                   // Check if this child element contains the next h2
                   const childH2s: Element[] = selectAll('h2', [child]).filter(
-                    (el): el is Element => 'name' in el && 'attribs' in el,
+                    (el): el is Element => 'name' in el && 'attribs' in el
                   );
                   if (childH2s.includes(nextH2Element)) {
                     endIndex = i;
@@ -237,7 +237,7 @@ export function parseArticleStructure(html: string): ParsedArticleStructure {
 
               const sectionNodes = bodyChildren.slice(
                 h2ContainerIndex,
-                endIndex,
+                endIndex
               );
               if (sectionNodes.length > 0) {
                 // Create a container element for this section
@@ -246,7 +246,7 @@ export function parseArticleStructure(html: string): ParsedArticleStructure {
                 sectionElementsWithHeading.push({
                   element: sectionContainer as any,
                   heading,
-                  id: `section-${idx}`,
+                  id: `section-${idx}`
                 });
               }
             });
@@ -282,7 +282,7 @@ export function parseArticleStructure(html: string): ParsedArticleStructure {
               sectionElementsWithHeading.push({
                 element: section,
                 heading,
-                id: `section-${sectionIdx}`,
+                id: `section-${sectionIdx}`
               });
               sectionIdx++;
             }
@@ -295,7 +295,7 @@ export function parseArticleStructure(html: string): ParsedArticleStructure {
       infoboxElement,
       infoboxImage,
       introElementNodes,
-      sectionElements: sectionElementsWithHeading,
+      sectionElements: sectionElementsWithHeading
     };
   } catch {
     // Fallback: return minimal structure
@@ -304,7 +304,7 @@ export function parseArticleStructure(html: string): ParsedArticleStructure {
       infoboxElement: null,
       infoboxImage: null,
       introElementNodes: [],
-      sectionElements: [],
+      sectionElements: []
     };
   }
 }
@@ -313,7 +313,7 @@ export function parseArticleStructure(html: string): ParsedArticleStructure {
  * Extract the main image from the infobox
  */
 export function extractInfoboxImage(
-  infoboxHtml: string,
+  infoboxHtml: string
 ): { src: string; alt: string; width: number; height: number } | null {
   try {
     const dom = parseHtml(infoboxHtml);
@@ -430,7 +430,7 @@ export function extractIntro(html: string) {
 
     // Find all section elements
     const sections = bodyChildren.filter(
-      (child: any) => child.name === 'section',
+      (child: any) => child.name === 'section'
     );
 
     if (sections.length === 0) {
@@ -462,7 +462,7 @@ export function extractIntro(html: string) {
       remainingDom.children = remainingNodes;
       return {
         introHtml: render(introDom),
-        remaining: render(remainingDom),
+        remaining: render(remainingDom)
       };
     }
 
@@ -495,7 +495,7 @@ export function extractIntro(html: string) {
 
     return {
       introHtml,
-      remaining: remainingHtml,
+      remaining: remainingHtml
     };
   } catch {
     return { introHtml: html, remaining: '' };
@@ -519,7 +519,7 @@ export function splitIntoSections(html: string) {
 
     // Find all section elements
     const sectionElements = bodyChildren.filter(
-      (child: any) => child.name === 'section',
+      (child: any) => child.name === 'section'
     );
 
     if (sectionElements.length === 0) {
@@ -575,7 +575,7 @@ export function splitIntoSections(html: string) {
           sections.push({
             id: `section-${idx}`,
             heading,
-            html: sectionHtml,
+            html: sectionHtml
           });
         }
       });
@@ -601,7 +601,7 @@ export function splitIntoSections(html: string) {
           sections.push({
             id: `section-${sectionIdx}`,
             heading,
-            html: sectionHtml,
+            html: sectionHtml
           });
           sectionIdx++;
         }
@@ -624,7 +624,7 @@ export function splitIntoSections(html: string) {
  * Uses the same logic as ImageRenderer for consistency
  */
 export function extractAllImages(
-  html: string,
+  html: string
 ): { uri: string; alt?: string }[] {
   if (!html || typeof html !== 'string') {
     return [];

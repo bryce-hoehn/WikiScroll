@@ -1,7 +1,7 @@
 import { useCallback, useContext } from 'react';
 
-import { BookmarksContext } from '@/context/BookmarksContext';
-import { SnackbarContext } from '@/context/SnackbarContext';
+import { BookmarksContext } from '@/stores/BookmarksContext';
+import { SnackbarContext } from '@/stores/SnackbarContext';
 import { RecommendationItem } from '@/types/components';
 
 /**
@@ -16,7 +16,7 @@ export default function useBookmarkToggle() {
   const { addBookmark, removeBookmark, isBookmarked } = bookmarksContext || {
     addBookmark: () => Promise.resolve(),
     removeBookmark: () => Promise.resolve(),
-    isBookmarked: () => false,
+    isBookmarked: () => false
   };
   const { showSuccess } = snackbarContext || { showSuccess: () => {} };
 
@@ -36,11 +36,11 @@ export default function useBookmarkToggle() {
         // Error handling is done by the context
       }
     },
-    [addBookmark, removeBookmark, isBookmarked, showSuccess],
+    [addBookmark, removeBookmark, isBookmarked, showSuccess]
   );
 
   return {
     handleBookmarkToggle,
-    isBookmarked,
+    isBookmarked
   };
 }

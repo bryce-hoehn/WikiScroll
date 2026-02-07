@@ -47,16 +47,16 @@ const WebAdManager = ({ style }: AdMobManagerProps) => {
             justifyContent: 'center',
             alignItems: 'center',
             borderWidth: 1,
-            borderColor: '#e0e0e0',
+            borderColor: '#e0e0e0'
           },
-          style,
+          style
         ]}
       >
         <Text
           style={{
             color: '#999',
             fontSize: 12,
-            fontWeight: '500',
+            fontWeight: '500'
           }}
         >
           Advertisement
@@ -72,7 +72,7 @@ const WebAdManager = ({ style }: AdMobManagerProps) => {
         style={{
           display: 'block',
           minHeight: 90,
-          width: '100%',
+          width: '100%'
         }}
         data-ad-client={adClient}
         data-ad-slot={adSlot}
@@ -92,8 +92,8 @@ const AdMobManager = ({ style }: AdMobManagerProps) => {
   // Lazy load native ad component to prevent web import errors
   const NativeAdManager = React.lazy(() =>
     import('./NativeAdManager').then((module) => ({
-      default: module.default,
-    })),
+      default: module.default
+    }))
   );
 
   return (

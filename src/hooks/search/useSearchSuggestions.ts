@@ -14,6 +14,6 @@ export default function useSearchSuggestions(query: string) {
     gcTime: 30 * 60 * 1000, // 30 minutes
     retry: 1,
     refetchOnWindowFocus: false, // Don't refetch on focus
-    refetchOnReconnect: false, // Don't refetch on reconnect
+    refetchOnReconnect: false // Don't refetch on reconnect
   });
 }

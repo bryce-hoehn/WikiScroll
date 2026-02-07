@@ -15,6 +15,6 @@ export default function useCategoryMembers(category: string) {
     gcTime: 24 * 60 * 60 * 1000, // 24 hours - keep in cache for a day
     retry: 2,
     refetchOnWindowFocus: false, // Don't refetch when window regains focus
-    refetchOnReconnect: false, // Don't refetch when reconnecting
+    refetchOnReconnect: false // Don't refetch when reconnecting
   });
 }

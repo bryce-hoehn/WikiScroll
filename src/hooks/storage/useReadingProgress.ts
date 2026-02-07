@@ -39,7 +39,7 @@ const READING_PROGRESS_KEY = 'reading_progress';
  */
 export default function useReadingProgress() {
   const [progressMap, setProgressMap] = useState<Map<string, ReadingProgress>>(
-    new Map(),
+    new Map()
   );
   const [loading, setLoading] = useState(true);
   const pendingSaveRef = useRef<Map<string, ReadingProgress> | null>(null);
@@ -101,7 +101,7 @@ export default function useReadingProgress() {
       } catch {
         // Silently handle save errors
       }
-    }, 1000), // 1 second debounce
+    }, 1000) // 1 second debounce
   ).current;
 
   // Save progress to storage with debouncing to avoid excessive writes
@@ -112,7 +112,7 @@ export default function useReadingProgress() {
       const readingProgress: ReadingProgress = {
         progress: Math.round(progress),
         lastReadAt: new Date().toISOString(),
-        expandedSections: expandedSections || [],
+        expandedSections: expandedSections || []
       };
 
       const newMap = new Map(progressMap);
@@ -125,7 +125,7 @@ export default function useReadingProgress() {
       // Debounce: Save after 1 second of no updates
       debouncedSave(newMap);
     },
-    [progressMap, debouncedSave],
+    [progressMap, debouncedSave]
   );
 
   // Save pending progress on unmount (flush debounced function)
@@ -142,7 +142,7 @@ export default function useReadingProgress() {
         AsyncStorage.setItem(READING_PROGRESS_KEY, JSON.stringify(obj)).catch(
           () => {
             // Silently handle save errors on unmount
-          },
+          }
         );
       }
     };
@@ -154,7 +154,7 @@ export default function useReadingProgress() {
       const progress = progressMap.get(title);
       return progress?.progress || 0;
     },
-    [progressMap],
+    [progressMap]
   );
 
   // Get full progress object
@@ -162,7 +162,7 @@ export default function useReadingProgress() {
     (title: string): ReadingProgress | null => {
       return progressMap.get(title) || null;
     },
-    [progressMap],
+    [progressMap]
   );
 
   // Clear progress for an article
@@ -182,7 +182,7 @@ export default function useReadingProgress() {
         // Silently handle clear errors
       }
     },
-    [progressMap],
+    [progressMap]
   );
 
   // Clear all progress
@@ -214,8 +214,8 @@ export default function useReadingProgress() {
         const entries = Array.from(progressMap.entries()).map(
           ([title, progress]) => ({
             title,
-            ...progress,
-          }),
+            ...progress
+          })
         );
 
         // Sort by lastReadAt descending (most recent first)
@@ -272,7 +272,7 @@ export default function useReadingProgress() {
         // Silently handle cleanup errors
       }
     },
-    [progressMap],
+    [progressMap]
   );
 
   return {
@@ -283,6 +283,6 @@ export default function useReadingProgress() {
     getProgressData,
     clearProgress,
     clearAllProgress,
-    cleanupOldProgress,
+    cleanupOldProgress
   };
 }

@@ -57,7 +57,7 @@ export function getMD3FocusStyles(options: FocusStyleOptions): string {
 export function applyMD3FocusStyles(
   elementRef: React.RefObject<any>,
   options: FocusStyleOptions,
-  styleId: string = 'md3-focus-styles',
+  styleId: string = 'md3-focus-styles'
 ): () => void {
   if (Platform.OS !== 'web' || !elementRef.current) {
     return () => {}; // No-op cleanup
@@ -91,6 +91,6 @@ export function applyMD3FocusStyles(
 export function getFocusProps(accessible: boolean = true) {
   return {
     accessible,
-    accessibilityRole: 'button' as const,
+    accessibilityRole: 'button' as const
   };
 }

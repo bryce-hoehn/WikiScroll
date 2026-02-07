@@ -54,7 +54,7 @@ export default function useVisitedArticles() {
   const {
     value: visitedArticles,
     isLoading: loading,
-    updateValue,
+    updateValue
   } = useAsyncStorage<VisitedArticle[]>(VISITED_ARTICLES_KEY, {
     defaultValue: [],
     validator: (val) => {
@@ -69,9 +69,9 @@ export default function useVisitedArticles() {
           typeof item === 'object' &&
           typeof item.title === 'string' &&
           typeof item.visitedAt === 'string' &&
-          item.title.length > 0,
+          item.title.length > 0
       );
-    },
+    }
   });
   const { removeArticleLinks, clearAllLinks } = useArticleLinks();
   const [error, setError] = useState<string | null>(null);
@@ -106,7 +106,7 @@ export default function useVisitedArticles() {
       try {
         const newArticle: VisitedArticle = {
           title,
-          visitedAt: new Date().toISOString(),
+          visitedAt: new Date().toISOString()
         };
 
         // Use functional update to avoid stale closure issues
@@ -121,7 +121,7 @@ export default function useVisitedArticles() {
         setError('Failed to save visited article');
       }
     },
-    [updateValue],
+    [updateValue]
   );
 
   const removeVisitedArticle = useCallback(
@@ -150,7 +150,7 @@ export default function useVisitedArticles() {
         return false;
       }
     },
-    [updateValue, removeArticleLinks],
+    [updateValue, removeArticleLinks]
   );
 
   const clearVisitedArticles = useCallback(async () => {
@@ -175,6 +175,6 @@ export default function useVisitedArticles() {
     addVisitedArticle,
     removeVisitedArticle,
     clearVisitedArticles,
-    loadVisitedArticles,
+    loadVisitedArticles
   };
 }

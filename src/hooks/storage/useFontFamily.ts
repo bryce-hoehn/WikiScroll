@@ -25,7 +25,7 @@ const FONT_FAMILIES: { label: string; value: FontFamily }[] = [
   { label: 'Inter', value: 'Inter' },
   { label: 'Lora', value: 'Lora' },
   { label: 'Merriweather', value: 'Merriweather' },
-  { label: 'Playfair Display', value: 'PlayfairDisplay' },
+  { label: 'Playfair Display', value: 'PlayfairDisplay' }
 ];
 
 const VALID_FONTS: FontFamily[] = [
@@ -38,25 +38,25 @@ const VALID_FONTS: FontFamily[] = [
   'Inter',
   'Lora',
   'Merriweather',
-  'PlayfairDisplay',
+  'PlayfairDisplay'
 ];
 
 export default function useFontFamily() {
   const {
     value: fontFamily,
     isLoading,
-    updateValue,
+    updateValue
   } = useAsyncStorage<FontFamily>(FONT_FAMILY_KEY, {
     defaultValue: DEFAULT_FONT_FAMILY,
     validator: (val) => VALID_FONTS.includes(val),
     serializer: (val) => val,
-    deserializer: (val) => val as FontFamily,
+    deserializer: (val) => val as FontFamily
   });
 
   return {
     fontFamily,
     isLoading,
     updateFontFamily: updateValue,
-    fontFamilies: FONT_FAMILIES,
+    fontFamilies: FONT_FAMILIES
   };
 }

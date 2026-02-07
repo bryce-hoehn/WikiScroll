@@ -11,14 +11,14 @@ export default function useAccordionBehavior() {
   const {
     value: autoClose,
     isLoading: loading,
-    updateValue,
+    updateValue
   } = useAsyncStorage<boolean>(ACCORDION_BEHAVIOR_KEY, {
-    defaultValue: false, // Default: sections stay open unless closed
+    defaultValue: false // Default: sections stay open unless closed
   });
 
   return {
     accordionAutoClose: autoClose,
     setAccordionAutoClose: updateValue,
-    loading,
+    loading
   };
 }

@@ -6,7 +6,7 @@ import {
   Platform,
   ScrollView,
   useWindowDimensions,
-  View,
+  View
 } from 'react-native';
 import {
   Appbar,
@@ -18,16 +18,13 @@ import {
   Portal,
   Switch,
   Text,
-  useTheme,
+  useTheme
 } from 'react-native-paper';
 
-import ProgressDialog from '@/components/common/ProgressDialog';
+import ProgressDialog from '@/components/ProgressDialog';
 import { LAYOUT } from '@/constants/layout';
 import { SPACING } from '@/constants/spacing';
 import { TYPOGRAPHY } from '@/constants/typography';
-import { useBookmarks } from '@/context/BookmarksContext';
-import { useSnackbar } from '@/context/SnackbarContext';
-import { useThemeContext } from '@/context/ThemeProvider';
 import {
   useAccordionBehavior,
   useFontFamily,
@@ -36,12 +33,15 @@ import {
   useParagraphSpacing,
   useReadingWidth,
   useReducedMotion,
-  useVisitedArticles,
+  useVisitedArticles
 } from '@/hooks';
+import { useBookmarks } from '@/stores/BookmarksContext';
+import { useSnackbar } from '@/stores/SnackbarContext';
+import { useThemeContext } from '@/stores/ThemeProvider';
 import {
   exportUserProfile,
   importUserProfile,
-  readFileContent,
+  readFileContent
 } from '@/utils/bookmarkImportExport';
 import { getAppVersion } from '@/utils/env';
 
@@ -77,7 +77,7 @@ export default function SettingsScreen() {
     { label: 'Dark', value: 'dark' },
     { label: 'Dark Medium Contrast', value: 'dark-medium-contrast' },
     { label: 'Dark High Contrast', value: 'dark-high-contrast' },
-    { label: 'Papyrus', value: 'papyrus' },
+    { label: 'Papyrus', value: 'papyrus' }
   ];
 
   const getThemeDisplayName = (themeValue: string) => {
@@ -102,7 +102,7 @@ export default function SettingsScreen() {
 
       // Export completed successfully
       showSuccess(
-        `Successfully exported user profile (${bookmarks.length} bookmark${bookmarks.length !== 1 ? 's' : ''}, ${visitedArticles.length} history item${visitedArticles.length !== 1 ? 's' : ''}, and settings)`,
+        `Successfully exported user profile (${bookmarks.length} bookmark${bookmarks.length !== 1 ? 's' : ''}, ${visitedArticles.length} history item${visitedArticles.length !== 1 ? 's' : ''}, and settings)`
       );
     } catch {
       showError('Failed to export user profile. Please try again.');
@@ -175,12 +175,12 @@ export default function SettingsScreen() {
                 const parts: string[] = [];
                 if (result.bookmarks.length > 0) {
                   parts.push(
-                    `${result.bookmarks.length} bookmark${result.bookmarks.length !== 1 ? 's' : ''}`,
+                    `${result.bookmarks.length} bookmark${result.bookmarks.length !== 1 ? 's' : ''}`
                   );
                 }
                 if (result.visitedArticles.length > 0) {
                   parts.push(
-                    `${result.visitedArticles.length} history item${result.visitedArticles.length !== 1 ? 's' : ''}`,
+                    `${result.visitedArticles.length} history item${result.visitedArticles.length !== 1 ? 's' : ''}`
                   );
                 }
                 const hasSettings =
@@ -200,11 +200,11 @@ export default function SettingsScreen() {
                 await new Promise((resolve) => setTimeout(resolve, 200));
 
                 showSuccess(
-                  `Successfully imported user profile (${parts.join(', ')})`,
+                  `Successfully imported user profile (${parts.join(', ')})`
                 );
               } catch {
                 showError(
-                  'Failed to import user profile. Please check the file format.',
+                  'Failed to import user profile. Please check the file format.'
                 );
               } finally {
                 setIsImporting(false);
@@ -222,7 +222,7 @@ export default function SettingsScreen() {
             DocumentPicker = require('expo-document-picker');
           } catch {
             showError(
-              'Document picker is not available. Please rebuild the app or restart the development server.',
+              'Document picker is not available. Please rebuild the app or restart the development server.'
             );
             setIsImporting(false);
             return;
@@ -230,7 +230,7 @@ export default function SettingsScreen() {
 
           const result = await DocumentPicker.getDocumentAsync({
             type: 'application/json',
-            copyToCacheDirectory: true,
+            copyToCacheDirectory: true
           });
 
           if (result.canceled) {
@@ -281,12 +281,12 @@ export default function SettingsScreen() {
           const parts: string[] = [];
           if (importResult.bookmarks.length > 0) {
             parts.push(
-              `${importResult.bookmarks.length} bookmark${importResult.bookmarks.length !== 1 ? 's' : ''}`,
+              `${importResult.bookmarks.length} bookmark${importResult.bookmarks.length !== 1 ? 's' : ''}`
             );
           }
           if (importResult.visitedArticles.length > 0) {
             parts.push(
-              `${importResult.visitedArticles.length} history item${importResult.visitedArticles.length !== 1 ? 's' : ''}`,
+              `${importResult.visitedArticles.length} history item${importResult.visitedArticles.length !== 1 ? 's' : ''}`
             );
           }
           const hasSettings =
@@ -306,12 +306,12 @@ export default function SettingsScreen() {
           await new Promise((resolve) => setTimeout(resolve, 200));
 
           showSuccess(
-            `Successfully imported user profile (${parts.join(', ')})`,
+            `Successfully imported user profile (${parts.join(', ')})`
           );
         }
       } catch {
         showError(
-          'Failed to import user profile. Please check the file format.',
+          'Failed to import user profile. Please check the file format.'
         );
       } finally {
         setIsImporting(false);
@@ -328,13 +328,13 @@ export default function SettingsScreen() {
         [
           {
             text: 'Cancel',
-            style: 'cancel',
+            style: 'cancel'
           },
           {
             text: 'Import',
-            onPress: confirmAction,
-          },
-        ],
+            onPress: confirmAction
+          }
+        ]
       );
     }
   };
@@ -343,7 +343,7 @@ export default function SettingsScreen() {
     <>
       <Appbar.Header
         style={{
-          backgroundColor: theme.colors.surface,
+          backgroundColor: theme.colors.surface
         }}
         mode="center-aligned"
       >
@@ -353,7 +353,7 @@ export default function SettingsScreen() {
             // MD3: Center-aligned app bars use 22sp title
             // Reference: https://m3.material.io/components/app-bars/overview
             fontWeight: '500', // MD3: Medium weight (500) for app bar titles
-            fontSize: TYPOGRAPHY.appBarTitle,
+            fontSize: TYPOGRAPHY.appBarTitle
           }}
         />
         <Appbar.Action
@@ -372,8 +372,7 @@ export default function SettingsScreen() {
             backgroundColor: theme.colors.surface,
             padding: SPACING.lg, // M3: 24dp padding for dialogs
             margin: SPACING.base + SPACING.xs, // M3: 20dp margin
-            borderRadius:
-              width >= LAYOUT.DESKTOP_BREAKPOINT ? 28 : SPACING.base, // M3: 28dp for large screens, 16dp for mobile
+            borderRadius: width >= LAYOUT.DESKTOP_BREAKPOINT ? 28 : SPACING.base // M3: 28dp for large screens, 16dp for mobile
           }}
         >
           <Text
@@ -454,7 +453,7 @@ export default function SettingsScreen() {
           paddingBottom: SPACING.xl,
           maxWidth: maxContentWidth,
           alignSelf: 'center',
-          width: '100%',
+          width: '100%'
         }}
       >
         {/* App Settings Section */}
@@ -551,7 +550,7 @@ export default function SettingsScreen() {
           <View
             style={{
               paddingHorizontal: SPACING.base,
-              paddingBottom: SPACING.base,
+              paddingBottom: SPACING.base
             }}
           >
             <Text
@@ -559,7 +558,7 @@ export default function SettingsScreen() {
               style={{
                 color: theme.colors.onSurfaceVariant,
                 marginBottom: SPACING.md,
-                lineHeight: 18,
+                lineHeight: 18
               }}
             >
               Export your complete user profile (bookmarks, reading history,
@@ -570,7 +569,7 @@ export default function SettingsScreen() {
               style={{
                 flexDirection: 'row',
                 gap: SPACING.md,
-                flexWrap: 'wrap',
+                flexWrap: 'wrap'
               }}
             >
               <Button
@@ -625,7 +624,7 @@ export default function SettingsScreen() {
                     console.error('Failed to open GitHub issues:', err);
                   }
                   showError(
-                    'Unable to open GitHub. Please visit: https://github.com/bryce-hoehn/WikiScape/issues',
+                    'Unable to open GitHub. Please visit: https://github.com/bryce-hoehn/WikiScape/issues'
                   );
                 });
               }

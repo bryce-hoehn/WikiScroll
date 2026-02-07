@@ -35,7 +35,7 @@ export default function useArticleLinks() {
   const {
     value: articleLinks,
     isLoading: loading,
-    updateValue,
+    updateValue
   } = useAsyncStorage<Record<string, string[]>>(ARTICLE_LINKS_KEY, {
     defaultValue: {},
     validator: (val) => {
@@ -48,9 +48,9 @@ export default function useArticleLinks() {
         ([key, value]) =>
           typeof key === 'string' &&
           Array.isArray(value) &&
-          value.every((item) => typeof item === 'string'),
+          value.every((item) => typeof item === 'string')
       );
-    },
+    }
   });
   const [error, setError] = useState<string | null>(null);
 
@@ -58,14 +58,14 @@ export default function useArticleLinks() {
     (title: string): string[] => {
       return articleLinks[title] || [];
     },
-    [articleLinks],
+    [articleLinks]
   );
 
   const hasArticleLinks = useCallback(
     (title: string): boolean => {
       return title in articleLinks;
     },
-    [articleLinks],
+    [articleLinks]
   );
 
   const saveArticleLinks = useCallback(
@@ -73,20 +73,20 @@ export default function useArticleLinks() {
       try {
         // Remove duplicates and ensure all items are strings
         const uniqueLinks = Array.from(
-          new Set(links.filter((link) => typeof link === 'string')),
+          new Set(links.filter((link) => typeof link === 'string'))
         );
 
         await updateValue((prevLinks) => {
           return {
             ...prevLinks,
-            [title]: uniqueLinks,
+            [title]: uniqueLinks
           };
         });
       } catch {
         setError('Failed to save article links');
       }
     },
-    [updateValue],
+    [updateValue]
   );
 
   const removeArticleLinks = useCallback(
@@ -112,7 +112,7 @@ export default function useArticleLinks() {
         return false;
       }
     },
-    [updateValue],
+    [updateValue]
   );
 
   const clearAllLinks = useCallback(async () => {
@@ -138,6 +138,6 @@ export default function useArticleLinks() {
     clearAllLinks,
     getAllLinks,
     loading,
-    error,
+    error
   };
 }

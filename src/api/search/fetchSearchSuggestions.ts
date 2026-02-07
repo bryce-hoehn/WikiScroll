@@ -24,7 +24,7 @@ interface CombinedSearchResponse {
  * ```
  */
 export const fetchSearchSuggestions = async (
-  query: string,
+  query: string
 ): Promise<SearchSuggestion[]> => {
   if (!query.trim()) return [];
 
@@ -39,13 +39,13 @@ export const fetchSearchSuggestions = async (
       pithumbsize: 200,
       pilimit: 10,
       format: 'json',
-      origin: '*',
+      origin: '*'
     };
 
     const searchResponse =
       await actionAxiosInstance.get<CombinedSearchResponse>('', {
         baseURL: WIKIPEDIA_API_CONFIG.BASE_URL,
-        params,
+        params
       });
     const searchData = searchResponse.data;
     const pages = searchData.query?.pages || {};
@@ -60,7 +60,7 @@ export const fetchSearchSuggestions = async (
       return {
         title: pageInfo.title,
         description: pageInfo.description || '',
-        image: pageInfo.thumbnail?.source,
+        image: pageInfo.thumbnail?.source
       };
     });
   } catch (error: unknown) {

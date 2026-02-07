@@ -7,17 +7,17 @@ import React, {
   useEffect,
   useMemo,
   useRef,
-  useState,
+  useState
 } from 'react';
 import { Animated, Platform, View, useWindowDimensions } from 'react-native';
 import { Card, Text, useTheme, type MD3Theme } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useReducedMotion } from '@/hooks';
-import { useScrollToTop } from '@/context/ScrollToTopContext';
-import { getHoverStyles } from '@/constants/motion';
+import CollapsibleHeader from '@/components/CollapsibleHeader';
 import { LAYOUT } from '@/constants/layout';
-import CollapsibleHeader from '@/components/common/CollapsibleHeader';
+import { getHoverStyles } from '@/constants/motion';
+import { useReducedMotion } from '@/hooks';
+import { useScrollToTop } from '@/stores/ScrollToTopContext';
 
 const rootCategories = {
   'Academic disciplines': require('../../assets/images/categories/Academic disciplines.jpg'),
@@ -52,7 +52,7 @@ const rootCategories = {
   Society: require('../../assets/images/categories/Society.jpg'),
   Technology: require('../../assets/images/categories/Technology.jpg'),
   Time: require('../../assets/images/categories/Time.jpg'),
-  Universe: require('../../assets/images/categories/Universe.jpg'),
+  Universe: require('../../assets/images/categories/Universe.jpg')
 } as const;
 
 const HEADER_HEIGHT = 60;
@@ -61,7 +61,7 @@ const HEADER_HEIGHT = 60;
 function CategoryItem({
   item,
   cardHeight,
-  theme,
+  theme
 }: {
   item: [string, any];
   cardHeight: number;
@@ -91,12 +91,12 @@ function CategoryItem({
         elevation: isHovered && Platform.OS === 'web' ? 3 : 1,
         overflow: 'hidden',
         ...(Platform.OS === 'web' &&
-          getHoverStyles(isHovered, reducedMotion, { scale: 1.02 })),
+          getHoverStyles(isHovered, reducedMotion, { scale: 1.02 }))
       }}
       onPress={() => router.push(`/subcategory/${encodeURIComponent(item[0])}`)}
       {...(Platform.OS === 'web' && {
         onMouseEnter: handleMouseEnter,
-        onMouseLeave: handleMouseLeave,
+        onMouseLeave: handleMouseLeave
       })}
       accessibilityRole="button"
       accessibilityLabel={`Browse ${item[0]} category`}
@@ -107,7 +107,7 @@ function CategoryItem({
         style={{
           height: cardHeight,
           width: '100%',
-          borderRadius: theme.roundness * 3, // 12dp equivalent (4dp * 3)
+          borderRadius: theme.roundness * 3 // 12dp equivalent (4dp * 3)
         }}
         alt={`${item[0]} category image`}
         accessibilityLabel={`${item[0]} category`}
@@ -124,7 +124,7 @@ function CategoryItem({
           alignItems: 'center',
           // Use theme scrim color with 30% opacity
           backgroundColor: theme.colors.scrim + '4D', // 30% opacity (0x4D in hex = 77/255 ≈ 0.3)
-          borderRadius: theme.roundness * 3, // 12dp equivalent (4dp * 3)
+          borderRadius: theme.roundness * 3 // 12dp equivalent (4dp * 3)
         }}
         accessibilityElementsHidden={true}
         importantForAccessibility="no"
@@ -139,7 +139,7 @@ function CategoryItem({
             // Add black border/outline using text shadow
             textShadowColor: '#000000',
             textShadowOffset: { width: 0, height: 0 },
-            textShadowRadius: 5,
+            textShadowRadius: 5
           }}
           numberOfLines={2}
           accessibilityRole="text"
@@ -167,7 +167,7 @@ export default function CategoriesScreen() {
         if (flashListRef.current) {
           flashListRef.current.scrollToOffset({ offset: 0, animated: true });
         }
-      },
+      }
     });
   }, [registerScrollRef]);
 
@@ -180,7 +180,7 @@ export default function CategoriesScreen() {
       }
       // Mark as focused for next time
       wasFocusedRef.current = true;
-    }, [scrollToTop]),
+    }, [scrollToTop])
   );
 
   // Calculate responsive grid columns and max width
@@ -192,29 +192,29 @@ export default function CategoriesScreen() {
         : 2;
   const categoriesMaxWidth = useMemo(
     () => Math.max(LAYOUT.MAX_GRID_WIDTH, 1600),
-    [],
+    []
   ); // Increased width for categories
   const maxContentWidth = useMemo(
     () => Math.min(width - 32, categoriesMaxWidth),
-    [width, categoriesMaxWidth],
+    [width, categoriesMaxWidth]
   );
   const horizontalPadding = useMemo(
     () =>
       width > categoriesMaxWidth ? (width - categoriesMaxWidth) / 2 + 8 : 8,
-    [width, categoriesMaxWidth],
+    [width, categoriesMaxWidth]
   );
 
   // Responsive card height - taller on larger screens
   const cardHeight = useMemo(
     () => (width >= LAYOUT.DESKTOP_BREAKPOINT ? 140 : 96),
-    [width],
+    [width]
   );
 
   const renderCategoryItem = useCallback(
     ({ item }: { item: [string, any] }) => (
       <CategoryItem item={item} cardHeight={cardHeight} theme={theme} />
     ),
-    [cardHeight, theme],
+    [cardHeight, theme]
   );
 
   const totalHeaderHeight = HEADER_HEIGHT + insets.top;
@@ -228,14 +228,14 @@ export default function CategoriesScreen() {
             flex: 1,
             justifyContent: 'center',
             alignItems: 'center',
-            paddingTop: insets.top,
+            paddingTop: insets.top
           }}
         >
           <Text
             style={{
               fontWeight: '700',
               fontSize: 20,
-              color: theme.colors.onSurface,
+              color: theme.colors.onSurface
             }}
           >
             Categories
@@ -257,14 +257,14 @@ export default function CategoriesScreen() {
           flexGrow: 1,
           maxWidth: maxContentWidth,
           alignSelf: 'center',
-          width: '100%',
+          width: '100%'
         }}
         showsVerticalScrollIndicator={false}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           {
-            useNativeDriver: false,
-          },
+            useNativeDriver: false
+          }
         )}
         scrollEventThrottle={16}
       />

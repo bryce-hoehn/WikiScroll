@@ -38,7 +38,7 @@ export const MOTION = {
   // Maximum items to stagger - limits animation overhead
   // MD3: Recommended limiting stagger to first 10-15 items
   // Reference: https://m3.material.io/foundations/motion
-  staggerLimit: 10,
+  staggerLimit: 10
 } as const;
 
 /**
@@ -68,7 +68,7 @@ export const EASING = {
   // MD3: Accelerate cubic-bezier curve for exiting animations
   // Elements quickly leave their starting position
   // Reference: https://m3.material.io/foundations/motion
-  accelerate: [0.4, 0.0, 1, 1] as const,
+  accelerate: [0.4, 0.0, 1, 1] as const
 } as const;
 
 /**
@@ -87,7 +87,7 @@ export function getHoverStyles(
   options?: {
     scale?: number;
     transitionProperty?: string;
-  },
+  }
 ): Record<string, any> {
   const scale = options?.scale ?? 1.01;
   const transitionProperty = options?.transitionProperty ?? 'all';
@@ -101,7 +101,7 @@ export function getHoverStyles(
   // When reduced motion is enabled, only return cursor (no animations)
   if (reducedMotion) {
     return {
-      cursor: 'pointer',
+      cursor: 'pointer'
     };
   }
 
@@ -109,6 +109,6 @@ export function getHoverStyles(
   return {
     transition: `${transitionProperty} ${MOTION.durationShort}ms cubic-bezier(${EASING.standard.join(', ')})`,
     transform: [{ scale }],
-    cursor: 'pointer',
+    cursor: 'pointer'
   };
 }

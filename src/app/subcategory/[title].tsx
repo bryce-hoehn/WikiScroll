@@ -7,7 +7,7 @@ import {
   Platform,
   Pressable,
   useWindowDimensions,
-  View,
+  View
 } from 'react-native';
 import {
   Appbar,
@@ -17,22 +17,22 @@ import {
   Surface,
   Text,
   TouchableRipple,
-  useTheme,
+  useTheme
 } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import ImageDialog from '@/components/article/ImageDialog';
-import CollapsibleHeader from '@/components/common/CollapsibleHeader';
-import ErrorState from '@/components/common/ErrorState';
-import StandardEmptyState from '@/components/common/StandardEmptyState';
-import SubcategorySkeleton from '@/components/common/SubcategorySkeleton';
-import AppSidebar from '@/components/layout/AppSidebar';
-import ArticleDrawerWrapper from '@/components/layout/ArticleDrawerWrapper';
-import ContentWithSidebar from '@/components/layout/ContentWithSidebar';
+import CollapsibleHeader from '@/components/CollapsibleHeader';
+import ErrorState from '@/components/ErrorState';
+import ImageDialog from '@/components/ImageDialog';
+import StandardEmptyState from '@/components/StandardEmptyState';
+import SubcategorySkeleton from '@/components/SubcategorySkeleton';
 import { LAYOUT } from '@/constants/layout';
 import { getHoverStyles } from '@/constants/motion';
 import { SPACING } from '@/constants/spacing';
 import { TYPOGRAPHY } from '@/constants/typography';
+import AppSidebar from '@/features/layout/AppSidebar';
+import ArticleDrawerWrapper from '@/features/layout/ArticleDrawerWrapper';
+import ContentWithSidebar from '@/features/layout/ContentWithSidebar';
 import { useCategoryMembers, useReducedMotion } from '@/hooks';
 import { CategoryArticle, CategorySubcategory } from '@/types/api';
 import { getUserFriendlyError } from '@/utils/errorHandling';
@@ -93,7 +93,7 @@ export default function SubCategories() {
     ({
       article,
       onPress,
-      onImagePress,
+      onImagePress
     }: {
       article: CategoryArticle;
       onPress: (title: string) => void;
@@ -123,12 +123,12 @@ export default function SubCategories() {
             margin: 4,
             overflow: 'hidden',
             ...(Platform.OS === 'web' &&
-              getHoverStyles(isHovered, itemReducedMotion, { scale: 1.02 })),
+              getHoverStyles(isHovered, itemReducedMotion, { scale: 1.02 }))
           }}
           onPress={() => onPress(article.title)}
           {...(Platform.OS === 'web' && {
             onMouseEnter: handleMouseEnter,
-            onMouseLeave: handleMouseLeave,
+            onMouseLeave: handleMouseLeave
           })}
         >
           {article.thumbnail ? (
@@ -137,7 +137,7 @@ export default function SubCategories() {
                 e.stopPropagation();
                 onImagePress(
                   article.thumbnail!,
-                  `Thumbnail for ${article.title}`,
+                  `Thumbnail for ${article.title}`
                 );
               }}
               style={{ height: 120 }}
@@ -153,7 +153,7 @@ export default function SubCategories() {
               style={{
                 height: 120,
                 justifyContent: 'center',
-                alignItems: 'center',
+                alignItems: 'center'
               }}
             >
               <Icon
@@ -183,7 +183,7 @@ export default function SubCategories() {
           </Card.Content>
         </Card>
       );
-    },
+    }
   );
   ArticleItem.displayName = 'ArticleItem';
 
@@ -191,7 +191,7 @@ export default function SubCategories() {
   const SubcategoryItem = React.memo(
     ({
       subcategory,
-      onPress,
+      onPress
     }: {
       subcategory: CategorySubcategory;
       onPress: (title: string) => void;
@@ -223,11 +223,11 @@ export default function SubCategories() {
                 ? itemTheme.colors.surfaceVariant
                 : itemTheme.colors.surface,
             ...(Platform.OS === 'web' &&
-              getHoverStyles(isHovered, itemReducedMotion, { scale: 1.01 })),
+              getHoverStyles(isHovered, itemReducedMotion, { scale: 1.01 }))
           }}
           {...(Platform.OS === 'web' && {
             onMouseEnter: handleMouseEnter,
-            onMouseLeave: handleMouseLeave,
+            onMouseLeave: handleMouseLeave
           })}
         >
           <List.Item
@@ -239,7 +239,7 @@ export default function SubCategories() {
           />
         </Surface>
       );
-    },
+    }
   );
   SubcategoryItem.displayName = 'SubcategoryItem';
 
@@ -274,7 +274,7 @@ export default function SubCategories() {
                   flexDirection: 'row',
                   alignItems: 'center',
                   paddingHorizontal: SPACING.sm,
-                  paddingTop: insets.top,
+                  paddingTop: insets.top
                 }}
               >
                 <Appbar.BackAction onPress={handleBack} />
@@ -284,7 +284,7 @@ export default function SubCategories() {
                     // Reference: https://m3.material.io/components/app-bars/overview
                     fontWeight: '500', // MD3: Medium weight (500) for app bar titles
                     fontSize: TYPOGRAPHY.appBarTitle,
-                    flex: 1,
+                    flex: 1
                   }}
                 >
                   {title?.replace(/_/g, ' ') || 'Category'}
@@ -320,7 +320,7 @@ export default function SubCategories() {
                   flexDirection: 'row',
                   alignItems: 'center',
                   paddingHorizontal: SPACING.sm,
-                  paddingTop: insets.top,
+                  paddingTop: insets.top
                 }}
               >
                 <Appbar.BackAction onPress={handleBack} />
@@ -330,7 +330,7 @@ export default function SubCategories() {
                     // Reference: https://m3.material.io/components/app-bars/overview
                     fontWeight: '500', // MD3: Medium weight (500) for app bar titles
                     fontSize: TYPOGRAPHY.appBarTitle,
-                    flex: 1,
+                    flex: 1
                   }}
                 >
                   {title?.replace(/_/g, ' ') || 'Category'}
@@ -367,7 +367,7 @@ export default function SubCategories() {
                 flexDirection: 'row',
                 alignItems: 'center',
                 paddingHorizontal: SPACING.sm,
-                paddingTop: insets.top,
+                paddingTop: insets.top
               }}
             >
               <Appbar.BackAction onPress={handleBack} />
@@ -375,7 +375,7 @@ export default function SubCategories() {
                 style={{
                   fontWeight: '700',
                   fontSize: TYPOGRAPHY.titleLarge,
-                  flex: 1,
+                  flex: 1
                 }}
               >
                 {title?.replace(/_/g, ' ') || 'Category'}
@@ -396,7 +396,7 @@ export default function SubCategories() {
                   flex: 1,
                   maxWidth: maxContentWidth,
                   alignSelf: 'center',
-                  width: '100%',
+                  width: '100%'
                 }}
               >
                 {/* Subcategories Section */}
@@ -406,7 +406,7 @@ export default function SubCategories() {
                       style={{
                         flexDirection: 'row',
                         alignItems: 'center',
-                        marginBottom: 12,
+                        marginBottom: 12
                       }}
                     >
                       <Text variant="titleMedium" style={{ flex: 1 }}>
@@ -431,7 +431,7 @@ export default function SubCategories() {
                     </View>
                     <View
                       style={{
-                        maxHeight: subcategoriesHorizontal ? undefined : 400,
+                        maxHeight: subcategoriesHorizontal ? undefined : 400
                       }}
                     >
                       <FlashList
@@ -439,7 +439,7 @@ export default function SubCategories() {
                         renderItem={renderSubcategoryItem}
                         keyExtractor={(item: CategorySubcategory) => item.title}
                         {...({
-                          estimatedItemSize: subcategoriesHorizontal ? 200 : 64,
+                          estimatedItemSize: subcategoriesHorizontal ? 200 : 64
                         } as any)}
                         horizontal={subcategoriesHorizontal}
                         showsHorizontalScrollIndicator={false}
@@ -458,7 +458,7 @@ export default function SubCategories() {
                     style={{
                       padding: SPACING.base,
                       paddingTop: subcategories.length > 0 ? 0 : SPACING.base,
-                      flex: 1,
+                      flex: 1
                     }}
                   >
                     <Text variant="titleMedium" style={{ marginBottom: 12 }}>

@@ -9,13 +9,13 @@ import {
   Menu,
   Switch,
   Text,
-  useTheme,
+  useTheme
 } from 'react-native-paper';
 
 import {
   DEFAULT_FONT_SIZE,
   MAX_FONT_SIZE,
-  MIN_FONT_SIZE,
+  MIN_FONT_SIZE
 } from '@/hooks/storage/useFontSize';
 import {
   useAccordionBehavior,
@@ -23,7 +23,7 @@ import {
   useFontSize,
   useLineHeight,
   useParagraphSpacing,
-  useReadingWidth,
+  useReadingWidth
 } from '@/hooks';
 import { TYPOGRAPHY } from '@/constants/typography';
 import { SPACING } from '@/constants/spacing';
@@ -48,7 +48,7 @@ export default function ReadingPreferencesScreen() {
     <>
       <Appbar.Header
         style={{
-          backgroundColor: theme.colors.surface,
+          backgroundColor: theme.colors.surface
         }}
         mode="center-aligned"
       >
@@ -59,7 +59,7 @@ export default function ReadingPreferencesScreen() {
             // MD3: Center-aligned app bars use 22sp title
             // Reference: https://m3.material.io/components/app-bars/overview
             fontWeight: '500', // MD3: Medium weight (500) for app bar titles
-            fontSize: TYPOGRAPHY.appBarTitle,
+            fontSize: TYPOGRAPHY.appBarTitle
           }}
         />
       </Appbar.Header>
@@ -71,7 +71,7 @@ export default function ReadingPreferencesScreen() {
           paddingBottom: SPACING.xl,
           maxWidth: maxContentWidth,
           alignSelf: 'center',
-          width: '100%',
+          width: '100%'
         }}
       >
         {/* Reading Preferences Section */}
@@ -89,7 +89,7 @@ export default function ReadingPreferencesScreen() {
           <View
             style={{
               paddingHorizontal: SPACING.base,
-              paddingBottom: SPACING.base,
+              paddingBottom: SPACING.base
             }}
           >
             <View
@@ -97,7 +97,7 @@ export default function ReadingPreferencesScreen() {
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                marginBottom: SPACING.sm,
+                marginBottom: SPACING.sm
               }}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -147,7 +147,7 @@ export default function ReadingPreferencesScreen() {
           <View
             style={{
               paddingHorizontal: SPACING.base,
-              paddingBottom: SPACING.base,
+              paddingBottom: SPACING.base
             }}
           >
             <View
@@ -155,7 +155,7 @@ export default function ReadingPreferencesScreen() {
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                marginBottom: SPACING.sm,
+                marginBottom: SPACING.sm
               }}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -203,7 +203,7 @@ export default function ReadingPreferencesScreen() {
           <View
             style={{
               paddingHorizontal: SPACING.base,
-              paddingBottom: SPACING.base,
+              paddingBottom: SPACING.base
             }}
           >
             <View
@@ -211,7 +211,7 @@ export default function ReadingPreferencesScreen() {
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                marginBottom: SPACING.sm,
+                marginBottom: SPACING.sm
               }}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -261,7 +261,7 @@ export default function ReadingPreferencesScreen() {
           <View
             style={{
               paddingHorizontal: SPACING.base,
-              paddingBottom: SPACING.base,
+              paddingBottom: SPACING.base
             }}
           >
             <View
@@ -269,7 +269,7 @@ export default function ReadingPreferencesScreen() {
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                marginBottom: SPACING.sm,
+                marginBottom: SPACING.sm
               }}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>

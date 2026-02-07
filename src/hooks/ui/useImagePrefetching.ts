@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 
 import {
   cacheUrlResolution,
-  getCachedUrlResolution,
+  getCachedUrlResolution
 } from '@/utils/imageUrlCache';
 import { getOptimizedThumbnailUrl } from '@/utils/imageUtils';
 
@@ -19,7 +19,7 @@ import { getOptimizedThumbnailUrl } from '@/utils/imageUtils';
 export function useImagePrefetching<T>({
   data,
   getImageUrl,
-  preferredWidth,
+  preferredWidth
 }: {
   data: T[];
   getImageUrl: (item: T) => string | undefined;
@@ -56,7 +56,7 @@ export function useImagePrefetching<T>({
           // This will cache the image in memory/disk for faster loading when it becomes visible
           // If prefetch fails, cache the failure to avoid retrying
           Image.prefetch(optimizedUrl, {
-            cachePolicy: 'memory-disk',
+            cachePolicy: 'memory-disk'
           })
             .then(() => {
               // Prefetch succeeded - cache that URL exists
@@ -69,7 +69,7 @@ export function useImagePrefetching<T>({
         }
       }
     },
-    [data, getImageUrl, preferredWidth],
+    [data, getImageUrl, preferredWidth]
   );
 
   return { onViewableItemsChanged };

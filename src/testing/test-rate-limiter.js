@@ -4,13 +4,13 @@ const axios = require('axios');
 const REST_RATE_LIMIT_CONFIG = {
   REQUESTS_PER_SECOND: 10,
   MIN_INTERVAL_MS: 100, // 100ms = 10 requests per second
-  MAX_CONCURRENT: 5,
+  MAX_CONCURRENT: 5
 };
 
 // Action API Rate Limit Configuration
 const ACTION_RATE_LIMIT_CONFIG = {
   REQUESTS_PER_SECOND: 5,
-  MIN_INTERVAL_MS: 200, // 200ms = 5 requests per second
+  MIN_INTERVAL_MS: 200 // 200ms = 5 requests per second
 };
 
 // REST API rate limiting state
@@ -38,9 +38,9 @@ let actionLastRequestTime = 0;
 const restAxiosInstance = axios.create({
   headers: {
     Accept: 'application/json',
-    'Api-User-Agent': 'WikiScape/1.0 (test@example.com)',
+    'Api-User-Agent': 'WikiScape/1.0 (test@example.com)'
   },
-  timeout: 15000,
+  timeout: 15000
 });
 
 restAxiosInstance.interceptors.request.use(
@@ -78,7 +78,7 @@ restAxiosInstance.interceptors.request.use(
 
     return config;
   },
-  (error) => Promise.reject(error),
+  (error) => Promise.reject(error)
 );
 
 restAxiosInstance.interceptors.response.use(
@@ -91,16 +91,16 @@ restAxiosInstance.interceptors.response.use(
     restConcurrentRequests = Math.max(0, restConcurrentRequests - 1);
     processRestQueue();
     return Promise.reject(error);
-  },
+  }
 );
 
 // Create Action API instance
 const actionAxiosInstance = axios.create({
   headers: {
     Accept: 'application/json',
-    'Api-User-Agent': 'WikiScape/1.0 (test@example.com)',
+    'Api-User-Agent': 'WikiScape/1.0 (test@example.com)'
   },
-  timeout: 15000,
+  timeout: 15000
 });
 
 actionAxiosInstance.interceptors.request.use(
@@ -129,13 +129,13 @@ actionAxiosInstance.interceptors.request.use(
 
     return config;
   },
-  (error) => Promise.reject(error),
+  (error) => Promise.reject(error)
 );
 
 async function testRateLimiter(instance, instanceName, config, testUrl) {
   console.log(`\n🧪 Testing ${instanceName} Rate Limiter`);
   console.log(
-    `Configuration: ${config.REQUESTS_PER_SECOND} requests/second = ${config.MIN_INTERVAL_MS}ms minimum interval`,
+    `Configuration: ${config.REQUESTS_PER_SECOND} requests/second = ${config.MIN_INTERVAL_MS}ms minimum interval`
   );
   if (config.MAX_CONCURRENT) {
     console.log(`Max concurrent: ${config.MAX_CONCURRENT}`);
@@ -172,7 +172,7 @@ async function testRateLimiter(instance, instanceName, config, testUrl) {
         duration,
         timeSinceLastStart: timeSinceLastStart,
         callInitiated: callInitiated,
-        delay: actualStartTime - callInitiated,
+        delay: actualStartTime - callInitiated
       });
 
       lastRequestStartTime = actualStartTime;
@@ -192,7 +192,7 @@ async function testRateLimiter(instance, instanceName, config, testUrl) {
         duration,
         timeSinceLastStart: timeSinceLastStart,
         callInitiated: callInitiated,
-        delay: actualStartTime - callInitiated,
+        delay: actualStartTime - callInitiated
       });
 
       lastRequestStartTime = actualStartTime;
@@ -209,7 +209,7 @@ async function testRateLimiter(instance, instanceName, config, testUrl) {
   console.log('\n📊 Results:');
   console.log(`Total time: ${totalTime}ms`);
   console.log(
-    `Average time per request: ${(totalTime / numRequests).toFixed(2)}ms`,
+    `Average time per request: ${(totalTime / numRequests).toFixed(2)}ms`
   );
   const expectedMinTime = config.MAX_CONCURRENT
     ? (numRequests / config.MAX_CONCURRENT) * config.MIN_INTERVAL_MS
@@ -240,7 +240,7 @@ async function testRateLimiter(instance, instanceName, config, testUrl) {
   console.log(`  Maximum: ${maxInterval}ms`);
   console.log(`  Average: ${avgInterval.toFixed(2)}ms`);
   console.log(
-    `  Required: ≥${displayThreshold}ms${config.MAX_CONCURRENT ? ` (with ${config.MAX_CONCURRENT} concurrent)` : ''}`,
+    `  Required: ≥${displayThreshold}ms${config.MAX_CONCURRENT ? ` (with ${config.MAX_CONCURRENT} concurrent)` : ''}`
   );
 
   // For REST API with concurrency, we need to account for parallel requests
@@ -256,7 +256,7 @@ async function testRateLimiter(instance, instanceName, config, testUrl) {
     : config.MIN_INTERVAL_MS;
 
   const mostIntervalsRespected = intervals.filter(
-    (interval) => interval >= minIntervalThreshold,
+    (interval) => interval >= minIntervalThreshold
   ).length;
   const percentageRespected =
     intervals.length > 0
@@ -265,15 +265,15 @@ async function testRateLimiter(instance, instanceName, config, testUrl) {
 
   console.log('\n✅ Rate Limiter Status:');
   console.log(
-    `  All requests spaced correctly: ${allIntervalsRespected ? '✅ YES' : '❌ NO'}`,
+    `  All requests spaced correctly: ${allIntervalsRespected ? '✅ YES' : '❌ NO'}`
   );
   console.log(
-    `  Intervals ≥${minIntervalThreshold}ms: ${mostIntervalsRespected}/${intervals.length} (${percentageRespected.toFixed(1)}%)`,
+    `  Intervals ≥${minIntervalThreshold}ms: ${mostIntervalsRespected}/${intervals.length} (${percentageRespected.toFixed(1)}%)`
   );
 
   if (config.MAX_CONCURRENT) {
     console.log(
-      `  Note: With ${config.MAX_CONCURRENT} concurrent requests, some intervals may be shorter`,
+      `  Note: With ${config.MAX_CONCURRENT} concurrent requests, some intervals may be shorter`
     );
   }
 
@@ -286,15 +286,15 @@ async function testRateLimiter(instance, instanceName, config, testUrl) {
     return true;
   } else if (allIntervalsRespected) {
     console.log(
-      `\n⚠️  ${instanceName} rate limiter is working, but some intervals are shorter than expected.`,
+      `\n⚠️  ${instanceName} rate limiter is working, but some intervals are shorter than expected.`
     );
     console.log(
-      '   This may be due to network latency, request processing time, or concurrency.',
+      '   This may be due to network latency, request processing time, or concurrency.'
     );
     return true;
   } else {
     console.log(
-      `\n❌ ${instanceName} rate limiter may not be working correctly.`,
+      `\n❌ ${instanceName} rate limiter may not be working correctly.`
     );
     console.log('   Some requests appear to be sent too quickly.');
     return false;
@@ -314,14 +314,14 @@ async function runAllTests() {
     restAxiosInstance,
     'REST API',
     REST_RATE_LIMIT_CONFIG,
-    restApiUrl,
+    restApiUrl
   );
 
   const actionResult = await testRateLimiter(
     actionAxiosInstance,
     'Action API',
     ACTION_RATE_LIMIT_CONFIG,
-    actionApiUrl,
+    actionApiUrl
   );
 
   console.log('\n=====================================');
