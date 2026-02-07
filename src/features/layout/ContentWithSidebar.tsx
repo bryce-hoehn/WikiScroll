@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, useWindowDimensions } from 'react-native';
-import { Card, Divider, Text, useTheme } from 'react-native-paper';
+import { Divider, useTheme } from 'react-native-paper';
 
 import { LAYOUT } from '@/constants/layout';
 import { SPACING } from '@/constants/spacing';
@@ -12,8 +12,8 @@ interface ContentWithSidebarProps {
 
 /**
  * Layout component that shows a right sidebar on large screens
- * Similar to Twitter's layout with main content and "What&apos;s happening" section
  */
+
 export default function ContentWithSidebar({
   children,
   sidebar
@@ -40,7 +40,7 @@ export default function ContentWithSidebar({
       {/* Right sidebar - only shown on large screens */}
       {isLargeScreen && (
         <>
-          <Divider style={{ width: 1 }} />
+          <Divider style={{ width: 1, height: '100%' }} />
           <View
             style={{
               width: LAYOUT.SIDEBAR_WIDTH,
@@ -48,24 +48,7 @@ export default function ContentWithSidebar({
               padding: SPACING.md
             }}
           >
-            {sidebar ? (
-              sidebar
-            ) : (
-              // Default sidebar content if none provided
-              <Card>
-                <Card.Content>
-                  <Text variant="titleMedium" style={{ marginBottom: 8 }}>
-                    What&apos;s happening
-                  </Text>
-                  <Text
-                    variant="bodyMedium"
-                    style={{ color: theme.colors.onSurfaceVariant }}
-                  >
-                    Sidebar content goes here
-                  </Text>
-                </Card.Content>
-              </Card>
-            )}
+            {sidebar}
           </View>
         </>
       )}
