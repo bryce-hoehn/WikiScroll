@@ -1,11 +1,20 @@
 import { ConfigContext, ExpoConfig } from '@expo/config';
 import 'tsx/cjs';
+import pkg from './package.json';
+
+const [major = 0, minor = 0, patch = 0] = pkg.version
+  .split('.')
+  .map((v: string) => parseInt(v, 10));
+
+const numericVersion = major * 10000 + minor * 1000 + patch;
+
+const expoVersion = pkg.version;
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: 'WikiScape',
   slug: 'wikiscape',
-  version: '0.3.1',
+  version: expoVersion,
   description:
     'A modern, cross-platform Wikipedia reader built with React Native and Expo.',
   orientation: 'portrait',
@@ -17,6 +26,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   githubUrl: 'https://github.com/bryce-hoehn/WikiScape',
   android: {
     package: 'com.wikiscape.app',
+    versionCode: numericVersion,
     adaptiveIcon: {
       foregroundImage: './src/assets/images/icon.png',
       backgroundColor: '#ffffff'
@@ -24,7 +34,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     permissions: ['RECORD_AUDIO', 'MODIFY_AUDIO_SETTINGS']
   },
   ios: {
-    bundleIdentifier: 'com.wikiscape.app'
+    bundleIdentifier: 'com.wikiscape.app',
+    buildNumber: expoVersion
   },
   web: {
     output: 'static',
