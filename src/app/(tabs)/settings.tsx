@@ -21,7 +21,7 @@ import {
   useTheme
 } from 'react-native-paper';
 
-import ProgressDialog from '@/components/ProgressDialog';
+import ProgressDialog from '@/components/ui/feedback/ProgressDialog';
 import { LAYOUT } from '@/constants/layout';
 import { SPACING } from '@/constants/spacing';
 import { TYPOGRAPHY } from '@/constants/typography';
