@@ -47,7 +47,7 @@ export default function BookmarksScreen() {
         mode="center-aligned"
       >
         <Appbar.Content
-          title={`Bookmarks (${bookmarks.length}}`}
+          title={`Bookmarks (${bookmarks.length})`}
           titleStyle={{
             // MD3: Center-aligned app bars use 22sp title
             // Reference: https://m3.material.io/components/app-bars/overview
