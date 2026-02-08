@@ -5,7 +5,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: 'WikiScape',
   slug: 'wikiscape',
-  version: '0.3.0',
+  version: '0.3.1',
   description:
     'A modern, cross-platform Wikipedia reader built with React Native and Expo.',
   orientation: 'portrait',
@@ -17,7 +17,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   githubUrl: 'https://github.com/bryce-hoehn/WikiScape',
   android: {
     package: 'com.wikiscape.app',
-    versionCode: 3,
     adaptiveIcon: {
       foregroundImage: './src/assets/images/icon.png',
       backgroundColor: '#ffffff'
@@ -25,8 +24,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     permissions: ['RECORD_AUDIO', 'MODIFY_AUDIO_SETTINGS']
   },
   ios: {
-    bundleIdentifier: 'com.wikiscape.app',
-    buildNumber: '0.3.0'
+    bundleIdentifier: 'com.wikiscape.app'
   },
   web: {
     output: 'static',
