@@ -40,7 +40,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     backgroundColor: '#ffffff',
     display: 'standalone',
     orientation: 'portrait',
-    startUrl: '/'
+    startUrl: '/',
+    manifest: './src/public/manifest.json'
   },
   plugins: [
     'expo-router',
