@@ -69,17 +69,8 @@ jobs:
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm ci
 
-      - name: Setup environment variables
-        run: |
-          echo "ADSENSE_AD_CLIENT=${{ secrets.ADSENSE_AD_CLIENT }}" >> $GITHUB_ENV
-          echo "ADSENSE_AD_SLOT=${{ secrets.ADSENSE_AD_SLOT }}" >> $GITHUB_ENV
-          echo "ADSENSE_AD_LAYOUT_KEY=${{ secrets.ADSENSE_AD_LAYOUT_KEY }}" >> $GITHUB_ENV
-
       - name: Build website
         run: |
-          # Load environment variables from previous step
-          cat $GITHUB_ENV >> $GITHUB_OUTPUT
-          # Build with environment variables
           npx expo export --platform web
 
       - name: Verify build output
