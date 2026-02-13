@@ -1,9 +1,7 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback } from 'react';
 import { View } from 'react-native';
 import { Card, List, useTheme } from 'react-native-paper';
-import Carousel, { ICarouselInstance } from 'react-native-reanimated-carousel';
-
-import { useReducedMotion } from '@/hooks';
+import Carousel from 'react-native-reanimated-carousel';
 
 import TrendingListItem from './TrendingListItem';
 
@@ -26,37 +24,6 @@ function TrendingCarousel({
   currentPage
 }: TrendingCarouselProps) {
   const theme = useTheme();
-  const { reducedMotion } = useReducedMotion();
-  const carouselRef = useRef<ICarouselInstance>(null);
-
-  // Expose scrollToIndex method via ref with looping support
-  React.useImperativeHandle(ref, () => ({
-    scrollToIndex: (params: { index: number; animated?: boolean }) => {
-      if (carouselRef.current && memoizedPages.length > 0) {
-        const normalizedIndex =
-          ((params.index % memoizedPages.length) + memoizedPages.length) %
-          memoizedPages.length;
-        carouselRef.current.scrollTo({
-          index: normalizedIndex,
-          animated: params.animated ?? true
-        });
-      }
-    }
-  }));
-
-  // Scroll to page when currentPage changes externally
-  useEffect(() => {
-    if (
-      carouselRef.current &&
-      currentPage !== undefined &&
-      memoizedPages.length > 0
-    ) {
-      const normalizedIndex =
-        ((currentPage % memoizedPages.length) + memoizedPages.length) %
-        memoizedPages.length;
-      carouselRef.current.scrollTo({ index: normalizedIndex, animated: true });
-    }
-  }, [currentPage, memoizedPages.length]);
 
   const containerHeight = 410;
 
@@ -77,12 +44,11 @@ function TrendingCarousel({
           }}
         >
           <Card
-            elevation={1} // M3: Default elevation 1dp
             style={{
               width: cardWidth,
               height: containerHeight + 8,
               backgroundColor: theme.colors.elevation.level2,
-              borderRadius: theme.roundness * 3, // M3: 12dp corner radius (4dp * 3)
+              borderRadius: theme.roundness * 3,
               overflow: 'hidden'
             }}
             contentStyle={{
@@ -128,19 +94,13 @@ function TrendingCarousel({
 
   return (
     <Carousel
-      ref={carouselRef}
       width={itemWidth}
       height={containerHeight + 8}
       data={memoizedPages}
       renderItem={renderPage}
       loop={true}
-      enabled={!reducedMotion}
       autoPlay={false}
-      scrollAnimationDuration={reducedMotion ? 0 : 300}
       style={{ backgroundColor: theme.colors.background }}
-      onSnapToItem={(index) => {
-        onPageChange(index);
-      }}
     />
   );
 }

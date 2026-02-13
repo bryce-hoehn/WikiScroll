@@ -160,7 +160,7 @@ export default function MediaPlayer({ tnode, type }: MediaPlayerProps) {
     <View
       style={{
         width: '100%',
-        marginVertical: SPACING.base,
+        marginVertical: SPACING.sm,
         alignItems: 'center'
       }}
     >

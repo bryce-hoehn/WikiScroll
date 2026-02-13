@@ -4,7 +4,7 @@ import { ImageStyle, Platform, useWindowDimensions, View } from 'react-native';
 import { TouchableRipple, useTheme } from 'react-native-paper';
 
 import { WIKIPEDIA_API_CONFIG } from '@/api/shared';
-import { LAYOUT } from '@/constants/layout';
+import { BREAKPOINTS } from '@/constants/breakpoints';
 import { getRandomBlurhash } from '@/utils/blurhash';
 import { extractFilenameFromUrl } from '@/utils/imageAltText';
 import {
@@ -75,11 +75,11 @@ const ResponsiveImage = React.memo(
       explicitWidth !== undefined || explicitHeight !== undefined;
 
     // Calculate max dimensions for large screens (only if not using explicit dimensions)
-    const isLargeScreen = windowWidth >= LAYOUT.DESKTOP_BREAKPOINT;
+    const isLargeScreen = windowWidth >= BREAKPOINTS.xl;
     const maxImageWidth = useExplicitDimensions
       ? explicitWidth || windowWidth
       : isLargeScreen
-        ? Math.min(LAYOUT.ARTICLE_MAX_WIDTH, 900)
+        ? Math.min(900)
         : windowWidth;
     const maxImageHeight = useExplicitDimensions
       ? explicitHeight || 600

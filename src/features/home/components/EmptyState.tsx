@@ -88,7 +88,7 @@ export default function EmptyState({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: SPACING.xxl, // Increased from 40 to SPACING.xxl (48dp) for more generous spacing
+        padding: SPACING.xl,
         minHeight: 500
       }}
     >
@@ -96,11 +96,11 @@ export default function EmptyState({
         style={{
           width: 80,
           height: 80,
-          borderRadius: theme.roundness * 7, // 28dp equivalent (4dp * 7) - MD3 maximum standard value
+          borderRadius: theme.roundness * 7,
           backgroundColor: theme.colors.surfaceVariant,
           justifyContent: 'center',
           alignItems: 'center',
-          marginBottom: SPACING.lg // Increased from 24 to SPACING.lg (24dp) for consistency
+          marginBottom: SPACING.lg
         }}
       >
         <IconButton
@@ -114,8 +114,7 @@ export default function EmptyState({
         variant="headlineSmall"
         style={{
           textAlign: 'center',
-          marginBottom: SPACING.base, // Increased from 16 to SPACING.base (16dp) for consistency
-          // fontWeight removed - using variant default
+          marginBottom: SPACING.sm,
           color: theme.colors.onSurface
         }}
       >
@@ -125,9 +124,9 @@ export default function EmptyState({
         variant="bodyLarge"
         style={{
           textAlign: 'center',
-          marginBottom: SPACING.xl, // Increased from 32 to SPACING.xl (32dp) for more spacing
+          marginBottom: SPACING.xl,
           color: theme.colors.onSurfaceVariant,
-          lineHeight: 26 // Increased from 24 to 26 for better readability (1.5x ratio)
+          lineHeight: 26
         }}
       >
         {config.description}
@@ -142,7 +141,6 @@ export default function EmptyState({
               mode="outlined"
               onPress={suggestion.action}
               icon={suggestion.icon}
-              // M3: Buttons use 20dp corner radius (RNP handles this by default)
               contentStyle={{ paddingVertical: SPACING.sm }}
             >
               {suggestion.label}

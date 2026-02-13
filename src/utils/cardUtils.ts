@@ -4,10 +4,10 @@
 
 import { type MD3Theme } from 'react-native-paper';
 
-import DidYouKnowCard from '../features/featured/components/DidYouKnowCard';
-import GenericCard from '../features/featured/components/GenericCard';
-import NewsCard from '../features/featured/components/NewsCard';
-import OnThisDayCard from '../features/featured/components/OnThisDayCard';
+import DidYouKnowCard from '@/features/discover/components/DidYouKnowCard';
+import GenericCard from '@/features/discover/components/GenericCard';
+import NewsCard from '@/features/discover/components/NewsCard';
+import OnThisDayCard from '@/features/discover/components/OnThisDayCard';
 import { RecommendationItem } from '../types/components';
 
 export type CardType = 'on-this-day' | 'news' | 'did-you-know' | 'generic';

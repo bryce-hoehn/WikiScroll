@@ -1,4 +1,3 @@
-import { router } from 'expo-router';
 import React, {
   Suspense,
   useCallback,
@@ -18,7 +17,6 @@ import {
 import { useTheme } from 'react-native-paper';
 
 import StandardEmptyState from '@/components/StandardEmptyState';
-import ErrorState from '@/components/ui/feedback/ErrorState';
 import {
   useArticleHtml,
   useFontFamily,
@@ -28,11 +26,8 @@ import {
   useReadingProgress,
   useReadingWidth
 } from '@/hooks';
-import { MAX_FONT_SIZE, MIN_FONT_SIZE } from '@/hooks/storage/useFontSize';
-import { getUserFriendlyError } from '@/utils/errorHandling';
 import { useLazyFonts } from '../hooks/useLazyFonts';
 import ArticleSkeleton from './ArticleSkeleton';
-import ArticleToolbar from './ArticleToolbar';
 
 // Lazy load heavy ArticleSectionedRenderer component (uses react-native-render-html)
 const ArticleSectionedRenderer = React.lazy(
@@ -56,7 +51,7 @@ export default function Article({
 }: ArticleProps) {
   const theme = useTheme();
   useWindowDimensions();
-  const { data: articleHtml, isLoading, error } = useArticleHtml(title || '');
+  const { data: articleHtml, isLoading } = useArticleHtml(title || '');
 
   // Global reading preferences (used as defaults)
   const { fontSize: globalFontSize } = useFontSize();
@@ -85,31 +80,6 @@ export default function Article({
 
   // Use local font size if set, otherwise fall back to global
   const fontSize = localFontSize ?? globalFontSize;
-
-  // Per-article font size handlers (don't persist globally)
-  const increaseFontSize = useCallback(() => {
-    setLocalFontSize((prev) => {
-      const current = prev ?? globalFontSize;
-      const newSize = Math.min(current + 2, MAX_FONT_SIZE);
-      return newSize;
-    });
-  }, [globalFontSize]);
-
-  const decreaseFontSize = useCallback(() => {
-    setLocalFontSize((prev) => {
-      const current = prev ?? globalFontSize;
-      const newSize = Math.max(current - 2, MIN_FONT_SIZE);
-      return newSize;
-    });
-  }, [globalFontSize]);
-
-  const resetFontSize = useCallback(() => {
-    // Reset to global default (or 16 if global is not set)
-    setLocalFontSize(globalFontSize);
-  }, [globalFontSize]);
-
-  const canIncrease = fontSize < MAX_FONT_SIZE;
-  const canDecrease = fontSize > MIN_FONT_SIZE;
 
   // Use global values for other settings (lineHeight, paragraphSpacing, fontFamily)
   const lineHeight = globalLineHeight;
@@ -413,36 +383,7 @@ export default function Article({
     return (
       <>
         <ArticleSkeleton />
-        <ArticleToolbar
-          onZoomIn={increaseFontSize}
-          onZoomOut={decreaseFontSize}
-          onResetZoom={resetFontSize}
-          canZoomIn={canIncrease}
-          canZoomOut={canDecrease}
-          sections={[]}
-          onSectionPress={() => {}}
-          currentFontSize={fontSize}
-          visible={true}
-        />
       </>
-    );
-  }
-
-  if (error) {
-    const errorInfo = getUserFriendlyError(error);
-    const handleRetry = () => {
-      // Navigate to home instead of retrying
-      router.replace('/(tabs)');
-    };
-    return (
-      <ErrorState
-        title="Unable to Load Article"
-        message={errorInfo.userFriendlyMessage}
-        onRetry={handleRetry}
-        showDetails
-        error={error instanceof Error ? error : undefined}
-        recoverySteps={errorInfo.recoverySteps}
-      />
     );
   }
 
@@ -524,20 +465,6 @@ export default function Article({
           </View>
         )}
       </ScrollView>
-
-      <ArticleToolbar
-        onZoomIn={increaseFontSize}
-        onZoomOut={decreaseFontSize}
-        onResetZoom={resetFontSize}
-        canZoomIn={canIncrease}
-        canZoomOut={canDecrease}
-        sections={sections}
-        onSectionPress={handleSectionPress}
-        currentFontSize={fontSize}
-        visible={true}
-        fabVisible={fabVisible}
-        scrollRef={scrollViewRef}
-      />
     </View>
   );
 }

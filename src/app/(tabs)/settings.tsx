@@ -1,15 +1,7 @@
 import { router } from 'expo-router';
 import React, { useState } from 'react';
+import { Linking, Platform, ScrollView, View } from 'react-native';
 import {
-  Alert,
-  Linking,
-  Platform,
-  ScrollView,
-  useWindowDimensions,
-  View
-} from 'react-native';
-import {
-  Appbar,
   Button,
   Divider,
   List,
@@ -21,53 +13,18 @@ import {
   useTheme
 } from 'react-native-paper';
 
-import ProgressDialog from '@/components/ui/feedback/ProgressDialog';
-import { LAYOUT } from '@/constants/layout';
 import { SPACING } from '@/constants/spacing';
-import { TYPOGRAPHY } from '@/constants/typography';
-import {
-  useAccordionBehavior,
-  useFontFamily,
-  useFontSize,
-  useLineHeight,
-  useParagraphSpacing,
-  useReadingWidth,
-  useReducedMotion,
-  useVisitedArticles
-} from '@/hooks';
-import { useBookmarks } from '@/stores/BookmarksContext';
-import { useSnackbar } from '@/stores/SnackbarContext';
+import { useReducedMotion, useVisitedArticles } from '@/hooks';
 import { useThemeContext } from '@/stores/ThemeProvider';
-import {
-  exportUserProfile,
-  importUserProfile,
-  readFileContent
-} from '@/utils/bookmarkImportExport';
 import { getAppVersion } from '@/utils/env';
 
 export default function SettingsScreen() {
   const theme = useTheme();
-  const { width } = useWindowDimensions();
   const { currentTheme, setTheme } = useThemeContext();
-  const { visitedArticles, loadVisitedArticles } = useVisitedArticles();
+  const { visitedArticles } = useVisitedArticles();
   const { reducedMotion, setReducedMotion } = useReducedMotion();
-  const { updateFontSize } = useFontSize();
-  const { updateFontFamily } = useFontFamily();
-  const { updateLineHeight } = useLineHeight();
-  const { updateParagraphSpacing } = useParagraphSpacing();
-  const { updateReadingPadding } = useReadingWidth();
-  const { setAccordionAutoClose } = useAccordionBehavior();
-  const { showSuccess, showError } = useSnackbar();
-  const { bookmarks, loadBookmarks } = useBookmarks();
-  const [isExporting, setIsExporting] = useState(false);
-  const [isImporting, setIsImporting] = useState(false);
-  const [exportProgress, setExportProgress] = useState(0);
-  const [importProgress, setImportProgress] = useState(0);
   const [themeMenuVisible, setThemeMenuVisible] = useState(false);
   const [helpVisible, setHelpVisible] = useState(false);
-
-  // Responsive max width for content
-  const maxContentWidth = Math.min(width - 32, LAYOUT.MAX_CONTENT_WIDTH);
 
   const themeOptions = [
     { label: 'Automatic', value: 'automatic' },
@@ -85,312 +42,35 @@ export default function SettingsScreen() {
     return option ? option.label : 'Automatic';
   };
 
-  const handleExportProfile = async () => {
-    setIsExporting(true);
-    setExportProgress(0);
-
-    try {
-      // Simulate progress for export (since it's relatively fast)
-      setExportProgress(0.3);
-      await new Promise((resolve) => setTimeout(resolve, 100));
-
-      setExportProgress(0.6);
-      await exportUserProfile();
-
-      setExportProgress(1.0);
-      await new Promise((resolve) => setTimeout(resolve, 200));
-
-      // Export completed successfully
-      showSuccess(
-        `Successfully exported user profile (${bookmarks.length} bookmark${bookmarks.length !== 1 ? 's' : ''}, ${visitedArticles.length} history item${visitedArticles.length !== 1 ? 's' : ''}, and settings)`
-      );
-    } catch {
-      showError('Failed to export user profile. Please try again.');
-    } finally {
-      setIsExporting(false);
-      setExportProgress(0);
-    }
-  };
-
-  const handleImportProfile = async () => {
-    const confirmAction = async () => {
-      setIsImporting(true);
-      setImportProgress(0);
-      try {
-        if (Platform.OS === 'web') {
-          // Web: Use file input
-          return new Promise<void>((resolve) => {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json,application/json';
-            input.onchange = async (e) => {
-              const target = e.target as HTMLInputElement;
-              const selectedFile = target.files?.[0];
-              if (!selectedFile) {
-                setIsImporting(false);
-                resolve();
-                return;
-              }
-
-              try {
-                setImportProgress(0.2);
-                const content = await readFileContent(selectedFile);
-
-                setImportProgress(0.5);
-                const result = await importUserProfile(content);
-
-                setImportProgress(0.7);
-                // Reload all data
-                await loadBookmarks();
-                await loadVisitedArticles();
-
-                setImportProgress(0.8);
-                // Update settings if imported
-                if (result.theme !== null) {
-                  await setTheme(result.theme);
-                }
-                if (result.fontSize !== null) {
-                  await updateFontSize(result.fontSize);
-                }
-                if (result.fontFamily !== null) {
-                  await updateFontFamily(result.fontFamily as any);
-                }
-                if (result.lineHeight !== null) {
-                  await updateLineHeight(result.lineHeight);
-                }
-                if (result.paragraphSpacing !== null) {
-                  await updateParagraphSpacing(result.paragraphSpacing);
-                }
-                if (result.readingPadding !== null) {
-                  await updateReadingPadding(result.readingPadding);
-                }
-                if (result.reducedMotion !== null) {
-                  await setReducedMotion(result.reducedMotion);
-                }
-                if (result.accordionAutoClose !== null) {
-                  await setAccordionAutoClose(result.accordionAutoClose);
-                }
-
-                setImportProgress(0.95);
-                const parts: string[] = [];
-                if (result.bookmarks.length > 0) {
-                  parts.push(
-                    `${result.bookmarks.length} bookmark${result.bookmarks.length !== 1 ? 's' : ''}`
-                  );
-                }
-                if (result.visitedArticles.length > 0) {
-                  parts.push(
-                    `${result.visitedArticles.length} history item${result.visitedArticles.length !== 1 ? 's' : ''}`
-                  );
-                }
-                const hasSettings =
-                  result.theme !== null ||
-                  result.fontSize !== null ||
-                  result.fontFamily !== null ||
-                  result.lineHeight !== null ||
-                  result.paragraphSpacing !== null ||
-                  result.readingPadding !== null ||
-                  result.reducedMotion !== null ||
-                  result.accordionAutoClose !== null;
-                if (hasSettings) {
-                  parts.push('settings');
-                }
-
-                setImportProgress(1.0);
-                await new Promise((resolve) => setTimeout(resolve, 200));
-
-                showSuccess(
-                  `Successfully imported user profile (${parts.join(', ')})`
-                );
-              } catch {
-                showError(
-                  'Failed to import user profile. Please check the file format.'
-                );
-              } finally {
-                setIsImporting(false);
-                setImportProgress(0);
-                resolve();
-              }
-            };
-            input.click();
-          });
-        } else {
-          // Mobile: Use document picker
-          let DocumentPicker;
-          try {
-            // eslint-disable-next-line @typescript-eslint/no-require-imports
-            DocumentPicker = require('expo-document-picker');
-          } catch {
-            showError(
-              'Document picker is not available. Please rebuild the app or restart the development server.'
-            );
-            setIsImporting(false);
-            return;
-          }
-
-          const result = await DocumentPicker.getDocumentAsync({
-            type: 'application/json',
-            copyToCacheDirectory: true
-          });
-
-          if (result.canceled) {
-            setIsImporting(false);
-            return;
-          }
-
-          setImportProgress(0.2);
-          const file = { uri: result.assets[0].uri };
-          const content = await readFileContent(file);
-
-          setImportProgress(0.5);
-          const importResult = await importUserProfile(content);
-
-          setImportProgress(0.7);
-          // Reload all data
-          await loadBookmarks();
-          await loadVisitedArticles();
-
-          setImportProgress(0.8);
-          // Update settings if imported
-          if (importResult.theme !== null) {
-            await setTheme(importResult.theme);
-          }
-          if (importResult.fontSize !== null) {
-            await updateFontSize(importResult.fontSize);
-          }
-          if (importResult.fontFamily !== null) {
-            await updateFontFamily(importResult.fontFamily as any);
-          }
-          if (importResult.lineHeight !== null) {
-            await updateLineHeight(importResult.lineHeight);
-          }
-          if (importResult.paragraphSpacing !== null) {
-            await updateParagraphSpacing(importResult.paragraphSpacing);
-          }
-          if (importResult.readingPadding !== null) {
-            await updateReadingPadding(importResult.readingPadding);
-          }
-          if (importResult.reducedMotion !== null) {
-            await setReducedMotion(importResult.reducedMotion);
-          }
-          if (importResult.accordionAutoClose !== null) {
-            await setAccordionAutoClose(importResult.accordionAutoClose);
-          }
-
-          setImportProgress(0.95);
-          const parts: string[] = [];
-          if (importResult.bookmarks.length > 0) {
-            parts.push(
-              `${importResult.bookmarks.length} bookmark${importResult.bookmarks.length !== 1 ? 's' : ''}`
-            );
-          }
-          if (importResult.visitedArticles.length > 0) {
-            parts.push(
-              `${importResult.visitedArticles.length} history item${importResult.visitedArticles.length !== 1 ? 's' : ''}`
-            );
-          }
-          const hasSettings =
-            importResult.theme !== null ||
-            importResult.fontSize !== null ||
-            importResult.fontFamily !== null ||
-            importResult.lineHeight !== null ||
-            importResult.paragraphSpacing !== null ||
-            importResult.readingPadding !== null ||
-            importResult.reducedMotion !== null ||
-            importResult.accordionAutoClose !== null;
-          if (hasSettings) {
-            parts.push('settings');
-          }
-
-          setImportProgress(1.0);
-          await new Promise((resolve) => setTimeout(resolve, 200));
-
-          showSuccess(
-            `Successfully imported user profile (${parts.join(', ')})`
-          );
-        }
-      } catch {
-        showError(
-          'Failed to import user profile. Please check the file format.'
-        );
-      } finally {
-        setIsImporting(false);
-        setImportProgress(0);
-      }
-    };
-
-    if (Platform.OS === 'web') {
-      confirmAction();
-    } else {
-      Alert.alert(
-        'Import User Profile',
-        'This will replace your current bookmarks, reading history, and settings with the imported data. Are you sure you want to continue?',
-        [
-          {
-            text: 'Cancel',
-            style: 'cancel'
-          },
-          {
-            text: 'Import',
-            onPress: confirmAction
-          }
-        ]
-      );
-    }
-  };
-
   return (
-    <>
-      <Appbar.Header
-        style={{
-          backgroundColor: theme.colors.surface
-        }}
-        mode="center-aligned"
-      >
-        <Appbar.Content
-          title="Settings"
-          titleStyle={{
-            // MD3: Center-aligned app bars use 22sp title
-            // Reference: https://m3.material.io/components/app-bars/overview
-            fontWeight: '500', // MD3: Medium weight (500) for app bar titles
-            fontSize: TYPOGRAPHY.appBarTitle
-          }}
-        />
-        <Appbar.Action
-          icon="help-circle-outline"
-          onPress={() => setHelpVisible(true)}
-          accessibilityLabel="Help"
-          accessibilityHint="Shows help information about settings"
-        />
-      </Appbar.Header>
-
+    <View style={{ flex: 1 }}>
       <Portal>
         <Modal
           visible={helpVisible}
           onDismiss={() => setHelpVisible(false)}
           contentContainerStyle={{
             backgroundColor: theme.colors.surface,
-            padding: SPACING.lg, // M3: 24dp padding for dialogs
-            margin: SPACING.base + SPACING.xs, // M3: 20dp margin
-            borderRadius: width >= LAYOUT.DESKTOP_BREAKPOINT ? 28 : SPACING.base // M3: 28dp for large screens, 16dp for mobile
+            padding: SPACING.sm,
+            margin: SPACING.sm,
+            borderRadius: SPACING.sm
           }}
         >
           <Text
             variant="headlineSmall"
-            style={{ marginBottom: SPACING.base, fontWeight: '700' }}
+            style={{ marginBottom: SPACING.sm, fontWeight: '700' }}
           >
             Settings Help
           </Text>
           <Text
             variant="bodyMedium"
-            style={{ marginBottom: SPACING.base, lineHeight: 22 }}
+            style={{ marginBottom: SPACING.sm, lineHeight: 22 }}
           >
             <Text style={{ fontWeight: '600' }}>Theme:</Text> Choose your
             preferred color scheme. Automatic follows your system settings.
           </Text>
           <Text
             variant="bodyMedium"
-            style={{ marginBottom: SPACING.base, lineHeight: 22 }}
+            style={{ marginBottom: SPACING.sm, lineHeight: 22 }}
           >
             <Text style={{ fontWeight: '600' }}>Hide Sensitive Content:</Text>{' '}
             Blurs sensitive images using Wikipedia&apos;s official content
@@ -398,7 +78,7 @@ export default function SettingsScreen() {
           </Text>
           <Text
             variant="bodyMedium"
-            style={{ marginBottom: SPACING.base, lineHeight: 22 }}
+            style={{ marginBottom: SPACING.sm, lineHeight: 22 }}
           >
             <Text style={{ fontWeight: '600' }}>Reading Preferences:</Text>{' '}
             Customize your reading experience with line height, paragraph
@@ -406,7 +86,7 @@ export default function SettingsScreen() {
           </Text>
           <Text
             variant="bodyMedium"
-            style={{ marginBottom: SPACING.base, lineHeight: 22 }}
+            style={{ marginBottom: SPACING.sm, lineHeight: 22 }}
           >
             <Text style={{ fontWeight: '600' }}>Reading History:</Text> View
             articles you&apos;ve recently read. Used for personalized
@@ -420,38 +100,12 @@ export default function SettingsScreen() {
             Got it
           </Button>
         </Modal>
-
-        <ProgressDialog
-          visible={isExporting}
-          progress={exportProgress}
-          message="Exporting user profile..."
-          showPercentage={true}
-          onCancel={() => {
-            setIsExporting(false);
-            setExportProgress(0);
-          }}
-          cancelLabel="Cancel"
-        />
-
-        <ProgressDialog
-          visible={isImporting}
-          progress={importProgress}
-          message="Importing user profile..."
-          showPercentage={true}
-          onCancel={() => {
-            setIsImporting(false);
-            setImportProgress(0);
-          }}
-          cancelLabel="Cancel"
-        />
       </Portal>
 
       <ScrollView
-        style={{ backgroundColor: theme.colors.background }}
         contentContainerStyle={{
-          padding: SPACING.base,
-          paddingBottom: SPACING.xl,
-          maxWidth: maxContentWidth,
+          padding: SPACING.sm,
+          paddingBottom: SPACING.sm,
           alignSelf: 'center',
           width: '100%'
         }}
@@ -535,69 +189,6 @@ export default function SettingsScreen() {
 
         <Divider style={{ marginVertical: SPACING.sm }} />
 
-        {/* Data Management Section */}
-        <List.Section>
-          <List.Subheader>Data & Privacy</List.Subheader>
-          <List.Item
-            title="User Profile"
-            description={`${bookmarks.length} bookmarks, ${visitedArticles.length} history items • Export or import your complete profile`}
-            left={(props) => (
-              <List.Icon {...props} icon="account-box-outline" />
-            )}
-            titleStyle={{ fontWeight: '500' }}
-            descriptionNumberOfLines={2}
-          />
-          <View
-            style={{
-              paddingHorizontal: SPACING.base,
-              paddingBottom: SPACING.base
-            }}
-          >
-            <Text
-              variant="bodySmall"
-              style={{
-                color: theme.colors.onSurfaceVariant,
-                marginBottom: SPACING.md,
-                lineHeight: 18
-              }}
-            >
-              Export your complete user profile (bookmarks, reading history,
-              reading progress, and settings) to a JSON file for backup, or
-              import from a previously exported file.
-            </Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                gap: SPACING.md,
-                flexWrap: 'wrap'
-              }}
-            >
-              <Button
-                mode="outlined"
-                onPress={handleExportProfile}
-                disabled={isExporting || isImporting}
-                loading={isExporting}
-                icon="export"
-                style={{ flex: 1, minWidth: 120 }}
-              >
-                {isExporting ? 'Exporting...' : 'Export'}
-              </Button>
-              <Button
-                mode="outlined"
-                onPress={handleImportProfile}
-                disabled={isExporting || isImporting}
-                loading={isImporting}
-                icon="import"
-                style={{ flex: 1, minWidth: 120 }}
-              >
-                {isImporting ? 'Importing...' : 'Import'}
-              </Button>
-            </View>
-          </View>
-        </List.Section>
-
-        <Divider style={{ marginVertical: SPACING.sm }} />
-
         {/* App Information Section */}
         <List.Section>
           <List.Subheader>About</List.Subheader>
@@ -623,9 +214,6 @@ export default function SettingsScreen() {
                   if (typeof __DEV__ !== 'undefined' && __DEV__) {
                     console.error('Failed to open GitHub issues:', err);
                   }
-                  showError(
-                    'Unable to open GitHub. Please visit: https://github.com/bryce-hoehn/WikiScape/issues'
-                  );
                 });
               }
             }}
@@ -643,6 +231,6 @@ export default function SettingsScreen() {
           />
         </List.Section>
       </ScrollView>
-    </>
+    </View>
   );
 }

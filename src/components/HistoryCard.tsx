@@ -1,11 +1,10 @@
-// Native date formatting - no external dependency needed
 import { router } from 'expo-router';
 import React from 'react';
 import { View } from 'react-native';
 import { Card, Text, useTheme } from 'react-native-paper';
 
-import { VisitedArticle } from '@/hooks/storage/useVisitedArticles';
 import { SPACING } from '@/constants/spacing';
+import { VisitedArticle } from '@/hooks/storage/useVisitedArticles';
 
 interface HistoryCardProps {
   item: VisitedArticle;
@@ -42,12 +41,11 @@ export default function HistoryCard({ item }: HistoryCardProps) {
 
   return (
     <Card
-      elevation={1} // M3: Default elevation 1dp
+      elevation={1}
       style={{
         width: '100%',
-        marginBottom: SPACING.lg, // Increased from SPACING.md (12dp) to SPACING.lg (24dp)
-        borderRadius: theme.roundness * 3, // M3: 12dp corner radius (4dp * 3)
-        // No border - MD3 recommends using elevation for depth instead of borders
+        marginBottom: SPACING.lg,
+        borderRadius: theme.roundness * 3,
         backgroundColor: theme.colors.elevation.level2,
         overflow: 'hidden'
       }}
@@ -58,18 +56,17 @@ export default function HistoryCard({ item }: HistoryCardProps) {
       <View
         style={{
           flexDirection: 'row',
-          padding: SPACING.base,
+          padding: SPACING.sm,
           alignItems: 'center'
         }}
       >
         {' '}
-        {/* M3: 16dp padding for card content */}
         {/* Content */}
         <View style={{ flex: 1 }}>
           <Text
             variant="titleMedium"
             style={{
-              fontWeight: '700', // Increased from 600 to 700 for stronger hierarchy
+              fontWeight: '700',
               color: theme.colors.onSurface,
               marginBottom: SPACING.xs
             }}

@@ -1,48 +1,44 @@
+import AppSidebar from '@/components/ui/layout/AppSidebar';
+import { BREAKPOINTS } from '@/constants/breakpoints';
 import React from 'react';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { useWindowDimensions, View } from 'react-native';
+import { Divider, useTheme } from 'react-native-paper';
+import Header from './Header';
+import NavDrawer from './NavDrawer';
 
-interface ResponsiveContainerProps {
-  children: React.ReactNode;
-  maxWidth?: number;
-}
-
-/**
- * Responsive container that centers content and limits width on larger screens
- * Similar to Twitter's layout - full width on mobile, max width on desktop
- */
 export default function ResponsiveContainer({
-  children,
-  maxWidth = 600
-}: ResponsiveContainerProps) {
+  children
+}: {
+  children: React.ReactNode;
+}) {
   const { width } = useWindowDimensions();
-
-  // On screens wider than maxWidth, center the content
-  const shouldCenter = width > maxWidth;
+  const theme = useTheme();
 
   return (
-    <View style={styles.outerContainer}>
-      <View
-        style={[
-          styles.innerContainer,
-          shouldCenter && {
-            maxWidth,
-            alignSelf: 'center',
-            width: '100%'
-          }
-        ]}
-      >
-        {children}
+    <View
+      style={{
+        flex: 1,
+        flexDirection: 'row',
+        backgroundColor: theme.colors.background
+      }}
+    >
+      {width > BREAKPOINTS.lg && (
+        <>
+          <NavDrawer />
+          <Divider style={{ width: 1, height: '100%' }} />
+        </>
+      )}
+      <View style={{ flex: 1, flexDirection: 'column' }}>
+        <Header />
+        <Divider />
+        <View style={{ flex: 1 }}>{children}</View>
       </View>
+      {width > BREAKPOINTS.xl && (
+        <>
+          <Divider style={{ width: 1, height: '100%' }} />
+          <AppSidebar />
+        </>
+      )}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  outerContainer: {
-    flex: 1,
-    width: '100%'
-  },
-  innerContainer: {
-    flex: 1
-  }
-});

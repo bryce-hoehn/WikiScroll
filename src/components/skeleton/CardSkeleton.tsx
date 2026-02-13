@@ -1,11 +1,9 @@
-import React, { useEffect, useRef } from 'react';
-import { Animated, Platform, useWindowDimensions, View } from 'react-native';
+import React from 'react';
+import { Animated, useWindowDimensions, View } from 'react-native';
 import { useTheme } from 'react-native-paper';
 
 import { LAYOUT } from '@/constants/layout';
-import { MOTION } from '@/constants/motion';
 import { SPACING } from '@/constants/spacing';
-import { useReducedMotion } from '@/hooks';
 
 interface CardSkeletonProps {
   index?: number;
@@ -18,68 +16,9 @@ interface CardSkeletonProps {
 export default function CardSkeleton({ index = 0 }: CardSkeletonProps) {
   const theme = useTheme();
   const { width } = useWindowDimensions();
-  const { reducedMotion } = useReducedMotion();
-  const shimmerAnim = useRef(new Animated.Value(0)).current;
-  const fadeAnim = useRef(new Animated.Value(reducedMotion ? 1 : 0)).current;
 
   // Determine if we're on a small screen (mobile)
   const isSmallScreen = width < LAYOUT.TABLET_BREAKPOINT;
-
-  // Shimmer animation (skip if reduced motion is enabled)
-  useEffect(() => {
-    if (reducedMotion) {
-      // Skip animations when reduced motion is enabled
-      fadeAnim.setValue(1);
-      shimmerAnim.setValue(0);
-      return;
-    }
-
-    // Use native driver only on native platforms (not web)
-    const useNativeDriver = Platform.OS !== 'web';
-
-    // MD3 recommends ~1500ms for shimmer animations
-    // Split into two segments for smooth back-and-forth motion
-    const shimmerSegmentDuration = MOTION.durationShimmer / 2;
-
-    const shimmer = Animated.loop(
-      Animated.sequence([
-        Animated.timing(shimmerAnim, {
-          toValue: 1,
-          duration: shimmerSegmentDuration,
-          useNativeDriver
-        }),
-        Animated.timing(shimmerAnim, {
-          toValue: 0,
-          duration: shimmerSegmentDuration,
-          useNativeDriver
-        })
-      ])
-    );
-    shimmer.start();
-
-    // Fade in animation with MD3-compliant stagger
-    // MD3: 20ms stagger delay, limited to first 10 items
-    const staggerDelay =
-      index < MOTION.staggerLimit ? index * MOTION.staggerDelay : 0;
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: MOTION.durationShort, // MD3: 150ms for standard transitions
-      delay: staggerDelay,
-      useNativeDriver
-    }).start();
-
-    return () => shimmer.stop();
-  }, [shimmerAnim, fadeAnim, index, reducedMotion]);
-
-  const shimmerTranslateX = shimmerAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [-300, 300]
-  });
-
-  const shimmerOpacity = shimmerAnim.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [0.2, 0.7, 0.2]
-  });
 
   const SkeletonBox = ({
     width,
@@ -110,9 +49,7 @@ export default function CardSkeleton({ index = 0 }: CardSkeletonProps) {
           style={{
             flex: 1,
             width: '100%',
-            backgroundColor: theme.colors.elevation.level2,
-            transform: [{ translateX: shimmerTranslateX }],
-            opacity: shimmerOpacity
+            backgroundColor: theme.colors.elevation.level2
           }}
         />
       </View>
@@ -126,8 +63,7 @@ export default function CardSkeleton({ index = 0 }: CardSkeletonProps) {
   return (
     <Animated.View
       style={{
-        opacity: fadeAnim,
-        marginBottom: SPACING.base
+        marginBottom: SPACING.sm
       }}
     >
       <View
@@ -153,7 +89,7 @@ export default function CardSkeleton({ index = 0 }: CardSkeletonProps) {
           <View
             style={{
               flex: 1,
-              padding: isSmallScreen ? SPACING.md : SPACING.base,
+              padding: isSmallScreen ? SPACING.md : SPACING.sm,
               justifyContent: 'space-between'
             }}
           >

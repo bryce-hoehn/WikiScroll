@@ -4,10 +4,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Platform, View } from 'react-native';
 import { IconButton, Text } from 'react-native-paper';
 
-import { formatTimeFromSeconds } from '@/utils/timeFormatters';
-import { hexToRgba } from '@/utils/themeUtils';
-import { TYPOGRAPHY } from '@/constants/typography';
 import { SPACING } from '@/constants/spacing';
+import { TYPOGRAPHY } from '@/constants/typography';
+import { hexToRgba } from '@/utils/themeUtils';
+import { formatTimeFromSeconds } from '@/utils/timeFormatters';
 
 interface VideoPlayerProps {
   src: string;
@@ -132,7 +132,7 @@ export default function VideoPlayer({
     <View
       style={{
         width: '100%',
-        marginVertical: SPACING.base,
+        marginVertical: SPACING.sm,
         alignItems: 'center'
       }}
     >

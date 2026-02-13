@@ -4,6 +4,7 @@ import { TouchableOpacity, View } from 'react-native';
 import { IconButton, Text, useTheme } from 'react-native-paper';
 
 import { SPACING } from '@/constants/spacing';
+import useMediaQuery from '@/hooks/useMediaQuery';
 
 interface ContentSectionProps {
   title: string;
@@ -29,6 +30,8 @@ export default function ContentSection({
 }: ContentSectionProps) {
   const theme = useTheme();
 
+  const windowSize = useMediaQuery();
+
   if (isLoading && skeleton) {
     return skeleton;
   }
@@ -52,7 +55,7 @@ export default function ContentSection({
           alignItems: 'center',
           justifyContent: 'flex-start',
           marginBottom: SPACING.sm,
-          gap: SPACING.xs
+          gap: SPACING.sm
         }}
       >
         <TouchableOpacity

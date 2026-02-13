@@ -120,7 +120,7 @@ export default function AudioPlayer({ src, width, theme }: AudioPlayerProps) {
     <View
       style={{
         width: '100%',
-        marginVertical: SPACING.base,
+        marginVertical: SPACING.sm,
         alignItems: 'center'
       }}
     >

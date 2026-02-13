@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, View } from 'react-native';
 import {
   ActivityIndicator,
@@ -12,17 +12,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { fetchArticleBacklinks, fetchArticleLinks } from '@/api';
 import { fetchArticleThumbnail } from '@/api/articles/fetchArticleThumbnail';
-import SearchOverlay from '@/components/search/SearchOverlay';
-import ImageDialog from '@/components/ui/feedback/ImageDialog';
-import CollapsibleHeader, {
-  useCollapsibleHeaderSpacing
-} from '@/components/ui/layout/CollapsibleHeader';
+import ResponsiveContainer from '@/components/ui/layout/ResponsiveContainer';
 import { SPACING } from '@/constants/spacing';
 import { TYPOGRAPHY } from '@/constants/typography';
 import { Article } from '@/features/article';
-import AppSidebar from '@/features/layout/AppSidebar';
-import ArticleDrawerWrapper from '@/features/layout/ArticleDrawerWrapper';
-import ContentWithSidebar from '@/features/layout/ContentWithSidebar';
 import {
   useArticle,
   useArticleHtml,
@@ -30,18 +23,13 @@ import {
   useBookmarks,
   useVisitedArticles
 } from '@/hooks';
-import { useSnackbar } from '@/stores/SnackbarContext';
 import { ImageThumbnail } from '@/types';
 import { extractAllImages } from '@/utils/articleParsing';
 import { shareArticle } from '@/utils/shareUtils';
 
-const HEADER_HEIGHT = 60;
-
 export default function ArticleScreen() {
   const theme = useTheme();
   const { title } = useLocalSearchParams<{ title: string }>();
-  const [showSearch, setShowSearch] = useState(false);
-  const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState<{
     uri: string;
     alt?: string;
@@ -53,11 +41,7 @@ export default function ArticleScreen() {
   const hasTrackedVisit = useRef(false);
   const hasFetchedLinks = useRef(false);
   const insets = useSafeAreaInsets();
-  const totalHeaderHeight = HEADER_HEIGHT + insets.top;
-  const animatedPaddingTop = useCollapsibleHeaderSpacing(
-    scrollY,
-    totalHeaderHeight
-  );
+
   const { data: article, isLoading: isLoadingArticle } = useArticle(
     title as string
   );
@@ -65,7 +49,6 @@ export default function ArticleScreen() {
   const { addVisitedArticle } = useVisitedArticles();
   const { hasArticleLinks, saveArticleLinks } = useArticleLinks();
   const { addBookmark, removeBookmark, isBookmarked } = useBookmarks();
-  const { showSuccess } = useSnackbar();
 
   // Extract all images from article HTML
   const articleImages = useMemo(() => {
@@ -196,10 +179,6 @@ export default function ArticleScreen() {
     router.back();
   };
 
-  const handleSearchClose = () => {
-    setShowSearch(false);
-  };
-
   const handleBookmarkToggle = async () => {
     if (!article) return;
 
@@ -207,10 +186,8 @@ export default function ArticleScreen() {
     try {
       if (bookmarked) {
         await removeBookmark(article.title);
-        showSuccess('Article removed from bookmarks');
       } else {
         await addBookmark(article.title, thumbnail, article.description);
-        showSuccess('Article bookmarked');
       }
     } catch {
       // Error handling is done by the context
@@ -231,158 +208,118 @@ export default function ArticleScreen() {
     }
   };
 
-  const handleCloseImageModal = () => {
-    setShowImageModal(false);
-    setSelectedImage(null);
-  };
-
   return (
-    <>
-      {showSearch ? (
-        <SearchOverlay visible={showSearch} onClose={handleSearchClose} />
-      ) : (
-        <ArticleDrawerWrapper>
-          <ContentWithSidebar sidebar={<AppSidebar />}>
-            <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-              <CollapsibleHeader
-                scrollY={scrollY}
-                headerHeight={totalHeaderHeight}
+    <ResponsiveContainer>
+      <View style={{ flex: 1 }}>
+        <View style={{ paddingTop: insets.top }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Appbar.BackAction
+              onPress={handleBackPress}
+              accessibilityLabel="Go back"
+              accessibilityHint="Returns to previous screen"
+            />
+            {isLoadingArticle || isLoadingThumbnail ? (
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginLeft: SPACING.sm
+                }}
               >
-                <View style={{ paddingTop: insets.top }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Appbar.BackAction
-                      onPress={handleBackPress}
-                      accessibilityLabel="Go back"
-                      accessibilityHint="Returns to previous screen"
-                    />
-                    {isLoadingArticle || isLoadingThumbnail ? (
-                      <View
-                        style={{
-                          flex: 1,
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          marginLeft: SPACING.sm
-                        }}
-                      >
-                        <Text
-                          style={{
-                            // MD3: Small app bars use 22sp title
-                            // Reference: https://m3.material.io/components/app-bars/overview
-                            fontWeight: '500', // MD3: Medium weight (500) for app bar titles
-                            fontSize: TYPOGRAPHY.appBarTitle,
-                            flex: 1
-                          }}
-                        >
-                          Loading...
-                        </Text>
-                        <ActivityIndicator
-                          size="small"
-                          color={theme.colors.primary}
-                          style={{ marginRight: SPACING.sm }}
-                        />
-                      </View>
-                    ) : (
-                      <Text
-                        style={{
-                          // MD3: Small app bars use 22sp title
-                          // Reference: https://m3.material.io/components/app-bars/overview
-                          flex: 1,
-                          marginLeft: SPACING.sm,
-                          fontWeight: '500', // MD3: Medium weight (500) for app bar titles
-                          fontSize: TYPOGRAPHY.appBarTitle // 22sp per MD3 specification
-                        }}
-                        numberOfLines={1}
-                        ellipsizeMode="tail"
-                      >
-                        {article?.title || ''}
-                      </Text>
-                    )}
-                    {handleShare && (
-                      <Appbar.Action
-                        icon="share-variant"
-                        onPress={handleShare}
-                        accessibilityLabel="Share article"
-                        accessibilityHint="Shares this article with others"
-                      />
-                    )}
-                    <Appbar.Action
-                      icon={
-                        article?.title && isBookmarked(article.title)
-                          ? 'bookmark'
-                          : 'bookmark-outline'
-                      }
-                      iconColor={
-                        article?.title && isBookmarked(article.title)
-                          ? theme.colors.primary
-                          : theme.colors.onSurfaceVariant
-                      }
-                      onPress={handleBookmarkToggle}
-                      accessibilityLabel={
-                        article?.title && isBookmarked(article.title)
-                          ? 'Remove bookmark'
-                          : 'Add bookmark'
-                      }
-                      accessibilityHint={
-                        article?.title && isBookmarked(article.title)
-                          ? 'Removes article from bookmarks'
-                          : 'Adds article to bookmarks'
-                      }
-                    />
-                  </View>
-                </View>
-              </CollapsibleHeader>
-              {scrollProgress > 0 && (
-                <Animated.View
+                <Text
                   style={{
-                    position: 'absolute',
-                    top: animatedPaddingTop,
-                    left: 0,
-                    right: 0,
-                    zIndex: 1000
+                    fontWeight: '500',
+                    fontSize: TYPOGRAPHY.appBarTitle,
+                    flex: 1
                   }}
                 >
-                  <ProgressBar
-                    progress={scrollProgress / 100}
-                    color={theme.colors.primary}
-                    style={{ height: 2 }}
-                  />
-                </Animated.View>
-              )}
-              <Animated.View
-                style={{ flex: 1, paddingTop: animatedPaddingTop }}
-              >
-                <Article
-                  title={title as string}
-                  articleTitle={article?.title}
-                  onHeaderStateChange={(
-                    collapsed: boolean,
-                    progress: number
-                  ) => {
-                    setScrollProgress(progress);
-                  }}
-                  scrollY={scrollY}
-                  onImagePress={(image) => {
-                    setSelectedImage(image);
-                    setShowImageModal(true);
-                  }}
+                  Loading...
+                </Text>
+                <ActivityIndicator
+                  size="small"
+                  color={theme.colors.primary}
+                  style={{ marginRight: SPACING.sm }}
                 />
-              </Animated.View>
-            </View>
-          </ContentWithSidebar>
-        </ArticleDrawerWrapper>
-      )}
-
-      {showImageModal && (
-        <Suspense fallback={null}>
-          <ImageDialog
-            visible={showImageModal}
-            selectedImage={selectedImage}
-            onClose={handleCloseImageModal}
-            images={articleImages.length > 0 ? articleImages : undefined}
-            initialIndex={currentImageIndex}
+              </View>
+            ) : (
+              <Text
+                style={{
+                  flex: 1,
+                  marginLeft: SPACING.sm,
+                  fontWeight: '500',
+                  fontSize: TYPOGRAPHY.appBarTitle
+                }}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {article?.title || ''}
+              </Text>
+            )}
+            {handleShare && (
+              <Appbar.Action
+                icon="share-variant"
+                onPress={handleShare}
+                accessibilityLabel="Share article"
+                accessibilityHint="Shares this article with others"
+              />
+            )}
+            <Appbar.Action
+              icon={
+                article?.title && isBookmarked(article.title)
+                  ? 'bookmark'
+                  : 'bookmark-outline'
+              }
+              iconColor={
+                article?.title && isBookmarked(article.title)
+                  ? theme.colors.primary
+                  : theme.colors.onSurfaceVariant
+              }
+              onPress={handleBookmarkToggle}
+              accessibilityLabel={
+                article?.title && isBookmarked(article.title)
+                  ? 'Remove bookmark'
+                  : 'Add bookmark'
+              }
+              accessibilityHint={
+                article?.title && isBookmarked(article.title)
+                  ? 'Removes article from bookmarks'
+                  : 'Adds article to bookmarks'
+              }
+            />
+          </View>
+        </View>
+        {scrollProgress > 0 && (
+          <Animated.View
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              zIndex: 1000
+            }}
+          >
+            <ProgressBar
+              progress={scrollProgress / 100}
+              color={theme.colors.primary}
+              style={{ height: 2 }}
+            />
+          </Animated.View>
+        )}
+        <Animated.View style={{ flex: 1 }}>
+          <Article
+            title={title as string}
+            articleTitle={article?.title}
+            onHeaderStateChange={(collapsed: boolean, progress: number) => {
+              setScrollProgress(progress);
+            }}
+            scrollY={scrollY}
+            onImagePress={(image) => {
+              setSelectedImage(image);
+              setShowImageModal(true);
+            }}
           />
-        </Suspense>
-      )}
-    </>
+        </Animated.View>
+      </View>
+    </ResponsiveContainer>
   );
 }

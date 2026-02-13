@@ -6,11 +6,8 @@ import { Card, IconButton, Text, type MD3Theme } from 'react-native-paper';
 
 import { fetchArticleHtml } from '@/api';
 import HtmlRenderer from '@/components/data/HtmlRenderer';
-import { LAYOUT } from '@/constants/layout';
-import { getHoverStyles } from '@/constants/motion';
 import { SPACING } from '@/constants/spacing';
 import { TYPOGRAPHY } from '@/constants/typography';
-import { useReducedMotion } from '@/hooks';
 import useBookmarkToggle from '@/hooks/ui/useBookmarkToggle';
 import useThumbnailLoader from '@/hooks/ui/useThumbnailLoader';
 import { DidYouKnowItem } from '@/types/api/featured';
@@ -18,6 +15,7 @@ import { RecommendationItem } from '@/types/components';
 import { shareArticle } from '@/utils/shareUtils';
 
 import ResponsiveImage from '@/components/ui/media/ResponsiveImage';
+import { BREAKPOINTS } from '@/constants/breakpoints';
 
 export type FeaturedCardItem = RecommendationItem | DidYouKnowItem;
 
@@ -53,7 +51,6 @@ function BaseFeaturedCard({
   const { width } = useWindowDimensions();
   const { thumbnail, isLoading: isLoadingThumbnail } = useThumbnailLoader(item);
   const { handleBookmarkToggle, isBookmarked } = useBookmarkToggle();
-  const { reducedMotion } = useReducedMotion();
   const articleTitle = getArticleTitle(item);
   const title = getTitle(item);
   const description = getDescription(item);
@@ -62,7 +59,7 @@ function BaseFeaturedCard({
   const [isHovered, setIsHovered] = useState(false);
 
   // Determine if we're on a small screen (mobile)
-  const isSmallScreen = width < LAYOUT.TABLET_BREAKPOINT;
+  const isSmallScreen = width < BREAKPOINTS.md;
 
   // Handle card press - navigate to article if available
   const handleCardPress = useCallback(() => {
@@ -134,7 +131,7 @@ function BaseFeaturedCard({
         <HtmlRenderer
           html={description}
           maxLines={4}
-          style={{ paddingTop: SPACING.md }}
+          style={{ paddingTop: SPACING.sm }}
         />
       );
     }
@@ -144,7 +141,7 @@ function BaseFeaturedCard({
         style={{
           // Using variant for fontSize, but need custom lineHeight calculation
           lineHeight: TYPOGRAPHY.bodyMedium * TYPOGRAPHY.lineHeightNormal,
-          paddingTop: SPACING.md
+          paddingTop: SPACING.sm
         }}
         numberOfLines={4}
       >
@@ -167,8 +164,8 @@ function BaseFeaturedCard({
       {headerContent ? (
         <View
           style={{
-            marginBottom: SPACING.md,
-            paddingHorizontal: SPACING.xs,
+            marginBottom: SPACING.sm,
+            paddingHorizontal: SPACING.sm,
             zIndex: 1
           }}
         >
@@ -186,9 +183,7 @@ function BaseFeaturedCard({
           backgroundColor:
             isHovered && Platform.OS === 'web'
               ? theme.colors.surface
-              : theme.colors.elevation.level2,
-          ...(Platform.OS === 'web' &&
-            getHoverStyles(isHovered, reducedMotion, { scale: 1.01 }))
+              : theme.colors.elevation.level2
         }}
         onPress={handleCardPress}
         {...(Platform.OS === 'web' && {
@@ -248,7 +243,7 @@ function BaseFeaturedCard({
         </View>
         <Card.Content
           style={{
-            padding: SPACING.base, // M3: 16dp padding for card content
+            padding: SPACING.sm,
             width: '100%',
             maxWidth: '100%',
             height: contentHeight
@@ -259,7 +254,7 @@ function BaseFeaturedCard({
               flexDirection: 'row',
               justifyContent: 'space-between',
               alignItems: 'flex-start',
-              marginBottom: SPACING.xs
+              marginBottom: SPACING.sm
             }}
           >
             <Text

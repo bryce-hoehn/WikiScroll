@@ -117,7 +117,7 @@ export default function BookmarkEditDialog({
         { backgroundColor: theme.colors.surface }
       ]}
     >
-      <Text variant="titleMedium" style={{ marginBottom: SPACING.base }}>
+      <Text variant="titleMedium" style={{ marginBottom: SPACING.sm }}>
         {bookmark.title}
       </Text>
 
@@ -244,18 +244,18 @@ export default function BookmarkEditDialog({
 const createStyles = (theme: any, width: number, isLargeScreen: boolean) =>
   StyleSheet.create({
     modal: {
-      padding: SPACING.lg, // M3: 24dp padding for dialogs
-      margin: SPACING.base + SPACING.xs, // M3: 20dp margin
-      borderRadius: isLargeScreen ? 28 : SPACING.base, // M3: 28dp for large screens, 16dp for mobile
+      padding: SPACING.lg,
+      margin: SPACING.sm + SPACING.xs,
+      borderRadius: isLargeScreen ? 28 : SPACING.sm,
       maxHeight: '80%',
-      width: Math.min(width - 40, 500), // Constrain to container width with 20px margin on each side
+      width: Math.min(width - 40, 500),
       alignSelf: 'center'
     },
     buttonContainer: {
       flexDirection: 'row',
-      justifyContent: 'flex-end', // M3: Affirmative action (Save) on right, dismissive (Cancel) on left
-      gap: SPACING.sm, // M3: 8dp gap between buttons
-      marginTop: SPACING.lg // M3: 24dp spacing above buttons
+      justifyContent: 'flex-end',
+      gap: SPACING.sm,
+      marginTop: SPACING.lg
     },
     existingTagsContainer: {
       marginTop: 16

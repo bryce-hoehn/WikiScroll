@@ -1,7 +1,6 @@
 import { FlashList } from '@shopify/flash-list';
 import React, { useCallback } from 'react';
 import { View } from 'react-native';
-import { Appbar, useTheme } from 'react-native-paper';
 
 import { SPACING } from '@/constants/spacing';
 import BookmarkCard from '@/features/bookmarks/components/BookmarkCard';
@@ -9,7 +8,6 @@ import { useBookmarks } from '@/hooks';
 import { Bookmark } from '@/types/bookmarks';
 
 export default function BookmarksScreen() {
-  const theme = useTheme();
   const { bookmarks, removeBookmark } = useBookmarks();
 
   const handleRemoveBookmark = useCallback(
@@ -41,23 +39,7 @@ export default function BookmarksScreen() {
   );
 
   return (
-    <>
-      <Appbar.Header
-        style={{ backgroundColor: theme.colors.surface }}
-        mode="center-aligned"
-      >
-        <Appbar.Content
-          title={`Bookmarks (${bookmarks.length})`}
-          titleStyle={{
-            // MD3: Center-aligned app bars use 22sp title
-            // Reference: https://m3.material.io/components/app-bars/overview
-            fontWeight: '500', // MD3: Medium weight (500) for app bar titles
-            fontSize: 22, // 22sp per MD3 specification
-            color: theme.colors.onSurface,
-            textAlign: 'center'
-          }}
-        />
-      </Appbar.Header>
+    <View style={{ flex: 1 }}>
       <FlashList
         data={bookmarks}
         renderItem={renderBookmarkCard}
@@ -66,14 +48,14 @@ export default function BookmarksScreen() {
             ? `${item.title}-${item.bookmarkedAt}`
             : `bookmark-${index}`
         }
+        style={{ flex: 1 }}
         {...({ estimatedItemSize: 220 } as any)}
-        style={{ backgroundColor: theme.colors.background }}
         contentContainerStyle={{
-          paddingVertical: SPACING.base,
+          paddingVertical: SPACING.sm,
           flexGrow: 1
         }}
         showsVerticalScrollIndicator={false}
       />
-    </>
+    </View>
   );
 }

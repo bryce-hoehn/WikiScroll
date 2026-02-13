@@ -1,10 +1,7 @@
-import React, { useEffect, useRef } from 'react';
-import { Animated, Platform, useWindowDimensions, View } from 'react-native';
-import { useTheme } from 'react-native-paper';
-
-import { MOTION } from '@/constants/motion';
 import { SPACING } from '@/constants/spacing';
-import { useReducedMotion } from '@/hooks';
+import React from 'react';
+import { Animated, View } from 'react-native';
+import { useTheme } from 'react-native-paper';
 
 /**
  * Skeleton loader component that matches Article layout
@@ -12,60 +9,8 @@ import { useReducedMotion } from '@/hooks';
  */
 export default function ArticleSkeleton() {
   const theme = useTheme();
-
-  const {} = useWindowDimensions();
-  const { reducedMotion } = useReducedMotion();
-  const shimmerAnim = useRef(new Animated.Value(0)).current;
-  const fadeAnim = useRef(new Animated.Value(reducedMotion ? 1 : 0)).current;
-
   // Match Article.tsx padding system - use default padding of 16px
   const defaultPadding = 16;
-
-  // Shimmer animation (skip if reduced motion is enabled)
-  useEffect(() => {
-    if (reducedMotion) {
-      fadeAnim.setValue(1);
-      shimmerAnim.setValue(0);
-      return;
-    }
-
-    const useNativeDriver = Platform.OS !== 'web';
-    const shimmerSegmentDuration = MOTION.durationShimmer / 2;
-
-    const shimmer = Animated.loop(
-      Animated.sequence([
-        Animated.timing(shimmerAnim, {
-          toValue: 1,
-          duration: shimmerSegmentDuration,
-          useNativeDriver
-        }),
-        Animated.timing(shimmerAnim, {
-          toValue: 0,
-          duration: shimmerSegmentDuration,
-          useNativeDriver
-        })
-      ])
-    );
-    shimmer.start();
-
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: MOTION.durationMedium,
-      useNativeDriver
-    }).start();
-
-    return () => shimmer.stop();
-  }, [shimmerAnim, fadeAnim, reducedMotion]);
-
-  const shimmerTranslateX = shimmerAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [-300, 300]
-  });
-
-  const shimmerOpacity = shimmerAnim.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [0.2, 0.7, 0.2]
-  });
 
   const SkeletonBox = ({
     width,
@@ -96,9 +41,7 @@ export default function ArticleSkeleton() {
           style={{
             flex: 1,
             width: '100%',
-            backgroundColor: theme.colors.surface,
-            transform: [{ translateX: shimmerTranslateX }],
-            opacity: shimmerOpacity
+            backgroundColor: theme.colors.surface
           }}
         />
       </View>
@@ -108,7 +51,6 @@ export default function ArticleSkeleton() {
   return (
     <Animated.View
       style={{
-        opacity: fadeAnim,
         flex: 1,
         backgroundColor: theme.colors.background
       }}
@@ -117,7 +59,7 @@ export default function ArticleSkeleton() {
         style={{
           width: '100%',
           paddingHorizontal: defaultPadding,
-          paddingVertical: SPACING.base
+          paddingVertical: SPACING.sm
         }}
       >
         {/* Title skeleton */}

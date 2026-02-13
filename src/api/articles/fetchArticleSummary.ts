@@ -157,7 +157,7 @@ export const fetchArticleSummaries = async (
               pageid: pageData.pageid,
               extract: pageData.extract || undefined,
               thumbnail: thumbnail,
-              description: pageData.description || undefined, // Use API's short description field
+              description: pageData.description || undefined,
               content_urls:
                 pageData.canonicalurl || pageData.fullurl
                   ? {

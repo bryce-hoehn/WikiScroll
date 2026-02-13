@@ -8,5 +8,4 @@ export {
   ImageRenderer,
   useDomVisitors
 } from './components/ArticleRenderers';
-export { default as ArticleToolbar } from './components/ArticleToolbar';
 export { default as RecommendationCard } from './components/RecommendationCard';

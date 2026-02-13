@@ -1,10 +1,6 @@
 import React from 'react';
-import { ActivityIndicator, View } from 'react-native';
-import { Text } from 'react-native-paper';
 import RenderHtml from 'react-native-render-html';
 
-import ExpansionPanel from '@/components/ui/ExpansionPanel';
-import { SPACING } from '@/constants/spacing';
 import type { SectionState } from '@/hooks/articles/useArticleSections';
 
 interface ArticleSectionRendererProps {
@@ -70,68 +66,3 @@ const RenderHtmlWrapper = React.memo(
   (prevProps, nextProps) => prevProps.html === nextProps.html
 );
 RenderHtmlWrapper.displayName = 'RenderHtmlWrapper';
-
-export default function ArticleSectionRenderer({
-  section,
-  isExpanded,
-  onPress,
-  renderers,
-  renderersProps,
-  customHTMLElementModels,
-  domVisitors,
-  tagsStyles,
-  classesStyles,
-  contentWidth,
-  systemFonts,
-  ignoredDomTags,
-  defaultTextProps
-}: ArticleSectionRendererProps) {
-  const renderSectionBody = (sec: SectionState) => {
-    if (sec.error) {
-      return <Text variant="bodyMedium">Content unavailable</Text>;
-    }
-    return (
-      <RenderHtmlWrapper
-        html={sec.html || ''}
-        renderers={renderers}
-        renderersProps={renderersProps}
-        customHTMLElementModels={customHTMLElementModels}
-        domVisitors={domVisitors}
-        tagsStyles={tagsStyles}
-        classesStyles={classesStyles}
-        contentWidth={contentWidth}
-        systemFonts={systemFonts}
-        ignoredDomTags={ignoredDomTags}
-        defaultTextProps={defaultTextProps}
-      />
-    );
-  };
-
-  const isStillLoading =
-    section.elementNodes && section.renderedElementCount !== undefined
-      ? section.renderedElementCount < section.elementNodes.length
-      : false;
-
-  return (
-    <ExpansionPanel
-      key={section.id}
-      title={section.heading}
-      expanded={isExpanded}
-      onPress={onPress}
-      accessibilityLabel={`Section: ${section.heading}`}
-      testID={`section-${section.id}`}
-      nativeID={`section-${section.id}`}
-    >
-      {section.html && !section.error && renderSectionBody(section)}
-      {isStillLoading && (
-        <View style={{ padding: SPACING.base, alignItems: 'center' }}>
-          <ActivityIndicator size="small" />
-        </View>
-      )}
-      {section.error && <Text variant="bodyMedium">Content unavailable</Text>}
-      {!section.html && !section.error && !isStillLoading && (
-        <Text variant="bodyMedium">No content available</Text>
-      )}
-    </ExpansionPanel>
-  );
-}

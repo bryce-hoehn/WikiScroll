@@ -1,10 +1,8 @@
+import { SPACING } from '@/constants/spacing';
+import { useReducedMotion } from '@/hooks';
 import React, { useEffect, useRef } from 'react';
 import { Animated, Platform, View } from 'react-native';
 import { useTheme } from 'react-native-paper';
-
-import { MOTION } from '@/constants/motion';
-import { SPACING } from '@/constants/spacing';
-import { useReducedMotion } from '@/hooks';
 
 interface SearchResultSkeletonProps {
   index?: number;
@@ -30,32 +28,23 @@ export default function SearchResultSkeleton({
     }
 
     const useNativeDriver = Platform.OS !== 'web';
-    const shimmerSegmentDuration = MOTION.durationShimmer / 2;
 
     const shimmer = Animated.loop(
       Animated.sequence([
         Animated.timing(shimmerAnim, {
           toValue: 1,
-          duration: shimmerSegmentDuration,
           useNativeDriver
         }),
         Animated.timing(shimmerAnim, {
           toValue: 0,
-          duration: shimmerSegmentDuration,
           useNativeDriver
         })
       ])
     );
     shimmer.start();
 
-    // MD3-compliant stagger animation
-    // MD3: 20ms stagger delay, limited to first 10 items
-    const staggerDelay =
-      index < MOTION.staggerLimit ? index * MOTION.staggerDelay : 0;
     Animated.timing(fadeAnim, {
       toValue: 1,
-      duration: MOTION.durationShort, // MD3: 150ms for standard transitions
-      delay: staggerDelay,
       useNativeDriver
     }).start();
 
@@ -120,7 +109,7 @@ export default function SearchResultSkeleton({
           marginHorizontal: SPACING.sm,
           marginVertical: SPACING.xs / 2,
           borderRadius: theme.roundness,
-          padding: SPACING.base,
+          padding: SPACING.sm,
           flexDirection: 'row',
           alignItems: 'center'
         }}

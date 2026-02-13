@@ -1,14 +1,8 @@
 import { FlashList } from '@shopify/flash-list';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useRef, useState } from 'react';
-import {
-  Animated,
-  Platform,
-  Pressable,
-  useWindowDimensions,
-  View
-} from 'react-native';
+import React, { useState } from 'react';
+import { Pressable, View } from 'react-native';
 import {
   Appbar,
   Card,
@@ -19,52 +13,21 @@ import {
   TouchableRipple,
   useTheme
 } from 'react-native-paper';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import StandardEmptyState from '@/components/StandardEmptyState';
-import SubcategorySkeleton from '@/components/SubcategorySkeleton';
-import ErrorState from '@/components/ui/feedback/ErrorState';
-import ImageDialog from '@/components/ui/feedback/ImageDialog';
-import CollapsibleHeader from '@/components/ui/layout/CollapsibleHeader';
-import { LAYOUT } from '@/constants/layout';
-import { getHoverStyles } from '@/constants/motion';
+import SubcategorySkeleton from '@/components/skeleton/SubcategorySkeleton';
+import ResponsiveContainer from '@/components/ui/layout/ResponsiveContainer';
 import { SPACING } from '@/constants/spacing';
 import { TYPOGRAPHY } from '@/constants/typography';
-import AppSidebar from '@/features/layout/AppSidebar';
-import ArticleDrawerWrapper from '@/features/layout/ArticleDrawerWrapper';
-import ContentWithSidebar from '@/features/layout/ContentWithSidebar';
-import { useCategoryMembers, useReducedMotion } from '@/hooks';
+import { useCategoryMembers } from '@/hooks';
 import { CategoryArticle, CategorySubcategory } from '@/types/api';
-import { getUserFriendlyError } from '@/utils/errorHandling';
-
-const HEADER_HEIGHT = 60;
 
 export default function SubCategories() {
   const theme = useTheme();
-  const { width } = useWindowDimensions();
   const router = useRouter();
   const { title } = useLocalSearchParams<{ title: string }>();
   const [subcategoriesHorizontal, setSubcategoriesHorizontal] = useState(true);
-  const [imageModalVisible, setImageModalVisible] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<{
-    uri: string;
-    alt?: string;
-  } | null>(null);
-  const scrollY = useRef(new Animated.Value(0)).current;
-  const insets = useSafeAreaInsets();
-  const totalHeaderHeight = HEADER_HEIGHT + insets.top;
-
-  const { data, isLoading, error } = useCategoryMembers(title || '');
-  useReducedMotion();
-
-  // Calculate responsive max width and number of columns
-  const maxContentWidth = Math.min(width - 32, LAYOUT.MAX_GRID_WIDTH);
-  const numColumns =
-    width >= LAYOUT.XLARGE_BREAKPOINT
-      ? 4
-      : width >= LAYOUT.DESKTOP_BREAKPOINT
-        ? 3
-        : 2;
+  const { data, isLoading } = useCategoryMembers(title || '');
 
   const handleBack = () => {
     if (router.canGoBack()) {
@@ -100,36 +63,15 @@ export default function SubCategories() {
       onImagePress: (uri: string, alt: string) => void;
     }) => {
       const itemTheme = useTheme();
-      const { reducedMotion: itemReducedMotion } = useReducedMotion();
-      const [isHovered, setIsHovered] = useState(false);
-
-      const handleMouseEnter = () => {
-        if (Platform.OS === 'web') {
-          setIsHovered(true);
-        }
-      };
-
-      const handleMouseLeave = () => {
-        if (Platform.OS === 'web') {
-          setIsHovered(false);
-        }
-      };
 
       return (
         <Card
-          elevation={isHovered && Platform.OS === 'web' ? 3 : 1}
           style={{
             flex: 1,
             margin: 4,
-            overflow: 'hidden',
-            ...(Platform.OS === 'web' &&
-              getHoverStyles(isHovered, itemReducedMotion, { scale: 1.02 }))
+            overflow: 'hidden'
           }}
           onPress={() => onPress(article.title)}
-          {...(Platform.OS === 'web' && {
-            onMouseEnter: handleMouseEnter,
-            onMouseLeave: handleMouseLeave
-          })}
         >
           {article.thumbnail ? (
             <Pressable
@@ -197,38 +139,13 @@ export default function SubCategories() {
       onPress: (title: string) => void;
     }) => {
       const itemTheme = useTheme();
-      const { reducedMotion: itemReducedMotion } = useReducedMotion();
-      const [isHovered, setIsHovered] = useState(false);
-
-      const handleMouseEnter = () => {
-        if (Platform.OS === 'web') {
-          setIsHovered(true);
-        }
-      };
-
-      const handleMouseLeave = () => {
-        if (Platform.OS === 'web') {
-          setIsHovered(false);
-        }
-      };
 
       return (
         <Surface
-          elevation={isHovered && Platform.OS === 'web' ? 2 : 1}
           style={{
             borderRadius: itemTheme.roundness * 3, // 12dp equivalent (4dp * 3)
-            margin: 4,
-            backgroundColor:
-              isHovered && Platform.OS === 'web'
-                ? itemTheme.colors.surfaceVariant
-                : itemTheme.colors.surface,
-            ...(Platform.OS === 'web' &&
-              getHoverStyles(isHovered, itemReducedMotion, { scale: 1.01 }))
+            margin: 4
           }}
-          {...(Platform.OS === 'web' && {
-            onMouseEnter: handleMouseEnter,
-            onMouseLeave: handleMouseLeave
-          })}
         >
           <List.Item
             key={subcategory.title}
@@ -261,95 +178,28 @@ export default function SubCategories() {
 
   if (isLoading) {
     return (
-      <ArticleDrawerWrapper>
-        <ContentWithSidebar sidebar={<AppSidebar />}>
-          <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-            <CollapsibleHeader
-              scrollY={scrollY}
-              headerHeight={totalHeaderHeight}
-            >
-              <View
-                style={{
-                  flex: 1,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  paddingHorizontal: SPACING.sm,
-                  paddingTop: insets.top
-                }}
-              >
-                <Appbar.BackAction onPress={handleBack} />
-                <Text
-                  style={{
-                    // MD3: Small app bars use 22sp title
-                    // Reference: https://m3.material.io/components/app-bars/overview
-                    fontWeight: '500', // MD3: Medium weight (500) for app bar titles
-                    fontSize: TYPOGRAPHY.appBarTitle,
-                    flex: 1
-                  }}
-                >
-                  {title?.replace(/_/g, ' ') || 'Category'}
-                </Text>
-              </View>
-            </CollapsibleHeader>
-            <View style={{ paddingTop: totalHeaderHeight }}>
-              <SubcategorySkeleton />
-            </View>
-          </View>
-        </ContentWithSidebar>
-      </ArticleDrawerWrapper>
-    );
-  }
-
-  if (error) {
-    const errorInfo = getUserFriendlyError(error);
-    const handleRetry = () => {
-      // Force refetch by updating the query key
-      router.replace(`/subcategory/${encodeURIComponent(title || '')}`);
-    };
-    return (
-      <ArticleDrawerWrapper>
-        <ContentWithSidebar sidebar={<AppSidebar />}>
-          <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-            <CollapsibleHeader
-              scrollY={scrollY}
-              headerHeight={totalHeaderHeight}
-            >
-              <View
-                style={{
-                  flex: 1,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  paddingHorizontal: SPACING.sm,
-                  paddingTop: insets.top
-                }}
-              >
-                <Appbar.BackAction onPress={handleBack} />
-                <Text
-                  style={{
-                    // MD3: Small app bars use 22sp title
-                    // Reference: https://m3.material.io/components/app-bars/overview
-                    fontWeight: '500', // MD3: Medium weight (500) for app bar titles
-                    fontSize: TYPOGRAPHY.appBarTitle,
-                    flex: 1
-                  }}
-                >
-                  {title?.replace(/_/g, ' ') || 'Category'}
-                </Text>
-              </View>
-            </CollapsibleHeader>
-            <View style={{ paddingTop: totalHeaderHeight }}>
-              <ErrorState
-                title="Unable to Load Category"
-                message={errorInfo.userFriendlyMessage}
-                onRetry={handleRetry}
-                showDetails
-                error={error instanceof Error ? error : undefined}
-                recoverySteps={errorInfo.recoverySteps}
-              />
-            </View>
-          </View>
-        </ContentWithSidebar>
-      </ArticleDrawerWrapper>
+      <View style={{ flex: 1 }}>
+        <View
+          style={{
+            flex: 1,
+            flexDirection: 'row',
+            alignItems: 'center'
+          }}
+        >
+          <Text
+            style={{
+              fontWeight: '500',
+              fontSize: TYPOGRAPHY.appBarTitle,
+              flex: 1
+            }}
+          >
+            {title?.replace(/_/g, ' ') || 'Category'}
+          </Text>
+        </View>
+        <View>
+          <SubcategorySkeleton />
+        </View>
+      </View>
     );
   }
 
@@ -357,139 +207,123 @@ export default function SubCategories() {
   const subcategories = data?.subcategories || [];
 
   return (
-    <ArticleDrawerWrapper>
-      <ContentWithSidebar sidebar={<AppSidebar />}>
-        <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-          <CollapsibleHeader scrollY={scrollY} headerHeight={totalHeaderHeight}>
+    <ResponsiveContainer>
+      <View style={{ flex: 1 }}>
+        <View
+          style={{
+            flex: 1,
+            flexDirection: 'row',
+            alignItems: 'center'
+          }}
+        >
+          <Appbar.BackAction onPress={handleBack} />
+          <Text
+            style={{
+              fontWeight: '700',
+              fontSize: TYPOGRAPHY.titleLarge,
+              flex: 1
+            }}
+          >
+            {title?.replace(/_/g, ' ') || 'Category'}
+          </Text>
+        </View>
+
+        <View style={{ flex: 1 }}>
+          {articles.length === 0 && subcategories.length === 0 ? (
+            <StandardEmptyState
+              icon="folder-open-outline"
+              title="No Content Found"
+              description="This category does not contain any articles or subcategories."
+            />
+          ) : (
             <View
               style={{
                 flex: 1,
-                flexDirection: 'row',
-                alignItems: 'center',
-                paddingHorizontal: SPACING.sm,
-                paddingTop: insets.top
+                alignSelf: 'center',
+                width: '100%'
               }}
             >
-              <Appbar.BackAction onPress={handleBack} />
-              <Text
-                style={{
-                  fontWeight: '700',
-                  fontSize: TYPOGRAPHY.titleLarge,
-                  flex: 1
-                }}
-              >
-                {title?.replace(/_/g, ' ') || 'Category'}
-              </Text>
-            </View>
-          </CollapsibleHeader>
-
-          <View style={{ flex: 1, paddingTop: totalHeaderHeight }}>
-            {articles.length === 0 && subcategories.length === 0 ? (
-              <StandardEmptyState
-                icon="folder-open-outline"
-                title="No Content Found"
-                description="This category does not contain any articles or subcategories."
-              />
-            ) : (
-              <View
-                style={{
-                  flex: 1,
-                  maxWidth: maxContentWidth,
-                  alignSelf: 'center',
-                  width: '100%'
-                }}
-              >
-                {/* Subcategories Section */}
-                {subcategories.length > 0 && (
-                  <View style={{ padding: SPACING.base }}>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        marginBottom: 12
-                      }}
-                    >
-                      <Text variant="titleMedium" style={{ flex: 1 }}>
-                        Subcategories
-                      </Text>
-                      <TouchableRipple
-                        onPress={() =>
-                          setSubcategoriesHorizontal(!subcategoriesHorizontal)
-                        }
-                        style={{ borderRadius: theme.roundness * 4 }} // 16dp equivalent (4dp * 4)
-                      >
-                        <Icon
-                          source={
-                            subcategoriesHorizontal
-                              ? 'chevron-down'
-                              : 'chevron-up'
-                          }
-                          size={24}
-                          color={theme.colors.onSurface}
-                        />
-                      </TouchableRipple>
-                    </View>
-                    <View
-                      style={{
-                        maxHeight: subcategoriesHorizontal ? undefined : 400
-                      }}
-                    >
-                      <FlashList
-                        data={subcategories}
-                        renderItem={renderSubcategoryItem}
-                        keyExtractor={(item: CategorySubcategory) => item.title}
-                        {...({
-                          estimatedItemSize: subcategoriesHorizontal ? 200 : 64
-                        } as any)}
-                        horizontal={subcategoriesHorizontal}
-                        showsHorizontalScrollIndicator={false}
-                        showsVerticalScrollIndicator={!subcategoriesHorizontal}
-                        scrollEnabled={true}
-                        contentContainerStyle={{ paddingRight: SPACING.base }}
-                        key={`subcategories-${subcategoriesHorizontal}`}
-                      />
-                    </View>
-                  </View>
-                )}
-
-                {/* Articles Section */}
-                {articles.length > 0 && (
+              {/* Subcategories Section */}
+              {subcategories.length > 0 && (
+                <View style={{ padding: SPACING.sm }}>
                   <View
                     style={{
-                      padding: SPACING.base,
-                      paddingTop: subcategories.length > 0 ? 0 : SPACING.base,
-                      flex: 1
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      marginBottom: 12
                     }}
                   >
-                    <Text variant="titleMedium" style={{ marginBottom: 12 }}>
-                      Articles
+                    <Text variant="titleMedium" style={{ flex: 1 }}>
+                      Subcategories
                     </Text>
+                    <TouchableRipple
+                      onPress={() =>
+                        setSubcategoriesHorizontal(!subcategoriesHorizontal)
+                      }
+                      style={{ borderRadius: theme.roundness * 4 }} // 16dp equivalent (4dp * 4)
+                    >
+                      <Icon
+                        source={
+                          subcategoriesHorizontal
+                            ? 'chevron-down'
+                            : 'chevron-up'
+                        }
+                        size={24}
+                        color={theme.colors.onSurface}
+                      />
+                    </TouchableRipple>
+                  </View>
+                  <View
+                    style={{
+                      maxHeight: subcategoriesHorizontal ? undefined : 400
+                    }}
+                  >
                     <FlashList
-                      data={articles}
-                      numColumns={numColumns}
-                      renderItem={renderArticleItem}
-                      keyExtractor={(item: CategoryArticle) => item.title}
-                      {...({ estimatedItemSize: 220 } as any)}
-                      contentContainerStyle={{ paddingRight: 16 }}
+                      data={subcategories}
+                      renderItem={renderSubcategoryItem}
+                      keyExtractor={(item: CategorySubcategory) => item.title}
+                      {...({
+                        estimatedItemSize: subcategoriesHorizontal ? 200 : 64
+                      } as any)}
+                      horizontal={subcategoriesHorizontal}
+                      showsHorizontalScrollIndicator={false}
+                      showsVerticalScrollIndicator={!subcategoriesHorizontal}
                       scrollEnabled={true}
-                      showsVerticalScrollIndicator={true}
+                      contentContainerStyle={{ paddingRight: SPACING.sm }}
+                      key={`subcategories-${subcategoriesHorizontal}`}
                     />
                   </View>
-                )}
-              </View>
-            )}
-          </View>
-        </View>
-      </ContentWithSidebar>
+                </View>
+              )}
 
-      <ImageDialog
-        visible={imageModalVisible}
-        selectedImage={selectedImage}
-        onClose={() => {
-          setImageModalVisible(false);
-          setSelectedImage(null);
-        }}
-      />
-    </ArticleDrawerWrapper>
+              {/* Articles Section */}
+              {articles.length > 0 && (
+                <View
+                  style={{
+                    padding: SPACING.sm,
+                    paddingTop: subcategories.length > 0 ? 0 : SPACING.sm,
+                    flex: 1
+                  }}
+                >
+                  <Text variant="titleMedium" style={{ marginBottom: 12 }}>
+                    Articles
+                  </Text>
+                  <FlashList
+                    data={articles}
+                    numColumns={2}
+                    renderItem={renderArticleItem}
+                    keyExtractor={(item: CategoryArticle) => item.title}
+                    {...({ estimatedItemSize: 220 } as any)}
+                    contentContainerStyle={{ paddingRight: 16 }}
+                    scrollEnabled={true}
+                    showsVerticalScrollIndicator={true}
+                  />
+                </View>
+              )}
+            </View>
+          )}
+        </View>
+      </View>
+    </ResponsiveContainer>
   );
 }

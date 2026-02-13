@@ -60,6 +60,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
  * Reference: https://m3.material.io/styles/color/overview
  * Reference: https://m3.material.io/styles/color/roles
  */
+
 const createMD3Theme = (scheme: any, isDark: boolean) => {
   const baseTheme = isDark ? MD3DarkTheme : MD3LightTheme;
 
@@ -277,7 +278,7 @@ const themes = {
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const systemColorScheme = useColorScheme();
-  const [currentTheme, setCurrentTheme] = useState<ThemeType>('automatic');
+  const [currentTheme, setCurrentTheme] = useState<ThemeType>('dark');
 
   // Load theme preference from storage on component mount
   useEffect(() => {
@@ -299,7 +300,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     };
 
     loadThemePreference();
-  }, []); // Only run once on mount - systemColorScheme is used for effectiveTheme calculation, not in this effect
+  }, []);
 
   const setTheme = useCallback(async (theme: ThemeType) => {
     setCurrentTheme(theme);

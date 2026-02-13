@@ -5,9 +5,9 @@ import { useFeaturedContent } from '@/stores/FeaturedContentContext';
 import { RecommendationItem } from '@/types/components';
 import { CardType } from '@/utils/cardUtils';
 
-import FeaturedCarousel from '@/features/featured/components/FeaturedCarousel';
 import CarouselItemsBottomSheet from './CarouselItemsBottomSheet';
 import ContentSection from './ContentSection';
+import FeaturedCarousel from './FeaturedCarousel';
 import { FeaturedCarouselSkeleton } from './SkeletonComponents';
 
 interface FeaturedCarouselSectionProps {

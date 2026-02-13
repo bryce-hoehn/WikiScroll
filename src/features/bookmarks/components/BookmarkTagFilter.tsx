@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { View, useWindowDimensions } from 'react-native';
 import { Chip, IconButton, useTheme } from 'react-native-paper';
 
 import { SPACING } from '@/constants/spacing';
-import { TYPOGRAPHY } from '@/constants/typography';
 import { Bookmark } from '@/types/bookmarks';
 
 interface BookmarkTagFilterProps {
@@ -81,15 +80,13 @@ export default function BookmarkTagFilter({
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.surface }]}>
-      <View style={styles.tagsRow}>
+    <View style={{ backgroundColor: theme.colors.surface }}>
+      <View>
         {displayedTags.map((item) => (
           <Chip
             key={item.tag || 'all'}
             selected={selectedTag === item.tag}
             onPress={() => onTagChange(item.tag)}
-            style={styles.chip}
-            textStyle={styles.chipText}
             mode="flat"
             compact
           >
@@ -98,7 +95,7 @@ export default function BookmarkTagFilter({
         ))}
       </View>
       {totalPages > 1 && (
-        <View style={styles.paginationContainer}>
+        <View>
           <IconButton
             icon="chevron-left"
             iconColor={theme.colors.onSurfaceVariant}
@@ -112,19 +109,16 @@ export default function BookmarkTagFilter({
             accessibilityLabel="Previous page"
             accessibilityHint="Navigate to the previous page of tags"
           />
-          <View style={styles.pageIndicators}>
+          <View>
             {Array.from({ length: totalPages }, (_, index) => (
               <View
                 key={index}
-                style={[
-                  styles.pageIndicator,
-                  {
-                    backgroundColor:
-                      currentPage === index
-                        ? theme.colors.primary
-                        : theme.colors.surfaceVariant
-                  }
-                ]}
+                style={{
+                  backgroundColor:
+                    currentPage === index
+                      ? theme.colors.primary
+                      : theme.colors.surfaceVariant
+                }}
               />
             ))}
           </View>
@@ -146,42 +140,3 @@ export default function BookmarkTagFilter({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    paddingVertical: SPACING.sm,
-    paddingHorizontal: SPACING.md
-  },
-  tagsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: SPACING.xs,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  chip: {
-    height: 32, // MD3: Filter chips are 32dp height
-    marginBottom: SPACING.xs
-  },
-  chipText: {
-    fontSize: TYPOGRAPHY.bodyMedium,
-    lineHeight: TYPOGRAPHY.bodyMedium * 1.2
-  },
-  paginationContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: SPACING.sm,
-    gap: SPACING.sm
-  },
-  pageIndicators: {
-    flexDirection: 'row',
-    gap: SPACING.xs + 2, // 6dp gap between indicators
-    alignItems: 'center'
-  },
-  pageIndicator: {
-    width: 8, // MD3: 8dp width for better touch target
-    height: 8, // MD3: 8dp height
-    borderRadius: 4 // Circular indicator
-  }
-});

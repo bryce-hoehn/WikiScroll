@@ -14,6 +14,7 @@ import {
 import { getOptimizedThumbnailUrl } from '@/utils/imageUtils';
 import { followLink, parseLink } from '@/utils/linkHandler';
 
+import { BREAKPOINTS } from '@/constants/breakpoints';
 import { useArticleRenderersConfig } from './ArticleRenderersConfig';
 import ArticleSectionRenderer from './ArticleSectionRenderer';
 import ArticleSkeleton from './ArticleSkeleton';
@@ -145,7 +146,7 @@ function ArticleSectionedRenderer({
   );
   const defaultTextProps = useMemo(() => ({ selectable: true }), []);
 
-  const isLargeScreen = width >= LAYOUT.DESKTOP_BREAKPOINT;
+  const isLargeScreen = width >= BREAKPOINTS.xl;
   const maxImageWidth = isLargeScreen
     ? Math.min(LAYOUT.ARTICLE_MAX_WIDTH, 900)
     : '100%';

@@ -6,7 +6,6 @@ import type { TNode } from 'react-native-render-html';
 
 import { SPACING } from '@/constants/spacing';
 import { getRandomBlurhash } from '@/utils/blurhash';
-import { hapticLight, hapticMedium } from '@/utils/haptics';
 import { extractAltText } from '@/utils/imageAltText';
 import { copyArticleUrl, shareArticle } from '@/utils/shareUtils';
 
@@ -177,18 +176,15 @@ const ImageRendererComponent = ({
   }, [handleImagePress, imageContextMenuVisible]);
 
   const handleImageLongPress = useCallback(() => {
-    hapticMedium();
     setImageContextMenuVisible(true);
   }, []);
 
   const handleViewFullscreen = useCallback(() => {
-    hapticLight();
     setImageContextMenuVisible(false);
     handleImagePress();
   }, [handleImagePress]);
 
   const handleShareImage = useCallback(async () => {
-    hapticLight();
     setImageContextMenuVisible(false);
     try {
       await shareArticle(articleTitle || '', alt || 'Image');
@@ -198,7 +194,6 @@ const ImageRendererComponent = ({
   }, [articleTitle, alt]);
 
   const handleCopyImageUrl = useCallback(async () => {
-    hapticLight();
     setImageContextMenuVisible(false);
     try {
       if (imageUrl) {
@@ -210,7 +205,6 @@ const ImageRendererComponent = ({
   }, [articleTitle, imageUrl]);
 
   const handleOpenImageUrl = useCallback(() => {
-    hapticLight();
     setImageContextMenuVisible(false);
     if (imageUrl) {
       Linking.openURL(imageUrl).catch(() => {

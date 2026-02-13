@@ -96,12 +96,12 @@ export function getArticleTagStyles(
       textDecorationLine: 'none'
     },
     ul: {
-      marginVertical: 12, // MD3: 12dp vertical spacing (1.5x base unit)
-      marginLeft: 16 // MD3: 16dp indentation (2x base unit)
+      marginVertical: 12,
+      marginLeft: 16
     },
     ol: {
-      marginVertical: 12, // MD3: 12dp vertical spacing (1.5x base unit)
-      marginLeft: 16 // MD3: 16dp indentation (2x base unit)
+      marginVertical: 12,
+      marginLeft: 16
     },
     li: {
       marginVertical: 4,
@@ -111,54 +111,51 @@ export function getArticleTagStyles(
       fontFamily: fontFamilyValue
     },
     table: {
-      backgroundColor: theme.colors.surface, // MD3: Surface color for table container
-      marginVertical: 12, // MD3: 12dp vertical spacing
+      backgroundColor: theme.colors.surface,
+      marginVertical: 12,
       width: '100%',
       maxWidth: '100%',
-      borderRadius: theme.roundness, // MD3: Use theme roundness for shape
+      borderRadius: theme.roundness,
       overflow: 'hidden',
       alignSelf: 'center'
     },
     thead: {
-      backgroundColor: 'transparent' // MD3: Transparent, rely on th styling
+      backgroundColor: 'transparent'
     },
     tbody: {
       backgroundColor: 'transparent'
     },
     th: {
-      // MD3: Use elevation level 5 (surfaceContainerHighest) for table headers, fallback to surfaceContainer or surfaceVariant
       backgroundColor:
         (theme.colors as any).elevation?.level5 ||
         (theme.colors as any).surfaceContainerHighest ||
         (theme.colors as any).surfaceContainer ||
         theme.colors.surfaceVariant,
-      color: theme.colors.onSurface, // MD3: On-surface for text
-      fontWeight: '600' as TextStyle['fontWeight'], // MD3: Use 600 for medium emphasis
-      paddingVertical: 8, // MD3: 8dp vertical padding (1x base unit)
-      paddingHorizontal: 12, // MD3: 12dp horizontal padding (1.5x base unit)
+      color: theme.colors.onSurface,
+      fontWeight: '600' as TextStyle['fontWeight'],
+      paddingVertical: 8,
+      paddingHorizontal: 12,
       textAlign: 'left' as TextStyle['textAlign'],
       fontSize: baseFontSize * 0.95,
       overflow: 'hidden',
       maxWidth: '100%',
       minWidth: 0,
-      borderWidth: 0.5, // MD3: Thinner borders for subtlety
-      borderColor: theme.colors.outlineVariant, // MD3: Use outlineVariant for subtle borders
+      borderWidth: 0.5,
+      borderColor: theme.colors.outlineVariant,
       borderStyle: 'solid' as any
     },
     td: {
-      // MD3: Table cells are transparent, inheriting the table's surface background
       backgroundColor: 'transparent',
-      paddingVertical: 8, // MD3: 8dp vertical padding (1x base unit)
-      paddingHorizontal: 12, // MD3: 12dp horizontal padding (1.5x base unit)
-      color: theme.colors.onSurface, // MD3: On-surface for text
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+      color: theme.colors.onSurface,
       fontSize: baseFontSize * 0.95,
       overflow: 'hidden',
       maxWidth: '100%',
       minWidth: 0,
-      borderWidth: 0.5, // MD3: Thinner borders for subtlety
-      borderColor: theme.colors.outlineVariant, // MD3: Use outlineVariant for subtle borders
+      borderWidth: 0.5,
+      borderColor: theme.colors.outlineVariant,
       borderStyle: 'solid' as any,
-      // Default text alignment for table cells
       textAlign: 'left' as TextStyle['textAlign']
     },
     tr: {
@@ -166,40 +163,40 @@ export function getArticleTagStyles(
     },
     caption: {
       fontSize: baseFontSize * 0.85,
-      color: theme.colors.onSurfaceVariant, // MD3: On-surface-variant for secondary text
+      color: theme.colors.onSurfaceVariant,
       fontStyle: 'italic',
-      paddingVertical: 8, // MD3: 8dp vertical padding (1x base unit)
+      paddingVertical: 8,
       textAlign: 'center' as TextStyle['textAlign']
     },
     // Improved code styling
     code: {
-      backgroundColor: theme.colors.surfaceVariant, // MD3: Surface variant for emphasis
-      color: theme.colors.onSurfaceVariant, // MD3: On-surface-variant for text
-      paddingHorizontal: 4, // MD3: 4dp horizontal padding (0.5x base unit)
-      paddingVertical: 2, // MD3: 2dp vertical padding (minimal)
-      borderRadius: theme.roundness * 2, // MD3: 8dp equivalent for inline elements (4dp * 2)
+      backgroundColor: theme.colors.surfaceVariant,
+      color: theme.colors.onSurfaceVariant,
+      paddingHorizontal: 4,
+      paddingVertical: 2,
+      borderRadius: theme.roundness * 2,
       fontFamily: 'monospace'
     },
     pre: {
-      backgroundColor: theme.colors.surfaceVariant, // MD3: Surface variant for code blocks
-      color: theme.colors.onSurfaceVariant, // MD3: On-surface-variant for text
-      padding: 16, // MD3: 16dp padding (2x base unit)
-      borderRadius: theme.roundness, // MD3: Standard roundness for blocks
+      backgroundColor: theme.colors.surfaceVariant,
+      color: theme.colors.onSurfaceVariant,
+      padding: 16,
+      borderRadius: theme.roundness,
       fontFamily: 'monospace',
       overflow: 'scroll',
-      marginVertical: 12 // MD3: 12dp vertical spacing (1.5x base unit)
+      marginVertical: 12
     },
     // Blockquote styling
     blockquote: {
-      backgroundColor: theme.colors.surfaceVariant, // MD3: Surface variant for emphasis
-      borderLeftWidth: 4, // MD3: 4dp accent border (0.5x base unit)
-      borderLeftColor: theme.colors.primary, // MD3: Primary color for accent
-      paddingVertical: 12, // MD3: 12dp vertical padding (1.5x base unit)
-      paddingHorizontal: 16, // MD3: 16dp horizontal padding (2x base unit)
-      marginVertical: 12, // MD3: 12dp vertical spacing (1.5x base unit)
-      marginLeft: 16, // MD3: 16dp left margin (2x base unit)
+      backgroundColor: theme.colors.surfaceVariant,
+      borderLeftWidth: 4,
+      borderLeftColor: theme.colors.primary,
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      marginVertical: 12,
+      marginLeft: 16,
       fontStyle: 'italic',
-      color: theme.colors.onSurfaceVariant // MD3: On-surface-variant for text
+      color: theme.colors.onSurfaceVariant
     },
     // Image styling
     img: {
@@ -324,11 +321,11 @@ export function getArticleClassStyles(
     },
     // Navigation boxes
     navbox: {
-      backgroundColor: theme.colors.surfaceVariant, // MD3: Surface variant for containers
-      borderColor: theme.colors.outlineVariant, // MD3: Outline variant for subtle borders
-      borderRadius: theme.roundness, // MD3: Standard roundness
-      padding: 12, // MD3: 12dp padding (1.5x base unit)
-      marginVertical: 16 // MD3: 16dp vertical spacing (2x base unit)
+      backgroundColor: theme.colors.surfaceVariant,
+      borderColor: theme.colors.outlineVariant,
+      borderRadius: theme.roundness,
+      padding: 12,
+      marginVertical: 16
     },
     // Citation styles
     citation: {
@@ -338,8 +335,8 @@ export function getArticleClassStyles(
     // Mobile-optimized table cells
     'mobile-table-cell': {
       minWidth: 80,
-      paddingVertical: 8, // MD3: 8dp vertical padding (1x base unit)
-      paddingHorizontal: 8 // MD3: 8dp horizontal padding (1x base unit) - increased for consistency
+      paddingVertical: 8,
+      paddingHorizontal: 8
     },
     // Infobox tables - should take full container width
     infobox: {

@@ -1,14 +1,11 @@
-import { Image } from 'expo-image';
-import { router } from 'expo-router';
-import React, { useState } from 'react';
-import { Platform, View } from 'react-native';
-import { List, Text, useTheme } from 'react-native-paper';
-
-import { getHoverStyles } from '@/constants/motion';
 import { SPACING } from '@/constants/spacing';
 import { TYPOGRAPHY } from '@/constants/typography';
-import { useReducedMotion } from '@/hooks';
 import { getRandomBlurhash } from '@/utils/blurhash';
+import { Image } from 'expo-image';
+import { router } from 'expo-router';
+import React from 'react';
+import { View } from 'react-native';
+import { List, Text, useTheme } from 'react-native-paper';
 
 interface TrendingListItemProps {
   item: {
@@ -34,21 +31,6 @@ export default function TrendingListItem({
   isLast
 }: TrendingListItemProps) {
   const theme = useTheme();
-  const [isHovered, setIsHovered] = useState(false);
-  const { reducedMotion } = useReducedMotion();
-
-  // Web-specific: Hover handlers
-  const handleMouseEnter = () => {
-    if (Platform.OS === 'web') {
-      setIsHovered(true);
-    }
-  };
-
-  const handleMouseLeave = () => {
-    if (Platform.OS === 'web') {
-      setIsHovered(false);
-    }
-  };
 
   return (
     <>
@@ -66,15 +48,11 @@ export default function TrendingListItem({
         descriptionStyle={{
           fontSize: TYPOGRAPHY.bodySmall,
           color: theme.colors.onSurfaceVariant,
-          marginTop: SPACING.xs / 2
+          marginTop: SPACING.sm
         }}
         contentStyle={{ paddingVertical: 0, minHeight: 0 }}
         accessibilityLabel={`Open trending article: ${item.normalizedTitle}`}
         accessibilityHint={`Opens the trending article: ${item.normalizedTitle}`}
-        {...(Platform.OS === 'web' && {
-          onMouseEnter: handleMouseEnter,
-          onMouseLeave: handleMouseLeave
-        })}
         left={(props) =>
           item.thumbnail ? (
             <View
@@ -83,9 +61,8 @@ export default function TrendingListItem({
                 height: 48,
                 borderRadius: theme.roundness * 2, // 8dp equivalent (4dp * 2)
                 overflow: 'hidden',
-                marginRight: SPACING.md,
-                marginLeft: SPACING.md,
-                backgroundColor: theme.colors.surface
+                marginRight: SPACING.sm,
+                marginLeft: SPACING.sm
               }}
             >
               <Image
@@ -105,8 +82,8 @@ export default function TrendingListItem({
                 backgroundColor: theme.colors.primary,
                 justifyContent: 'center',
                 alignItems: 'center',
-                marginRight: SPACING.md,
-                marginLeft: SPACING.md
+                marginRight: SPACING.sm,
+                marginLeft: SPACING.sm
               }}
               accessibilityElementsHidden={true}
               importantForAccessibility="no"
@@ -124,25 +101,9 @@ export default function TrendingListItem({
           )
         }
         style={{
-          backgroundColor:
-            isHovered && Platform.OS === 'web'
-              ? theme.colors.surfaceVariant
-              : 'transparent',
           marginTop: isFirst ? 0 : 0,
           marginBottom: 0,
-          paddingBottom: 0,
-          ...(Platform.OS === 'web' && {
-            ...getHoverStyles(isHovered, reducedMotion, {
-              transitionProperty: 'background-color'
-            }),
-            borderRadius: theme.roundness * 0.5, // Default border radius for all corners
-            borderBottomLeftRadius: isLast
-              ? theme.roundness * 3
-              : theme.roundness * 0.5, // Match Card border radius for last item
-            borderBottomRightRadius: isLast
-              ? theme.roundness * 3
-              : theme.roundness * 0.5 // Match Card border radius for last item
-          })
+          paddingBottom: 0
         }}
       />
     </>

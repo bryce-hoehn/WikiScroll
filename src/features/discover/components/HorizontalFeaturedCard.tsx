@@ -13,7 +13,6 @@ import { Card, IconButton, Text, useTheme } from 'react-native-paper';
 import { fetchArticleHtml } from '@/api';
 import HtmlRenderer from '@/components/data/HtmlRenderer';
 import { LAYOUT } from '@/constants/layout';
-import { getHoverStyles, MOTION } from '@/constants/motion';
 import { SPACING } from '@/constants/spacing';
 import { useReducedMotion, useVisitedArticles } from '@/hooks';
 import useBookmarkToggle from '@/hooks/ui/useBookmarkToggle';
@@ -145,34 +144,6 @@ const HorizontalFeaturedCard = memo(function HorizontalFeaturedCard({
   }, [item, cardType]);
   const hasHtmlContent = description.includes('<') && description.includes('>');
 
-  // MD3 stagger animation: 20ms delay, limited to first 10 items
-  React.useEffect(() => {
-    if (reducedMotion || Platform.OS === 'web') {
-      fadeAnim.setValue(1);
-      scaleAnim.setValue(1);
-      return;
-    }
-
-    const useNativeDriver = true;
-    const staggerDelay =
-      index < MOTION.staggerLimit ? index * MOTION.staggerDelay : 0;
-
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: MOTION.durationShort,
-        delay: staggerDelay,
-        useNativeDriver
-      }),
-      Animated.timing(scaleAnim, {
-        toValue: 1,
-        duration: MOTION.durationShort,
-        delay: staggerDelay,
-        useNativeDriver
-      })
-    ]).start();
-  }, [fadeAnim, scaleAnim, index, reducedMotion]);
-
   const handlePress = useCallback(() => {
     if (articleTitle) {
       router.push(`/article/${encodeURIComponent(articleTitle)}`);
@@ -262,18 +233,16 @@ const HorizontalFeaturedCard = memo(function HorizontalFeaturedCard({
         accessibilityHint={`Opens the article: ${displayTitle}`}
       >
         <Card
-          elevation={isPressed || (isHovered && Platform.OS === 'web') ? 4 : 1} // M3: Default elevation 1dp, increases to 4dp on hover/press
+          elevation={isPressed || (isHovered && Platform.OS === 'web') ? 4 : 1}
           style={{
             width: '100%',
             maxWidth: '100%',
-            borderRadius: theme.roundness * 3, // M3: 12dp corner radius (4dp * 3)
+            borderRadius: theme.roundness * 3,
             backgroundColor:
               isPressed || (isHovered && Platform.OS === 'web')
                 ? theme.colors.surface
                 : theme.colors.elevation.level2,
-            overflow: 'hidden',
-            ...(Platform.OS === 'web' &&
-              getHoverStyles(isHovered, reducedMotion, { scale: 1.01 }))
+            overflow: 'hidden'
           }}
         >
           <View style={{ flexDirection: 'row', height: cardHeight }}>

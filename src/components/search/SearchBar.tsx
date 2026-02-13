@@ -1,3 +1,4 @@
+import { useDebounce, useSearchSuggestions, useVisitedArticles } from '@/hooks';
 import { router } from 'expo-router';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import {
@@ -11,13 +12,9 @@ import {
 } from 'react-native';
 import { Portal, Searchbar, useTheme } from 'react-native-paper';
 
-import { COMPONENT_HEIGHTS, LAYOUT } from '@/constants/layout';
-import { SPACING } from '@/constants/spacing';
-import { useDebounce, useSearchSuggestions, useVisitedArticles } from '@/hooks';
-
+import { BREAKPOINTS } from '@/constants/breakpoints';
 import NoResultsState from '../data/NoResultsState';
 import RecentArticlesList from '../RecentArticlesList';
-import SearchOverlay from './SearchOverlay';
 import SearchResultSkeleton from './SearchResultSkeleton';
 import SearchResultsList from './SearchResultsList';
 
@@ -55,7 +52,7 @@ export default function SearchBar({
 }: SearchBarProps) {
   const theme = useTheme();
   const { width } = useWindowDimensions();
-  const isLargeScreen = width >= LAYOUT.DESKTOP_BREAKPOINT;
+  const isLargeScreen = width >= BREAKPOINTS.xl;
   const [internalValue, setInternalValue] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -219,8 +216,6 @@ export default function SearchBar({
     }
   };
 
-  // MD3 SearchBar styling - per https://m3.material.io/components/search/specs
-  // Height: 56dp, Background: surfaceVariant, Elevation: 2dp, Corner radius: 12dp (corner.medium)
   const elevation = Platform.select({ android: 2, ios: 0, web: 2 });
   const backgroundColor = theme.colors.surfaceVariant;
 
@@ -257,19 +252,17 @@ export default function SearchBar({
           style={{
             elevation,
             backgroundColor,
-            borderRadius: theme.roundness * 3, // 12dp (corner.medium)
-            minHeight: COMPONENT_HEIGHTS.STANDARD, // MD3: 56dp height
-            height: COMPONENT_HEIGHTS.STANDARD
+            borderRadius: theme.roundness * 3,
+            minHeight: 56,
+            height: 56
           }}
           inputStyle={{
-            // fontSize removed - using variant default
             color: theme.colors.onSurface,
             paddingVertical: 0,
             textAlignVertical: 'center',
             includeFontPadding: false
           }}
           iconColor={theme.colors.onSurfaceVariant}
-          // MD3 Accessibility: Proper labels and hints - per https://m3.material.io/components/search/accessibility
           accessibilityLabel="Search Wikipedia"
           accessibilityRole="search"
           accessibilityHint={
@@ -426,15 +419,6 @@ export default function SearchBar({
             </View>
           </Portal>
         )}
-
-      {/* Mobile: Full-screen SearchView overlay */}
-      {!isLargeScreen && (
-        <SearchOverlay
-          visible={showMobileOverlay && !disableOverlay}
-          onClose={handleOverlayClose}
-          initialQuery={value || ''}
-        />
-      )}
     </View>
   );
 }
@@ -450,8 +434,8 @@ const styles = StyleSheet.create({
   searchBarWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: SPACING.base,
-    gap: SPACING.xs
+    paddingHorizontal: 24,
+    gap: 24
   },
   searchBar: {
     flex: 1
@@ -465,11 +449,11 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingTop: 0,
-    paddingBottom: SPACING.sm
+    paddingBottom: 24
   },
   skeletonContainer: {
-    paddingHorizontal: SPACING.sm,
-    paddingTop: SPACING.sm,
-    paddingBottom: SPACING.sm
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 24
   }
 });

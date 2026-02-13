@@ -4,10 +4,10 @@ import { useFeaturedContent } from '@/stores/FeaturedContentContext';
 
 import { RecommendationItem } from '@/types/components';
 
-import TrendingList from '@/features/featured/components/Trending';
 import CarouselItemsBottomSheet from './CarouselItemsBottomSheet';
 import ContentSection from './ContentSection';
 import { TrendingCarouselSkeleton } from './SkeletonComponents';
+import TrendingList from './Trending';
 
 interface TrendingSectionProps {
   maxItemsPerPage?: number;

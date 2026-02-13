@@ -28,8 +28,6 @@ function TrendingCarousel({
   const theme = useTheme();
   const { reducedMotion } = useReducedMotion();
   const carouselRef = useRef<ICarouselInstance>(null);
-  const actualCarouselIndexRef = useRef<number>(0);
-  const isUpdatingFromExternalRef = useRef<boolean>(false);
 
   // Expose scrollToIndex method via ref with looping support
   React.useImperativeHandle(ref, () => ({
@@ -38,20 +36,8 @@ function TrendingCarousel({
         const normalizedIndex =
           ((params.index % memoizedPages.length) + memoizedPages.length) %
           memoizedPages.length;
-        const currentActualIndex = actualCarouselIndexRef.current;
-        const targetIndex = normalizedIndex;
-
-        // Calculate relative offset to ensure consistent scroll distance
-        let offset = targetIndex - (currentActualIndex % memoizedPages.length);
-        if (offset > memoizedPages.length / 2) {
-          offset -= memoizedPages.length;
-        } else if (offset < -memoizedPages.length / 2) {
-          offset += memoizedPages.length;
-        }
-
-        const newIndex = currentActualIndex + offset;
         carouselRef.current.scrollTo({
-          index: newIndex,
+          index: normalizedIndex,
           animated: params.animated ?? true
         });
       }
@@ -65,33 +51,10 @@ function TrendingCarousel({
       currentPage !== undefined &&
       memoizedPages.length > 0
     ) {
-      // Only update if the change comes from external source (not from user interaction)
-      const currentNormalizedIndex =
-        ((actualCarouselIndexRef.current % memoizedPages.length) +
-          memoizedPages.length) %
+      const normalizedIndex =
+        ((currentPage % memoizedPages.length) + memoizedPages.length) %
         memoizedPages.length;
-
-      if (
-        currentNormalizedIndex !== currentPage &&
-        !isUpdatingFromExternalRef.current
-      ) {
-        // Mark that we're updating from external source to prevent feedback loop
-        isUpdatingFromExternalRef.current = true;
-
-        // Directly scroll to the target page
-        const normalizedIndex =
-          ((currentPage % memoizedPages.length) + memoizedPages.length) %
-          memoizedPages.length;
-        carouselRef.current.scrollTo({
-          index: normalizedIndex,
-          animated: true
-        });
-
-        // Reset the flag after a short delay to allow the animation to complete
-        setTimeout(() => {
-          isUpdatingFromExternalRef.current = false;
-        }, 300); // Match the scrollAnimationDuration
-      }
+      carouselRef.current.scrollTo({ index: normalizedIndex, animated: true });
     }
   }, [currentPage, memoizedPages.length]);
 
@@ -114,12 +77,11 @@ function TrendingCarousel({
           }}
         >
           <Card
-            elevation={1} // M3: Default elevation 1dp
             style={{
               width: cardWidth,
               height: containerHeight + 8,
               backgroundColor: theme.colors.elevation.level2,
-              borderRadius: theme.roundness * 3, // M3: 12dp corner radius (4dp * 3)
+              borderRadius: theme.roundness * 3,
               overflow: 'hidden'
             }}
             contentStyle={{
@@ -176,11 +138,7 @@ function TrendingCarousel({
       scrollAnimationDuration={reducedMotion ? 0 : 300}
       style={{ backgroundColor: theme.colors.background }}
       onSnapToItem={(index) => {
-        actualCarouselIndexRef.current = index;
-        const normalizedIndex =
-          ((index % memoizedPages.length) + memoizedPages.length) %
-          memoizedPages.length;
-        onPageChange(normalizedIndex);
+        onPageChange(index);
       }}
     />
   );

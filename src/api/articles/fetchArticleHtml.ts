@@ -25,7 +25,6 @@ export const fetchArticleHtml = async (
   try {
     const cleanTitle = normalizeWikipediaTitle(title);
 
-    // REST API automatically handles redirects, so we only need a single request
     const response = await restAxiosInstance.get<string>(
       `/page/html/${encodeURIComponent(cleanTitle)}`,
       {
@@ -33,7 +32,6 @@ export const fetchArticleHtml = async (
         headers: {
           Accept: 'text/html'
         }
-        // Uses centralized timeout from axiosInstance
       }
     );
 

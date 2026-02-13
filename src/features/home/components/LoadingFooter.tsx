@@ -16,11 +16,11 @@ export default function LoadingFooter({ loading }: LoadingFooterProps) {
   return (
     <View
       style={{
-        padding: SPACING.lg, // M3: 24dp padding
+        padding: SPACING.lg,
         alignItems: 'center',
         flexDirection: 'row',
         justifyContent: 'center',
-        gap: SPACING.md // M3: 12dp gap
+        gap: SPACING.md
       }}
     >
       <ActivityIndicator size="small" color={theme.colors.primary} />

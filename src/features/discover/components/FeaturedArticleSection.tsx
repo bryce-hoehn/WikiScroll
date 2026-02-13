@@ -2,8 +2,8 @@ import React from 'react';
 
 import { useFeaturedContent } from '@/stores/FeaturedContentContext';
 
-import { FeaturedArticleCard } from '@/features/featured';
 import ContentSection from './ContentSection';
+import FeaturedArticleCard from './FeaturedArticleCard';
 import { FeaturedArticleSkeleton } from './SkeletonComponents';
 
 /**

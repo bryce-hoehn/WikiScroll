@@ -1,7 +1,6 @@
 import { useCallback, useContext } from 'react';
 
 import { BookmarksContext } from '@/stores/BookmarksContext';
-import { SnackbarContext } from '@/stores/SnackbarContext';
 import { RecommendationItem } from '@/types/components';
 
 /**
@@ -11,14 +10,12 @@ import { RecommendationItem } from '@/types/components';
  */
 export default function useBookmarkToggle() {
   const bookmarksContext = useContext(BookmarksContext);
-  const snackbarContext = useContext(SnackbarContext);
 
   const { addBookmark, removeBookmark, isBookmarked } = bookmarksContext || {
     addBookmark: () => Promise.resolve(),
     removeBookmark: () => Promise.resolve(),
     isBookmarked: () => false
   };
-  const { showSuccess } = snackbarContext || { showSuccess: () => {} };
 
   const handleBookmarkToggle = useCallback(
     async (item: RecommendationItem) => {
@@ -27,16 +24,14 @@ export default function useBookmarkToggle() {
       try {
         if (bookmarked) {
           await removeBookmark(item.title);
-          showSuccess('Article removed from bookmarks');
         } else {
           await addBookmark(item.title, item.thumbnail, item.description);
-          showSuccess('Article bookmarked');
         }
       } catch {
         // Error handling is done by the context
       }
     },
-    [addBookmark, removeBookmark, isBookmarked, showSuccess]
+    [addBookmark, removeBookmark, isBookmarked]
   );
 
   return {

@@ -3,13 +3,12 @@ import React from 'react';
 import { useWindowDimensions, View } from 'react-native';
 import { Card, Chip, IconButton, Text, useTheme } from 'react-native-paper';
 
-import { SPACING } from '@/constants/spacing';
 import { TYPOGRAPHY } from '@/constants/typography';
 import { useReadingProgress } from '@/hooks';
 import { BookmarkCardProps } from '@/types/components';
 
 import ResponsiveImage from '@/components/ui/media/ResponsiveImage';
-import { LAYOUT } from '@/constants/layout';
+import { BREAKPOINTS } from '@/constants/breakpoints';
 import ReadingProgressIndicator from './ReadingProgressIndicator';
 
 const BookmarkCard = React.memo(function BookmarkCard({
@@ -35,7 +34,7 @@ const BookmarkCard = React.memo(function BookmarkCard({
   const readingProgress = getProgress(item.title);
 
   // Determine if we're on a small screen (mobile)
-  const isSmallScreen = width < LAYOUT.TABLET_BREAKPOINT;
+  const isSmallScreen = width < BREAKPOINTS.lg;
 
   // Responsive dimensions for horizontal card layout
   // Increased height to accommodate tags, description, and progress bar
@@ -57,9 +56,7 @@ const BookmarkCard = React.memo(function BookmarkCard({
         width: '100%',
         maxWidth: '100%',
         minHeight: cardHeight,
-        borderRadius: theme.roundness * 3, // M3: 12dp corner radius (4dp * 3)
-        // Only show border when selected in selection mode (for visual feedback)
-        // Otherwise rely on elevation for depth (MD3 best practice)
+        borderRadius: theme.roundness * 3,
         borderWidth: selectionMode && isSelected ? 2 : 0,
         borderColor:
           selectionMode && isSelected ? theme.colors.primary : 'transparent',
@@ -141,7 +138,7 @@ const BookmarkCard = React.memo(function BookmarkCard({
         <Card.Content
           style={{
             flex: 1,
-            padding: isSmallScreen ? SPACING.md : SPACING.lg,
+            padding: 24,
             justifyContent: 'space-between',
             height: cardHeight,
             minHeight: cardHeight
@@ -154,7 +151,7 @@ const BookmarkCard = React.memo(function BookmarkCard({
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 alignItems: 'flex-start',
-                marginBottom: isSmallScreen ? SPACING.xs + 2 : SPACING.sm
+                marginBottom: 24
               }}
             >
               <Text
@@ -166,7 +163,7 @@ const BookmarkCard = React.memo(function BookmarkCard({
                       : TYPOGRAPHY.titleMedium) * TYPOGRAPHY.lineHeightNormal,
                   color: theme.colors.onSurface,
                   flex: 1,
-                  marginRight: SPACING.sm
+                  marginRight: 24
                 }}
                 numberOfLines={2}
               >
@@ -178,8 +175,8 @@ const BookmarkCard = React.memo(function BookmarkCard({
                     flexDirection: 'row',
                     alignItems: 'flex-start',
                     flexShrink: 0,
-                    marginLeft: SPACING.xs,
-                    paddingTop: SPACING.xs / 2
+                    marginLeft: 24,
+                    paddingTop: 24
                   }}
                 >
                   {onEdit && (
@@ -226,9 +223,9 @@ const BookmarkCard = React.memo(function BookmarkCard({
                 style={{
                   flexDirection: 'row',
                   flexWrap: 'wrap',
-                  gap: SPACING.xs,
-                  marginBottom: SPACING.xs + 2,
-                  marginTop: SPACING.xs / 2
+                  gap: 24,
+                  marginBottom: 24,
+                  marginTop: 24
                 }}
               >
                 {item.tags.slice(0, 2).map((tag) => (
@@ -236,7 +233,7 @@ const BookmarkCard = React.memo(function BookmarkCard({
                     key={tag}
                     style={{
                       height: 28,
-                      paddingHorizontal: SPACING.xs + 2,
+                      paddingHorizontal: 24,
                       paddingVertical: 0,
                       justifyContent: 'center'
                     }}
@@ -260,7 +257,7 @@ const BookmarkCard = React.memo(function BookmarkCard({
                   <Chip
                     style={{
                       height: 28,
-                      paddingHorizontal: SPACING.xs + 2,
+                      paddingHorizontal: 24,
                       paddingVertical: 0,
                       justifyContent: 'center'
                     }}

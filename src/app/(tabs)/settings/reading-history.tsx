@@ -1,10 +1,8 @@
 import { FlashList, FlashListRef } from '@shopify/flash-list';
 import { useQuery } from '@tanstack/react-query';
-import { router } from 'expo-router';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ScrollView, useWindowDimensions, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import {
-  Appbar,
   Button,
   Dialog,
   Divider,
@@ -16,61 +14,34 @@ import {
 } from 'react-native-paper';
 
 import { fetchArticleSummaries } from '@/api';
-import { LAYOUT } from '@/constants/layout';
+import ResponsiveContainer from '@/components/ui/layout/ResponsiveContainer';
 import { SPACING } from '@/constants/spacing';
-import { TYPOGRAPHY } from '@/constants/typography';
 import { RecommendationCard } from '@/features/article';
 import {
   useBookmarkToggle,
   useReadingProgress,
   useVisitedArticles
 } from '@/hooks';
-import { useSnackbar } from '@/stores/SnackbarContext';
 import { RecommendationItem } from '@/types/components';
 
 const ITEMS_PER_PAGE = 10;
 
 export default function ReadingHistoryScreen() {
   const theme = useTheme();
-  const { width } = useWindowDimensions();
-  const {
-    removeVisitedArticle,
-    clearVisitedArticles,
-    visitedArticles,
-    addVisitedArticle,
-    loadVisitedArticles
-  } = useVisitedArticles();
-  const { clearAllProgress, saveProgress, getProgressData } =
-    useReadingProgress();
-  const { showSuccess, showError, showSnackbar } = useSnackbar();
+  const { removeVisitedArticle, clearVisitedArticles, visitedArticles } =
+    useVisitedArticles();
+  const { clearAllProgress, getProgressData } = useReadingProgress();
   const { handleBookmarkToggle, isBookmarked } = useBookmarkToggle();
   const [isResetting, setIsResetting] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const flashListRef = useRef<FlashListRef<RecommendationItem[]>>(null);
 
-  // Calculate content width to match main feed layout
-  const isLargeScreen = width >= LAYOUT.DESKTOP_BREAKPOINT;
-  // Left: 88px gutter + 280px drawer = 368px, plus 1px divider
-  const leftOffset = isLargeScreen ? 369 : 0;
-  // Right: 480px sidebar + 1px divider
-  const rightOffset = isLargeScreen ? 481 : 0;
-  const availableWidth = width - leftOffset - rightOffset;
-  const maxCardWidth = 800; // Match main feed max width
-  const cardWidth =
-    availableWidth > maxCardWidth
-      ? maxCardWidth
-      : availableWidth - SPACING.base * 2;
-  // itemWidth should be the available content width, not full screen width
-  const itemWidth = availableWidth;
-
-  // Batch fetch all article summaries at once (much faster)
   const articleTitles = useMemo(
     () => visitedArticles.map((visited) => visited.title),
     [visitedArticles]
   );
 
-  // Sort for stable query key but don't mutate original array
   const sortedTitlesForKey = useMemo(
     () => [...articleTitles].sort().join('|'),
     [articleTitles]
@@ -137,7 +108,6 @@ export default function ReadingHistoryScreen() {
     setShowConfirmDialog(false);
     setIsResetting(true);
     try {
-      const articlesToRestore = [...visitedArticles];
       const progressToRestore: Record<
         string,
         { progress: number; lastReadAt: string; expandedSections?: string[] }
@@ -151,61 +121,23 @@ export default function ReadingHistoryScreen() {
       }
 
       await Promise.all([clearVisitedArticles(), clearAllProgress()]);
-
-      showSnackbar('Reading history and progress cleared successfully', {
-        duration: 5000,
-        action: {
-          label: 'Undo',
-          onPress: async () => {
-            try {
-              for (const article of articlesToRestore) {
-                await addVisitedArticle(article.title);
-              }
-
-              for (const [title, progressData] of Object.entries(
-                progressToRestore
-              )) {
-                await saveProgress(
-                  title,
-                  progressData.progress,
-                  progressData.expandedSections
-                );
-              }
-
-              await loadVisitedArticles();
-            } catch (error) {
-              if (typeof __DEV__ !== 'undefined' && __DEV__) {
-                console.error('Failed to undo history clearing:', error);
-              }
-              showError('Failed to restore reading history');
-            }
-          }
-        }
-      });
     } catch (error) {
       if (typeof __DEV__ !== 'undefined' && __DEV__) {
         console.error('Failed to clear reading history:', error);
       }
-      showError('Failed to clear reading history. Please try again.');
     } finally {
       setIsResetting(false);
     }
   };
 
   const handleRemoveArticle = async (title: string) => {
-    try {
-      await removeVisitedArticle(title);
-      showSuccess('Article removed from history');
-      // Reset to first page if current page becomes empty
-      if (
-        pages.length > 0 &&
-        currentPage >= pages.length - 1 &&
-        currentPage > 0
-      ) {
-        setCurrentPage(currentPage - 1);
-      }
-    } catch {
-      showError('Failed to remove article from history');
+    await removeVisitedArticle(title);
+    if (
+      pages.length > 0 &&
+      currentPage >= pages.length - 1 &&
+      currentPage > 0
+    ) {
+      setCurrentPage(currentPage - 1);
     }
   };
 
@@ -217,7 +149,7 @@ export default function ReadingHistoryScreen() {
     index: number;
   }) => (
     <ScrollView
-      style={{ width: itemWidth, flex: 1 }}
+      style={{ flex: 1 }}
       contentContainerStyle={{
         paddingVertical: SPACING.sm,
         paddingBottom: SPACING.xl,
@@ -230,8 +162,7 @@ export default function ReadingHistoryScreen() {
         <View
           key={`${articleItem.title}-${itemIndex}`}
           style={{
-            marginBottom: SPACING.base,
-            width: cardWidth,
+            marginBottom: SPACING.sm,
             alignSelf: 'center'
           }}
         >
@@ -248,37 +179,15 @@ export default function ReadingHistoryScreen() {
   );
 
   return (
-    <>
-      <Appbar.Header
-        style={{
-          backgroundColor: theme.colors.surface
-        }}
-        mode="center-aligned"
-      >
-        <Appbar.BackAction onPress={() => router.push('/(tabs)/settings')} />
-        <Appbar.Content
-          title="Reading History"
-          titleStyle={{
-            // MD3: Center-aligned app bars use 22sp title
-            // Reference: https://m3.material.io/components/app-bars/overview
-            fontWeight: '500', // MD3: Medium weight (500) for app bar titles
-            fontSize: TYPOGRAPHY.appBarTitle
-          }}
-        />
-      </Appbar.Header>
-
-      <ScrollView
-        style={{ flex: 1, backgroundColor: theme.colors.background }}
-        contentContainerStyle={{ flexGrow: 1 }}
-        showsVerticalScrollIndicator={true}
-      >
+    <ResponsiveContainer>
+      <ScrollView style={{ flex: 1 }}>
         {/* Clear History Section */}
         <List.Section>
           <List.Subheader>Manage History</List.Subheader>
           <View
             style={{
-              paddingHorizontal: SPACING.base,
-              paddingBottom: SPACING.base
+              paddingHorizontal: SPACING.sm,
+              paddingBottom: SPACING.sm
             }}
           >
             <Text
@@ -313,7 +222,6 @@ export default function ReadingHistoryScreen() {
           <>
             <View
               style={{
-                // Calculate height for 5 cards: 5 * cardHeight (140) + 4 * spacing (16) + padding (16) = 780px
                 height: 780
               }}
             >
@@ -322,29 +230,20 @@ export default function ReadingHistoryScreen() {
                 data={pages}
                 renderItem={renderPage}
                 keyExtractor={(_, index) => `page-${index}`}
-                {...({ estimatedItemSize: itemWidth } as any)}
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                snapToInterval={itemWidth}
                 decelerationRate="fast"
                 pagingEnabled
                 contentContainerStyle={{
                   backgroundColor: theme.colors.background
                 }}
                 style={{ backgroundColor: theme.colors.background, flex: 1 }}
-                onMomentumScrollEnd={(event) => {
-                  const pageIndex = Math.round(
-                    event.nativeEvent.contentOffset.x / itemWidth
-                  );
-                  setCurrentPage(pageIndex);
-                }}
                 ListEmptyComponent={
                   <View
                     style={{
-                      width: itemWidth,
                       justifyContent: 'center',
                       alignItems: 'center',
-                      padding: SPACING.base
+                      padding: SPACING.sm
                     }}
                   >
                     <Text
@@ -402,7 +301,7 @@ export default function ReadingHistoryScreen() {
                       style={{
                         width: 8,
                         height: 8,
-                        borderRadius: theme.roundness * 1, // 4dp equivalent (4dp * 1)
+                        borderRadius: theme.roundness * 1,
                         backgroundColor:
                           index === currentPage
                             ? theme.colors.primary
@@ -443,7 +342,7 @@ export default function ReadingHistoryScreen() {
               flex: 1,
               justifyContent: 'center',
               alignItems: 'center',
-              padding: SPACING.base,
+              padding: SPACING.sm,
               minHeight: 400
             }}
           >
@@ -465,9 +364,8 @@ export default function ReadingHistoryScreen() {
           visible={showConfirmDialog}
           onDismiss={() => setShowConfirmDialog(false)}
           style={{
-            maxWidth: Math.min(availableWidth - SPACING.base * 2, 500),
             alignSelf: 'center',
-            marginHorizontal: SPACING.base
+            marginHorizontal: SPACING.sm
           }}
         >
           <Dialog.Title>Reset Reading History</Dialog.Title>
@@ -491,7 +389,6 @@ export default function ReadingHistoryScreen() {
             )}
           </Dialog.Content>
           <Dialog.Actions>
-            {/* M3: Dismissive action (Cancel) on left, affirmative action (Reset) on right */}
             <Button mode="outlined" onPress={() => setShowConfirmDialog(false)}>
               Cancel
             </Button>
@@ -506,6 +403,6 @@ export default function ReadingHistoryScreen() {
           </Dialog.Actions>
         </Dialog>
       </Portal>
-    </>
+    </ResponsiveContainer>
   );
 }

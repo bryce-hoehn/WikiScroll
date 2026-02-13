@@ -4,7 +4,6 @@ import { Animated, Platform, View } from 'react-native';
 import { Divider, List, Text, useTheme } from 'react-native-paper';
 
 import ResponsiveImage from '@/components/ui/media/ResponsiveImage';
-import { MOTION } from '@/constants/motion';
 import { SPACING } from '@/constants/spacing';
 import { useImagePrefetching, useReducedMotion } from '@/hooks';
 
@@ -66,7 +65,6 @@ function HoverableListItem<T>({
     if (Platform.OS === 'web' && !reducedMotion) {
       Animated.timing(hoverAnim, {
         toValue: 1,
-        duration: MOTION.durationShort,
         useNativeDriver: false
       }).start();
     } else if (Platform.OS === 'web' && reducedMotion) {
@@ -78,7 +76,6 @@ function HoverableListItem<T>({
     if (Platform.OS === 'web' && !reducedMotion) {
       Animated.timing(hoverAnim, {
         toValue: 0,
-        duration: MOTION.durationShort,
         useNativeDriver: false
       }).start();
     } else if (Platform.OS === 'web' && reducedMotion) {
@@ -120,7 +117,7 @@ function HoverableListItem<T>({
         description={description}
         style={{
           backgroundColor: 'transparent',
-          padding: SPACING.base,
+          padding: SPACING.sm,
           minHeight: 56
         }}
         titleStyle={{
@@ -263,7 +260,6 @@ function BaseListWithHeader<T>({
             fontWeight: '500',
             letterSpacing: 0.15
           }}
-          // MD3 Accessibility: Proper header role - per https://m3.material.io/components/search/accessibility
           accessibilityRole="header"
           accessibilityLabel={headerTitle}
         >
@@ -297,7 +293,6 @@ function BaseListWithHeader<T>({
         keyboardShouldPersistTaps="handled"
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={viewabilityConfig}
-        // MD3 Accessibility: Proper list role - per https://m3.material.io/components/search/accessibility
         accessibilityRole="list"
         accessibilityLabel={`${data.length} ${headerTitle.toLowerCase()}`}
       />

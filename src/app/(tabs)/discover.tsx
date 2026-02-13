@@ -1,65 +1,22 @@
-import { useFocusEffect } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 import { router } from 'expo-router';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from 'react';
-import { Animated, View, useWindowDimensions } from 'react-native';
-import { useTheme } from 'react-native-paper';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { Animated, View } from 'react-native';
 
 import SearchBar from '@/components/search/SearchBar';
-import CollapsibleHeader from '@/components/ui/layout/CollapsibleHeader';
 import { LAYOUT } from '@/constants/layout';
 import { SPACING } from '@/constants/spacing';
 import FeaturedArticleSection from '@/features/discover/components/FeaturedArticleSection';
 import FeaturedCarouselSection from '@/features/discover/components/FeaturedCarouselSection';
-import FeaturedContentError from '@/features/discover/components/FeaturedContentError';
 import FeaturedPictureSection from '@/features/discover/components/FeaturedPictureSection';
 import TrendingSection from '@/features/discover/components/TrendingSection';
 import { useFeaturedContent } from '@/stores/FeaturedContentContext';
-import { useScrollToTop } from '@/stores/ScrollToTopContext';
-
-const HEADER_HEIGHT = 60;
 
 export default function SearchScreen() {
-  const theme = useTheme();
-  const { width } = useWindowDimensions();
-  const { featuredContent, isLoading, error } = useFeaturedContent();
-  const { registerScrollRef, scrollToTop } = useScrollToTop();
+  const { featuredContent, isLoading } = useFeaturedContent();
   const [searchQuery, setSearchQuery] = useState('');
   const scrollY = useRef(new Animated.Value(0)).current;
   const flashListRef = useRef<any>(null);
-  const insets = useSafeAreaInsets();
-  const totalHeaderHeight = HEADER_HEIGHT + insets.top + SPACING.base;
-  const wasFocusedRef = useRef(false);
-
-  // Register scroll ref for scroll-to-top functionality
-  useEffect(() => {
-    registerScrollRef('/(tabs)/search', {
-      scrollToTop: () => {
-        if (flashListRef.current) {
-          flashListRef.current.scrollToOffset({ offset: 0, animated: true });
-        }
-      }
-    });
-  }, [registerScrollRef]);
-
-  // Listen for tab press from bottom nav bar - scroll to top if already focused
-  useFocusEffect(
-    useCallback(() => {
-      // If we were already focused before, this means the user pressed the tab again
-      if (wasFocusedRef.current) {
-        scrollToTop('/(tabs)/search');
-      }
-      // Mark as focused for next time
-      wasFocusedRef.current = true;
-    }, [scrollToTop])
-  );
 
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
@@ -76,28 +33,6 @@ export default function SearchScreen() {
     }
   }, [searchQuery]);
 
-  // Calculate responsive grid columns - max 2 columns due to larger content sections
-  const numColumns = useMemo(
-    () => (width >= LAYOUT.DESKTOP_BREAKPOINT ? 2 : 1),
-    [width]
-  );
-  const discoverMaxWidth = useMemo(
-    () => Math.max(LAYOUT.MAX_GRID_WIDTH, 1600),
-    []
-  );
-  const maxContentWidth = useMemo(
-    () => Math.min(width - SPACING.xl, discoverMaxWidth),
-    [width, discoverMaxWidth]
-  );
-  const horizontalPadding = useMemo(
-    () =>
-      width > discoverMaxWidth
-        ? (width - discoverMaxWidth) / 2 + SPACING.sm
-        : SPACING.sm,
-    [width, discoverMaxWidth]
-  );
-
-  // Memoize contentItems to prevent recreation on every render
   const contentItems = useMemo(
     () =>
       [
@@ -207,7 +142,6 @@ export default function SearchScreen() {
     [featuredContent, isLoading]
   );
 
-  // Memoize renderItem to prevent recreation on every render
   const renderItem = useCallback(
     ({ item }: { item: { key: string; content: React.ReactNode } }) => (
       <View
@@ -224,85 +158,34 @@ export default function SearchScreen() {
     []
   );
 
-  // Memoize keyExtractor to prevent recreation on every render
   const keyExtractor = useCallback(
     (item: { key: string; content: React.ReactNode }) => item.key,
     []
   );
 
-  // Show error state if there's an error and no content
-  if (error && !featuredContent && !isLoading) {
-    return (
-      <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-        <CollapsibleHeader scrollY={scrollY} headerHeight={totalHeaderHeight}>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'center',
-              paddingHorizontal: SPACING.base,
-              paddingTop: insets.top,
-              minHeight: HEADER_HEIGHT,
-              width: '100%'
-            }}
-          >
-            <SearchBar
-              value={searchQuery}
-              onChangeText={handleSearchChange}
-              onSubmitEditing={handleSearchSubmit}
-              onIconPress={handleSearchSubmit}
-              headerStyle
-              style={{ width: '100%' }}
-            />
-          </View>
-        </CollapsibleHeader>
-
-        <View style={{ paddingTop: totalHeaderHeight }}>
-          <FeaturedContentError />
-        </View>
-      </View>
-    );
-  }
-
   return (
-    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <CollapsibleHeader scrollY={scrollY} headerHeight={totalHeaderHeight}>
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            paddingHorizontal: SPACING.base,
-            paddingTop: insets.top + SPACING.base,
-            minHeight: HEADER_HEIGHT,
-            width: '100%'
-          }}
-        >
-          <SearchBar
-            value={searchQuery}
-            onChangeText={handleSearchChange}
-            onSubmitEditing={handleSearchSubmit}
-            onIconPress={handleSearchSubmit}
-            headerStyle
-            style={{ width: '100%' }}
-          />
-        </View>
-      </CollapsibleHeader>
-
+    <View style={{ flex: 1 }}>
+      <SearchBar
+        value={searchQuery}
+        onChangeText={handleSearchChange}
+        onSubmitEditing={handleSearchSubmit}
+        onIconPress={handleSearchSubmit}
+        style={{ width: '100%', padding: SPACING.sm }}
+      />
       <FlashList
         ref={flashListRef}
         data={contentItems}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
-        numColumns={numColumns}
-        style={{ backgroundColor: theme.colors.background }}
+        numColumns={2}
+        style={{ flex: 1 }}
         scrollEventThrottle={16}
         contentContainerStyle={{
-          paddingTop: totalHeaderHeight + SPACING.base,
-          paddingHorizontal: horizontalPadding,
-          paddingBottom: SPACING.xl,
           flexGrow: 1,
-          maxWidth: maxContentWidth,
+          maxWidth: LAYOUT.MAX_CONTENT_WIDTH,
           alignSelf: 'center',
-          width: '100%'
+          width: '100%',
+          padding: SPACING.sm
         }}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],

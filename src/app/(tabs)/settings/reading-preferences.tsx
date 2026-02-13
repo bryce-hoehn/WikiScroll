@@ -1,9 +1,7 @@
 import Slider from '@react-native-community/slider';
-import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { ScrollView, useWindowDimensions, View } from 'react-native';
 import {
-  Appbar,
   IconButton,
   List,
   Menu,
@@ -12,11 +10,8 @@ import {
   useTheme
 } from 'react-native-paper';
 
-import {
-  DEFAULT_FONT_SIZE,
-  MAX_FONT_SIZE,
-  MIN_FONT_SIZE
-} from '@/hooks/storage/useFontSize';
+import ResponsiveContainer from '@/components/ui/layout/ResponsiveContainer';
+import { SPACING } from '@/constants/spacing';
 import {
   useAccordionBehavior,
   useFontFamily,
@@ -25,8 +20,11 @@ import {
   useParagraphSpacing,
   useReadingWidth
 } from '@/hooks';
-import { TYPOGRAPHY } from '@/constants/typography';
-import { SPACING } from '@/constants/spacing';
+import {
+  DEFAULT_FONT_SIZE,
+  MAX_FONT_SIZE,
+  MIN_FONT_SIZE
+} from '@/hooks/storage/useFontSize';
 
 export default function ReadingPreferencesScreen() {
   const theme = useTheme();
@@ -41,33 +39,14 @@ export default function ReadingPreferencesScreen() {
   const { accordionAutoClose, setAccordionAutoClose } = useAccordionBehavior();
   const [fontFamilyMenuVisible, setFontFamilyMenuVisible] = useState(false);
 
-  // Responsive max width for content (max 800px for better readability)
   const maxContentWidth = Math.min(width - SPACING.xl, 800);
 
   return (
-    <>
-      <Appbar.Header
-        style={{
-          backgroundColor: theme.colors.surface
-        }}
-        mode="center-aligned"
-      >
-        <Appbar.BackAction onPress={() => router.push('/(tabs)/settings')} />
-        <Appbar.Content
-          title="Reading Preferences"
-          titleStyle={{
-            // MD3: Center-aligned app bars use 22sp title
-            // Reference: https://m3.material.io/components/app-bars/overview
-            fontWeight: '500', // MD3: Medium weight (500) for app bar titles
-            fontSize: TYPOGRAPHY.appBarTitle
-          }}
-        />
-      </Appbar.Header>
-
+    <ResponsiveContainer>
       <ScrollView
         style={{ backgroundColor: theme.colors.background }}
         contentContainerStyle={{
-          padding: SPACING.base,
+          padding: SPACING.sm,
           paddingBottom: SPACING.xl,
           maxWidth: maxContentWidth,
           alignSelf: 'center',
@@ -88,8 +67,8 @@ export default function ReadingPreferencesScreen() {
           />
           <View
             style={{
-              paddingHorizontal: SPACING.base,
-              paddingBottom: SPACING.base
+              paddingHorizontal: SPACING.sm,
+              paddingBottom: SPACING.sm
             }}
           >
             <View
@@ -146,8 +125,8 @@ export default function ReadingPreferencesScreen() {
           />
           <View
             style={{
-              paddingHorizontal: SPACING.base,
-              paddingBottom: SPACING.base
+              paddingHorizontal: SPACING.sm,
+              paddingBottom: SPACING.sm
             }}
           >
             <View
@@ -202,8 +181,8 @@ export default function ReadingPreferencesScreen() {
           />
           <View
             style={{
-              paddingHorizontal: SPACING.base,
-              paddingBottom: SPACING.base
+              paddingHorizontal: SPACING.sm,
+              paddingBottom: SPACING.sm
             }}
           >
             <View
@@ -260,8 +239,8 @@ export default function ReadingPreferencesScreen() {
           />
           <View
             style={{
-              paddingHorizontal: SPACING.base,
-              paddingBottom: SPACING.base
+              paddingHorizontal: SPACING.sm,
+              paddingBottom: SPACING.sm
             }}
           >
             <View
@@ -357,6 +336,6 @@ export default function ReadingPreferencesScreen() {
           />
         </List.Section>
       </ScrollView>
-    </>
+    </ResponsiveContainer>
   );
 }

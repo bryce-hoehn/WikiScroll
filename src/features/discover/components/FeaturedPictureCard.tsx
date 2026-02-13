@@ -1,15 +1,11 @@
+import { SPACING } from '@/constants/spacing';
+import { useFeaturedContent } from '@/stores/FeaturedContentContext';
 import { Image } from 'expo-image';
 import React, { useState } from 'react';
 import { Platform, useWindowDimensions, View } from 'react-native';
 import { Card, Text, TouchableRipple, useTheme } from 'react-native-paper';
 
-import { getHoverStyles } from '@/constants/motion';
-import { SPACING } from '@/constants/spacing';
-import { useReducedMotion } from '@/hooks';
-import { useFeaturedContent } from '@/stores/FeaturedContentContext';
-
 import HtmlRenderer from '@/components/data/HtmlRenderer';
-import ImageDialog from '@/components/ui/feedback/ImageDialog';
 
 export default function FeaturedImageCard() {
   const { featuredContent } = useFeaturedContent();
@@ -17,9 +13,7 @@ export default function FeaturedImageCard() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { width } = useWindowDimensions();
   const img = featuredContent?.image;
-  const [imageModalVisible, setImageModalVisible] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const { reducedMotion } = useReducedMotion();
 
   if (!img) {
     return null;
@@ -54,7 +48,7 @@ export default function FeaturedImageCard() {
   return (
     <>
       <Card
-        elevation={isHovered && Platform.OS === 'web' ? 4 : 1} // M3: Default elevation 1dp, increases to 4dp on hover
+        elevation={isHovered && Platform.OS === 'web' ? 4 : 1}
         style={{
           width: '100%',
           height: cardHeight,
@@ -62,12 +56,10 @@ export default function FeaturedImageCard() {
             isHovered && Platform.OS === 'web'
               ? theme.colors.surface
               : theme.colors.elevation.level2,
-          borderRadius: theme.roundness * 3, // M3: 12dp corner radius (4dp * 3)
+          borderRadius: theme.roundness * 3,
           overflow: 'hidden',
           display: 'flex',
-          flexDirection: 'column',
-          ...(Platform.OS === 'web' &&
-            getHoverStyles(isHovered, reducedMotion, { scale: 1.01 }))
+          flexDirection: 'column'
         }}
         {...(Platform.OS === 'web' && {
           onMouseEnter: handleMouseEnter,
@@ -119,7 +111,7 @@ export default function FeaturedImageCard() {
             style={{
               backgroundColor: theme.colors.elevation.level2,
               height: contentHeight,
-              padding: SPACING.md
+              padding: SPACING.sm
             }}
           >
             {img.description?.html ? (
@@ -140,15 +132,6 @@ export default function FeaturedImageCard() {
           </Card.Content>
         )}
       </Card>
-
-      <ImageDialog
-        visible={imageModalVisible}
-        selectedImage={{
-          uri: img.image.source,
-          alt: img.title || 'Featured Picture'
-        }}
-        onClose={() => setImageModalVisible(false)}
-      />
     </>
   );
 }

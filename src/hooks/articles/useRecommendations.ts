@@ -2,12 +2,9 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 
 import {
-  fetchArticleBacklinks,
   fetchArticleBacklinksBatch,
-  fetchArticleLinks,
   fetchArticleLinksBatch,
-  fetchArticleSummaries,
-  fetchArticleSummary
+  fetchArticleSummaries
 } from '@/api';
 import useArticleLinks from '@/hooks/storage/useArticleLinks';
 import useVisitedArticles from '@/hooks/storage/useVisitedArticles';
@@ -16,7 +13,7 @@ import { RecommendationItem } from '@/types/components';
 
 /**
  * Hook for generating article recommendations using Wikipedia's link APIs
- * This provides highly relevant recommendations based on articles that link to or are linked from visited articles
+ * This provides relevant recommendations based on articles that link to or are linked from visited articles
  */
 export default function useBacklinkRecommendations() {
   const { visitedArticles } = useVisitedArticles();
@@ -28,7 +25,7 @@ export default function useBacklinkRecommendations() {
 
   // Main recommendation function
   // Default limit matches ForYouFeed initial load (30)
-  const getRecommendations = useCallback(
+  const recommendations = useCallback(
     async (limit = 30) => {
       setLoading(true);
       setError(null);
@@ -66,78 +63,49 @@ export default function useBacklinkRecommendations() {
           }
         }
 
-        // Batch fetch links for all articles not in storage (follows Wikipedia best practice)
+        // Batch fetch links for all articles not in storage
         const fetchedLinksMap: Record<string, string[]> = {};
         if (articlesNeedingFetch.length > 0) {
-          try {
-            // Batch fetch both backlinks and forward links in parallel
-            // Sort for stable query key but don't mutate original array
-            const sortedTitlesForKey = [...articlesNeedingFetch]
-              .sort()
-              .join('|');
-            const [backlinksBatch, forwardLinksBatch] = await Promise.all([
-              queryClient.fetchQuery({
-                queryKey: ['article-backlinks-batch', sortedTitlesForKey],
-                queryFn: () => fetchArticleBacklinksBatch(articlesNeedingFetch),
-                staleTime: 10 * 60 * 1000,
-                gcTime: 30 * 60 * 1000
-              }),
-              queryClient.fetchQuery({
-                queryKey: ['article-links-batch', sortedTitlesForKey],
-                queryFn: () => fetchArticleLinksBatch(articlesNeedingFetch),
-                staleTime: 10 * 60 * 1000,
-                gcTime: 30 * 60 * 1000
-              })
-            ]);
+          // Batch fetch both backlinks and forward links in parallel
+          const sortedTitlesForKey = [...articlesNeedingFetch].sort().join('|');
+          const [backlinksBatch, forwardLinksBatch] = await Promise.all([
+            queryClient.fetchQuery({
+              queryKey: ['article-backlinks-batch', sortedTitlesForKey],
+              queryFn: () => fetchArticleBacklinksBatch(articlesNeedingFetch),
+              staleTime: 10 * 60 * 1000,
+              gcTime: 30 * 60 * 1000
+            }),
+            queryClient.fetchQuery({
+              queryKey: ['article-links-batch', sortedTitlesForKey],
+              queryFn: () => fetchArticleLinksBatch(articlesNeedingFetch),
+              staleTime: 10 * 60 * 1000,
+              gcTime: 30 * 60 * 1000
+            })
+          ]);
 
-            // Combine backlinks and forward links for each article
-            // Collect all updates first, then save in parallel
-            const linkUpdates: { title: string; links: string[] }[] = [];
-            for (const title of articlesNeedingFetch) {
-              const backlinks = backlinksBatch[title] || [];
-              const forwardLinks = forwardLinksBatch[title] || [];
-              const allLinks = Array.from(
-                new Set([...backlinks, ...forwardLinks])
-              );
-              fetchedLinksMap[title] = allLinks;
-              linkUpdates.push({ title, links: allLinks });
-
-              // Update React Query cache for individual article queries
-              queryClient.setQueryData(['article-backlinks', title], backlinks);
-              queryClient.setQueryData(['article-links', title], forwardLinks);
-            }
-
-            // Save all links in parallel (AsyncStorage handles concurrency)
-            await Promise.all(
-              linkUpdates.map(({ title, links }) =>
-                saveArticleLinks(title, links)
-              )
+          // Combine backlinks and forward links for each article
+          // Collect all updates first, then save in parallel
+          const linkUpdates: { title: string; links: string[] }[] = [];
+          for (const title of articlesNeedingFetch) {
+            const backlinks = backlinksBatch[title] || [];
+            const forwardLinks = forwardLinksBatch[title] || [];
+            const allLinks = Array.from(
+              new Set([...backlinks, ...forwardLinks])
             );
-          } catch (error) {
-            // If batch fetch fails, fall back to individual fetches
-            if (typeof __DEV__ !== 'undefined' && __DEV__) {
-              console.warn(
-                'Batch fetch failed, falling back to individual fetches:',
-                error
-              );
-            }
-            // Fallback: fetch individually (slower but more resilient)
-            for (const title of articlesNeedingFetch) {
-              try {
-                const [backlinks, forwardLinks] = await Promise.all([
-                  fetchArticleBacklinks(title),
-                  fetchArticleLinks(title)
-                ]);
-                const allLinks = Array.from(
-                  new Set([...backlinks, ...forwardLinks])
-                );
-                fetchedLinksMap[title] = allLinks;
-                await saveArticleLinks(title, allLinks);
-              } catch {
-                fetchedLinksMap[title] = [];
-              }
-            }
+            fetchedLinksMap[title] = allLinks;
+            linkUpdates.push({ title, links: allLinks });
+
+            // Update React Query cache for individual article queries
+            queryClient.setQueryData(['article-backlinks', title], backlinks);
+            queryClient.setQueryData(['article-links', title], forwardLinks);
           }
+
+          // Save all links in parallel (AsyncStorage handles concurrency)
+          await Promise.all(
+            linkUpdates.map(({ title, links }) =>
+              saveArticleLinks(title, links)
+            )
+          );
         }
 
         // Combine stored and fetched links
@@ -159,7 +127,7 @@ export default function useBacklinkRecommendations() {
           }
         }
 
-        // Convert Set to array and shuffle using Fisher-Yates algorithm
+        // Convert Set to array and shuffle
         const candidateArray = Array.from(allCandidates);
         for (let i = candidateArray.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
@@ -172,47 +140,18 @@ export default function useBacklinkRecommendations() {
         // Select candidates up to limit
         const candidateTitles = candidateArray.slice(0, limit);
 
-        // Step 2: Batch fetch summaries for all candidates at once (much faster)
+        // Step 2: Batch fetch summaries for all candidates
         const fetchLimit = Math.min(candidateTitles.length, limit + 5);
         const titlesToFetch = candidateTitles.slice(0, fetchLimit);
 
         let summariesMap: Record<string, Article | null> = {};
-        try {
-          // Sort for stable query key but don't mutate original array
-          const sortedTitlesForKey = [...titlesToFetch].sort().join('|');
-          summariesMap = await queryClient.fetchQuery({
-            queryKey: ['article-summaries-batch', sortedTitlesForKey],
-            queryFn: () => fetchArticleSummaries(titlesToFetch),
-            staleTime: 5 * 60 * 1000,
-            gcTime: 30 * 60 * 1000
-          });
-        } catch (error) {
-          // If batch fails, fall back to individual fetches
-          if (typeof __DEV__ !== 'undefined' && __DEV__) {
-            console.warn(
-              'Batch summary fetch failed, falling back to individual fetches:',
-              error
-            );
-          }
-          for (const title of titlesToFetch) {
-            try {
-              const response = await queryClient.fetchQuery({
-                queryKey: ['article', title],
-                queryFn: async () => {
-                  const response = await fetchArticleSummary(title);
-                  return response.article;
-                },
-                staleTime: 5 * 60 * 1000,
-                gcTime: 30 * 60 * 1000
-              });
-              if (response) {
-                summariesMap[title] = response;
-              }
-            } catch {
-              summariesMap[title] = null;
-            }
-          }
-        }
+        const sortedTitlesForKey = [...titlesToFetch].sort().join('|');
+        summariesMap = await queryClient.fetchQuery({
+          queryKey: ['article-summaries-batch', sortedTitlesForKey],
+          queryFn: () => fetchArticleSummaries(titlesToFetch),
+          staleTime: 5 * 60 * 1000,
+          gcTime: 30 * 60 * 1000
+        });
 
         // Convert summaries to recommendations
         const recommendations: RecommendationItem[] = [];
@@ -256,9 +195,6 @@ export default function useBacklinkRecommendations() {
   );
 
   return {
-    getRecommendations,
-    visitedArticlesCount: visitedArticles.length,
-    loading,
-    error
+    recommendations
   };
 }

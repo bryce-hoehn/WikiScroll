@@ -3,7 +3,6 @@ import { Animated, Platform, useWindowDimensions, View } from 'react-native';
 import { Surface, useTheme } from 'react-native-paper';
 
 import { LAYOUT } from '@/constants/layout';
-import { MOTION } from '@/constants/motion';
 import { SPACING } from '@/constants/spacing';
 import { useReducedMotion } from '@/hooks';
 
@@ -34,18 +33,15 @@ export default function SubcategorySkeleton() {
     }
 
     const useNativeDriver = Platform.OS !== 'web';
-    const shimmerSegmentDuration = MOTION.durationShimmer / 2;
 
     const shimmer = Animated.loop(
       Animated.sequence([
         Animated.timing(shimmerAnim, {
           toValue: 1,
-          duration: shimmerSegmentDuration,
           useNativeDriver
         }),
         Animated.timing(shimmerAnim, {
           toValue: 0,
-          duration: shimmerSegmentDuration,
           useNativeDriver
         })
       ])
@@ -54,7 +50,6 @@ export default function SubcategorySkeleton() {
 
     Animated.timing(fadeAnim, {
       toValue: 1,
-      duration: MOTION.durationMedium,
       useNativeDriver
     }).start();
 
@@ -124,7 +119,7 @@ export default function SubcategorySkeleton() {
           flexDirection: 'row',
           alignItems: 'center',
           paddingVertical: SPACING.sm,
-          paddingHorizontal: SPACING.base // List.Item default horizontal padding
+          paddingHorizontal: SPACING.sm // List.Item default horizontal padding
         }}
       >
         <SkeletonBox
@@ -174,9 +169,9 @@ export default function SubcategorySkeleton() {
         backgroundColor: theme.colors.background
       }}
     >
-      <View style={{ flex: 1, padding: SPACING.base }}>
+      <View style={{ flex: 1, padding: SPACING.sm }}>
         {/* Subcategories Section Skeleton */}
-        <View style={{ marginBottom: SPACING.base }}>
+        <View style={{ marginBottom: SPACING.sm }}>
           <View
             style={{
               flexDirection: 'row',

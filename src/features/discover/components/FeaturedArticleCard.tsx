@@ -5,9 +5,7 @@ import { Platform, View } from 'react-native';
 import { Card, IconButton, Text, useTheme } from 'react-native-paper';
 
 import { fetchArticleHtml } from '@/api';
-import { getHoverStyles } from '@/constants/motion';
 import { SPACING } from '@/constants/spacing';
-import { useReducedMotion } from '@/hooks';
 import { useFeaturedContent } from '@/stores/FeaturedContentContext';
 
 import HtmlRenderer from '@/components/data/HtmlRenderer';
@@ -24,7 +22,6 @@ export default function FeaturedArticleCard({
   const theme = useTheme();
   const article = featuredContent?.tfa;
   const [isHovered, setIsHovered] = useState(false);
-  const { reducedMotion } = useReducedMotion();
   const queryClient = useQueryClient();
 
   const isCompact = variant === 'compact';
@@ -61,7 +58,7 @@ export default function FeaturedArticleCard({
 
   return (
     <Card
-      elevation={isHovered && Platform.OS === 'web' ? 4 : 1} // M3: Default elevation 1dp, increases to 4dp on hover
+      elevation={isHovered && Platform.OS === 'web' ? 4 : 1}
       style={{
         width: '100%',
         height: cardHeight,
@@ -69,10 +66,8 @@ export default function FeaturedArticleCard({
           isHovered && Platform.OS === 'web'
             ? theme.colors.surface
             : theme.colors.elevation.level2,
-        borderRadius: theme.roundness * 3, // M3: 12dp corner radius (4dp * 3)
-        overflow: 'hidden',
-        ...(Platform.OS === 'web' &&
-          getHoverStyles(isHovered, reducedMotion, { scale: 1.01 }))
+        borderRadius: theme.roundness * 3,
+        overflow: 'hidden'
       }}
       onPress={() =>
         router.push(
@@ -131,7 +126,7 @@ export default function FeaturedArticleCard({
       </View>
       <Card.Content
         style={{
-          padding: SPACING.md,
+          padding: SPACING.sm,
           minHeight: contentHeight,
           justifyContent: 'flex-start'
         }}
@@ -185,7 +180,7 @@ export default function FeaturedArticleCard({
             maxLines={maxLines}
             variant="bodyMedium"
             style={{
-              paddingTop: SPACING.md,
+              paddingTop: SPACING.sm,
               color: theme.colors.onSurfaceVariant
             }}
           />
@@ -195,7 +190,7 @@ export default function FeaturedArticleCard({
             style={{
               lineHeight: 21,
               color: theme.colors.onSurfaceVariant,
-              paddingTop: SPACING.md
+              paddingTop: SPACING.sm
             }}
             numberOfLines={maxLines}
           >

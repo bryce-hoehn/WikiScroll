@@ -15,9 +15,9 @@ import { Portal, Text, useTheme } from 'react-native-paper';
 
 import { SPACING } from '@/constants/spacing';
 
-import HorizontalFeaturedCard from '@/features/featured/components/HorizontalFeaturedCard';
 import { RecommendationItem } from '@/types/components';
 import { CardType } from '@/utils/cardUtils';
+import HorizontalFeaturedCard from './HorizontalFeaturedCard';
 
 interface CarouselItemsBottomSheetProps {
   visible: boolean;
@@ -181,16 +181,16 @@ export default function CarouselItemsBottomSheet({
         <BottomSheetScrollView
           ref={scrollViewRef}
           contentContainerStyle={{
-            paddingTop: SPACING.md, // Match Feed spacing
-            paddingBottom: SPACING.lg, // Match Feed spacing
-            paddingHorizontal: SPACING.base
+            paddingTop: SPACING.sm,
+            paddingBottom: SPACING.sm,
+            paddingHorizontal: SPACING.sm
           }}
           accessibilityLabel={`${title} bottom sheet`}
         >
           {/* Title - placed under the handle indicator, left-aligned */}
           <View
             style={{
-              paddingBottom: SPACING.base,
+              paddingBottom: SPACING.sm,
               alignItems: 'flex-start'
             }}
             accessible={true}
@@ -213,8 +213,8 @@ export default function CarouselItemsBottomSheet({
           {/* Content */}
           {cardType === 'on-this-day'
             ? (() => {
-                const timelineLeft = SPACING.md; // Line position from container left
-                const containerPadding = SPACING.base + 20; // Card container padding
+                const timelineLeft = SPACING.sm; // Line position from container left
+                const containerPadding = SPACING.sm; // Card container padding
                 const dotRadius = 6; // Dot radius (12px / 2)
                 const dotLeft = -(containerPadding - timelineLeft + dotRadius); // Position dot center on line
 
@@ -273,8 +273,8 @@ export default function CarouselItemsBottomSheet({
                             <View
                               style={{
                                 marginTop: index === 0 ? 0 : SPACING.lg,
-                                marginBottom: SPACING.md,
-                                paddingLeft: SPACING.base
+                                marginBottom: SPACING.sm,
+                                paddingLeft: SPACING.sm
                               }}
                             >
                               <Text

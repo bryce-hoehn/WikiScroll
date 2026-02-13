@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, Platform, View } from 'react-native';
 import { useTheme } from 'react-native-paper';
 
-import { MOTION } from '@/constants/motion';
 import { SPACING } from '@/constants/spacing';
 import { useReducedMotion } from '@/hooks';
 
@@ -168,30 +167,22 @@ export function TrendingCarouselSkeleton({
 
     const useNativeDriver = Platform.OS !== 'web';
 
-    // MD3-compliant shimmer animation
-    // Split durationShimmer into two segments for smooth back-and-forth motion
-    const shimmerSegmentDuration = MOTION.durationShimmer / 2;
-
     const shimmer = Animated.loop(
       Animated.sequence([
         Animated.timing(shimmerAnim, {
           toValue: 1,
-          duration: shimmerSegmentDuration,
           useNativeDriver
         }),
         Animated.timing(shimmerAnim, {
           toValue: 0,
-          duration: shimmerSegmentDuration,
           useNativeDriver
         })
       ])
     );
     shimmer.start();
 
-    // MD3-compliant fade-in animation
     Animated.timing(fadeAnim, {
       toValue: 1,
-      duration: MOTION.durationMedium, // Use medium duration for fade-in
       useNativeDriver
     }).start();
 

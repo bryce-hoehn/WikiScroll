@@ -1,4 +1,3 @@
-import { ScrollViewStyleReset } from 'expo-router/html';
 import type { PropsWithChildren } from 'react';
 
 export default function Root({ children }: PropsWithChildren) {
@@ -30,12 +29,15 @@ export default function Root({ children }: PropsWithChildren) {
 
         <meta name="google-adsense-account" content="ca-pub-5306494001256992" />
         <link rel="apple-touch-icon" href="/icon.png" />
-
-        <ScrollViewStyleReset />
       </head>
-      <body>
+      <body style={{ height: '100vh', overflow: 'hidden' }}>
         <noscript>You need to enable JavaScript to run this app.</noscript>
-        <div id="root">{children}</div>
+        <div
+          id="root"
+          style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+        >
+          {children}
+        </div>
       </body>
     </html>
   );
