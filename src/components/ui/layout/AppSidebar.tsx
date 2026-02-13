@@ -1,6 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 
+import { LAYOUT } from '@/constants/layout';
 import { SPACING } from '@/constants/spacing';
 
 export default function AppSidebar() {
@@ -9,7 +10,8 @@ export default function AppSidebar() {
       style={{
         gap: SPACING.sm,
         height: '100%',
-        padding: SPACING.sm
+        padding: SPACING.sm,
+        width: LAYOUT.SIDEBAR_WIDTH
       }}
     ></View>
   );

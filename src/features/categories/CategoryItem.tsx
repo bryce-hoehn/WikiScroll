@@ -1,6 +1,5 @@
 import { SPACING } from '@/constants/spacing';
 import { ImageBackground } from 'expo-image';
-import { router } from 'expo-router';
 import { View } from 'react-native';
 import { Card, MD3Theme, Text } from 'react-native-paper';
 
@@ -21,7 +20,6 @@ export default function CategoryItem({
         borderRadius: theme.roundness * 3,
         overflow: 'hidden'
       }}
-      onPress={() => router.push(`/subcategory/${encodeURIComponent(item[0])}`)}
       accessibilityRole="button"
       accessibilityLabel={`Browse ${item[0]} category`}
       accessibilityHint={`Opens articles in the ${item[0]} category`}

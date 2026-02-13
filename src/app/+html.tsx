@@ -1,5 +1,10 @@
-import type { PropsWithChildren } from 'react';
+import { ScrollViewStyleReset } from 'expo-router/html';
+import { type PropsWithChildren } from 'react';
 
+// This file is web-only and used to configure the root HTML for every
+// web page during server rendering.
+// The contents of this function only run in Node.js environments and
+// do not have access to the DOM or browser APIs.
 export default function Root({ children }: PropsWithChildren) {
   return (
     <html lang="en">
@@ -10,6 +15,7 @@ export default function Root({ children }: PropsWithChildren) {
           name="viewport"
           content="width=device-width, initial-scale=1, shrink-to-fit=no"
         />
+        <meta name="google-adsense-account" content="ca-pub-5306494001256992" />
 
         <title>WikiScape</title>
 
@@ -19,26 +25,15 @@ export default function Root({ children }: PropsWithChildren) {
         <link rel="preconnect" href="https://upload.wikimedia.org" />
         <link rel="dns-prefetch" href="https://en.wikipedia.org" />
         <link rel="dns-prefetch" href="https://upload.wikimedia.org" />
+        {/*
+          Disable body scrolling on web. This makes ScrollView components work closer to how they do on native platforms.
+          However, body scrolling is often nice to have for mobile web. If you want to enable it, remove this line.
+        */}
+        <ScrollViewStyleReset />
 
-        <meta name="theme-color" content="#000000" />
-
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="WikiScape" />
-
-        <meta name="google-adsense-account" content="ca-pub-5306494001256992" />
-        <link rel="apple-touch-icon" href="/icon.png" />
+        {/* Add any additional <head> elements that you want globally available on web... */}
       </head>
-      <body style={{ height: '100vh', overflow: 'hidden' }}>
-        <noscript>You need to enable JavaScript to run this app.</noscript>
-        <div
-          id="root"
-          style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-        >
-          {children}
-        </div>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
