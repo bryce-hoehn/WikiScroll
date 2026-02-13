@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { fetchArticleSummary } from '@/api';
-import { useBookmarks } from '@/stores/BookmarksContext';
 import { Article } from '@/types/api';
 
 /**
@@ -25,18 +24,9 @@ import { Article } from '@/types/api';
  * ```
  */
 export default function useArticle(title: string) {
-  const { getOfflineArticle } = useBookmarks();
-
   return useQuery({
     queryKey: ['article', title],
     queryFn: async (): Promise<Article | null> => {
-      // Check if article is available offline first
-      const offlineArticle = getOfflineArticle(title);
-      if (offlineArticle) {
-        return offlineArticle;
-      }
-
-      // Fall back to network request
       const articleResponse = await fetchArticleSummary(title);
       return articleResponse.article;
     },
