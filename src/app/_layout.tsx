@@ -2,8 +2,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Slot } from 'expo-router';
 import React from 'react';
 
-import { BookmarksProvider } from '@/stores/BookmarksContext';
-import { FeaturedContentProvider } from '@/stores/FeaturedContentContext';
 import { ThemeProvider } from '@/stores/ThemeProvider';
 
 const queryClient = new QueryClient({
@@ -21,11 +19,7 @@ export default function Layout() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <BookmarksProvider>
-          <FeaturedContentProvider>
-            <Slot />
-          </FeaturedContentProvider>
-        </BookmarksProvider>
+        <Slot />
       </ThemeProvider>
     </QueryClientProvider>
   );

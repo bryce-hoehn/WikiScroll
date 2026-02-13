@@ -1,30 +1,13 @@
-import { router } from 'expo-router';
+import { SPACING } from '@/constants/spacing';
+import { useThemeContext } from '@/stores/ThemeProvider';
+import * as Application from 'expo-application';
 import React, { useState } from 'react';
 import { Linking, Platform, ScrollView, View } from 'react-native';
-import {
-  Button,
-  Divider,
-  List,
-  Menu,
-  Modal,
-  Portal,
-  Switch,
-  Text,
-  useTheme
-} from 'react-native-paper';
-
-import { SPACING } from '@/constants/spacing';
-import { useReducedMotion, useVisitedArticles } from '@/hooks';
-import { useThemeContext } from '@/stores/ThemeProvider';
-import { getAppVersion } from '@/utils/env';
+import { Divider, List, Menu } from 'react-native-paper';
 
 export default function SettingsScreen() {
-  const theme = useTheme();
   const { currentTheme, setTheme } = useThemeContext();
-  const { visitedArticles } = useVisitedArticles();
-  const { reducedMotion, setReducedMotion } = useReducedMotion();
   const [themeMenuVisible, setThemeMenuVisible] = useState(false);
-  const [helpVisible, setHelpVisible] = useState(false);
 
   const themeOptions = [
     { label: 'Automatic', value: 'automatic' },
@@ -44,64 +27,6 @@ export default function SettingsScreen() {
 
   return (
     <View style={{ flex: 1 }}>
-      <Portal>
-        <Modal
-          visible={helpVisible}
-          onDismiss={() => setHelpVisible(false)}
-          contentContainerStyle={{
-            backgroundColor: theme.colors.surface,
-            padding: SPACING.sm,
-            margin: SPACING.sm,
-            borderRadius: SPACING.sm
-          }}
-        >
-          <Text
-            variant="headlineSmall"
-            style={{ marginBottom: SPACING.sm, fontWeight: '700' }}
-          >
-            Settings Help
-          </Text>
-          <Text
-            variant="bodyMedium"
-            style={{ marginBottom: SPACING.sm, lineHeight: 22 }}
-          >
-            <Text style={{ fontWeight: '600' }}>Theme:</Text> Choose your
-            preferred color scheme. Automatic follows your system settings.
-          </Text>
-          <Text
-            variant="bodyMedium"
-            style={{ marginBottom: SPACING.sm, lineHeight: 22 }}
-          >
-            <Text style={{ fontWeight: '600' }}>Hide Sensitive Content:</Text>{' '}
-            Blurs sensitive images using Wikipedia&apos;s official content
-            filter.
-          </Text>
-          <Text
-            variant="bodyMedium"
-            style={{ marginBottom: SPACING.sm, lineHeight: 22 }}
-          >
-            <Text style={{ fontWeight: '600' }}>Reading Preferences:</Text>{' '}
-            Customize your reading experience with line height, paragraph
-            spacing, reading width, and font family settings.
-          </Text>
-          <Text
-            variant="bodyMedium"
-            style={{ marginBottom: SPACING.sm, lineHeight: 22 }}
-          >
-            <Text style={{ fontWeight: '600' }}>Reading History:</Text> View
-            articles you&apos;ve recently read. Used for personalized
-            recommendations. Access from the Reading section.
-          </Text>
-          <Button
-            mode="contained"
-            onPress={() => setHelpVisible(false)}
-            style={{ marginTop: SPACING.sm }}
-          >
-            Got it
-          </Button>
-        </Modal>
-      </Portal>
-
       <ScrollView
         contentContainerStyle={{
           padding: SPACING.sm,
@@ -147,54 +72,12 @@ export default function SettingsScreen() {
 
         <Divider style={{ marginVertical: SPACING.sm }} />
 
-        {/* Accessibility Section */}
-        <List.Section>
-          <List.Subheader>Accessibility</List.Subheader>
-          <List.Item
-            title="Reduce Motion"
-            description="Disable non-essential animations for a more static experience. Helps reduce motion sensitivity and improves performance."
-            left={(props) => <List.Icon {...props} icon="motion-pause" />}
-            right={() => (
-              <Switch value={reducedMotion} onValueChange={setReducedMotion} />
-            )}
-            titleStyle={{ fontWeight: '500' }}
-            descriptionNumberOfLines={2}
-          />
-        </List.Section>
-
-        <Divider style={{ marginVertical: SPACING.sm }} />
-
-        {/* Reading Preferences Section */}
-        <List.Section>
-          <List.Subheader>Reading</List.Subheader>
-          <List.Item
-            title="Reading Preferences"
-            description="Customize line height, paragraph spacing, reading width, and font family"
-            left={(props) => <List.Icon {...props} icon="book-open-outline" />}
-            right={(props) => <List.Icon {...props} icon="chevron-right" />}
-            onPress={() => router.push('/(tabs)/settings/reading-preferences')}
-            titleStyle={{ fontWeight: '500' }}
-            descriptionNumberOfLines={2}
-          />
-          <List.Item
-            title="Reading History"
-            description={`${visitedArticles.length} articles visited • View your recently read articles and browsing history`}
-            left={(props) => <List.Icon {...props} icon="history" />}
-            right={(props) => <List.Icon {...props} icon="chevron-right" />}
-            onPress={() => router.push('/(tabs)/settings/reading-history')}
-            titleStyle={{ fontWeight: '500' }}
-            descriptionNumberOfLines={2}
-          />
-        </List.Section>
-
-        <Divider style={{ marginVertical: SPACING.sm }} />
-
         {/* App Information Section */}
         <List.Section>
           <List.Subheader>About</List.Subheader>
           <List.Item
             title="Version"
-            description={getAppVersion()}
+            description={Application.nativeApplicationVersion}
             left={(props) => (
               <List.Icon {...props} icon="information-outline" />
             )}
